@@ -20,7 +20,7 @@ surfaced no openly licensed editorial collections; stock-image sites (写真AC, 
 
 | source | licence | content | status |
 |---|---|---|---|
-| **Art Institute of Chicago, Photography and Media, public domain** (`aic_photographs`) | CC0 (AIC Open Access; `is_public_domain` per record) | 3,777 works with images; museum records of artist, date, process (gelatin silver, albumen, salted paper, platinum, chromogenic ...); mostly 1840s–1920s (Stieglitz, Atget, Emerson, Fenton, Cameron, Talbot, Hine ...) | pilot 600 images capped 8 per artist via the public API + IIIF 843 px renditions (`scripts/ingest_aic_photographs.py`); first attempts hit an intermittent HTTP 403 from the API, retried by the orchestrator |
+| **Art Institute of Chicago, Photography and Media, public domain** (`aic_photographs`) | CC0 (AIC Open Access; `is_public_domain` per record) | 3,777 works with images; museum records of artist, date, process (gelatin silver, albumen, salted paper, platinum, chromogenic ...); mostly 1840s–1920s (Stieglitz, Atget, Emerson, Fenton, Cameron, Talbot, Hine ...) | **acquired 2026-11-08: 593 images, 207 artists (max artist share 1.3 %), 1830s-1920s**, capped 8 per artist via the public API + IIIF 843 px renditions (`scripts/ingest_aic_photographs.py`); the API caps a query at 1,000 results, so the listing is partitioned by decade |
 | The Met, Photographs department | CC0 for public-domain works | similar era; objects endpoint works, search endpoint returned HTTP 410 on 2026-11-07 | deferred (open-access CSV route) |
 | Smithsonian Open Access | CC0 subset | 2.8 M items incl. photographic collections; bulk S3 metadata | deferred (per-unit filtering) |
 | Wikimedia Commons Featured/Quality pictures | per file CC | community-curated modern photography | deferred: this client is throttled by Wikimedia (HTTP 429) |
@@ -41,6 +41,10 @@ artist excluded for the fixed candidates and eligible students (chance = class p
 photographer-leakage guard, (c) agreement of student and teacher embeddings on these images (Spearman of pairwise
 cosines, as E22). Falsified for a candidate if its artist-share excess over the hybrid baseline exceeds 0.02 or its
 process p@5 lower CI is below chance. No promotion follows from this group alone.
+
+## E29 result (2026-11-08)
+
+Process retrieval (artist excluded) is above chance for the hybrid teacher (0.532 [0.453, 0.596] vs 0.389) and the synthetic-only students (0.48-0.51) with low artist leakage (0.04-0.10 vs prior 0.017); raw DINOv2-global and colour statistics score higher but leak the artist (0.21-0.22). The three real-distilled students fall to 0.445-0.468 with lower CIs below chance and are falsified under the rule. Mixed result; the set stays evaluation-only; see `docs/EXPERIMENT_LOG.md` (E29).
 
 ## Dataset limitations
 

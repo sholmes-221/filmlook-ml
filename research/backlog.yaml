@@ -430,11 +430,17 @@ experiments:
   - historic prints only
   falsified_if: a candidate's artist-share excess over hybrid_supcon_family exceeds 0.02, or its process p@5 lower CI is below
     chance
-  needs: 'dataset:aic_photographs ready; an evaluation script for process retrieval (to write: scripts/eval_curated_photos.py)'
+  needs: done
   next_step: 'if supported: register aic_photographs as a distillation-input domain for an E23-style student run; if rejected:
     record the leakage and keep the group evaluation-only'
-  status: pending
-  blocked_by: dataset:aic_photographs ready; script not written
+  status: inconclusive
+  result: 'mixed: on the aic_photographs analysis half (306 prints, 111 artists) process p@5 artist-excluded is above chance
+    (0.389) for every fixed candidate (hybrid_supcon_family 0.532 [0.453, 0.596]; raw_hybrid 0.519; student_fs_v2 0.505),
+    but raw_dino_global and colour_tone16 leak the artist (share 0.22/0.21 vs prior 0.017) and the three real-distilled students
+    have a process p@5 lower CI below chance (fs_v2_real 0.446 [0.365, 0.517], l3_real 0.445, kdsdxl 0.468): falsified for
+    [''raw_dino_global'', ''colour_tone16'', ''student_style_fs_v2_kdsdxl_64'', ''student_style_fs_v2_real_64'', ''student_style_l3_real_64''].
+    Teacher agreement: fs_v2_real 0.55, l3_real 0.41. No promotion; aic_photographs is not registered as a distillation domain
+    on this evidence.'
 - id: E30_joint_generator_supcon
   hypothesis: a family SupCon projection trained on the union of the filmsynth and sdxl TRAIN families (13 generator-namespaced
     labels) transfers to the held-out generator (zimage) better than the filmsynth-only projection, without more content leakage
