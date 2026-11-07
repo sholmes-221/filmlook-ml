@@ -34,6 +34,15 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
   `data/embeddings/bench_layers_v1.npz` 115 MB, reports).
 - Ledger totals across the three sessions: 84 GPU-minutes, 0.34 GB.
 
+## Session 4 (2026-11-07/08, 20-hour orchestrator, dataset discovery, E28, E30)
+- GPU: 0.2 metered minutes so far (E28 5.8 s, E30 4.6 s; both on cached features) plus about 3 unmetered minutes
+  (`student_bench_embed.py` for the L3 student on CPU, one evaluation smoke pass on the partial CommonCatalog film
+  snapshot). The acquisition tasks use no GPU. Updated at session end.
+- Disk: CommonCatalog film scans 74 MB after the first bounded run, ARTeFACT 177 MB after 37 of 88 files, museum
+  photographs pending; discovery registry and candidate files < 2 MB. Within the 20 GB budget by a wide margin.
+- Network etiquette: Wikimedia retries honour `Retry-After` (21 requests per attempt, doubling backoff); Hugging Face
+  parquet range reads at 2 workers; figshare and AIC in series with >= 1 s spacing.
+
 ## Standing storage (not charged to any session)
 `data/hf_cache` 39 GB (SDXL, Z-Image-Turbo, LoRAs, BlueNeg previews), `data/synthetic` 0.2 GB, `data/raw/commons_film` 0.07 GB (growing; evaluation-only),
 `data/embeddings` 0.1 GB + benchmark caches (0.15 GB), `checkpoints` 0.3 GB. Nothing is deleted without approval.
