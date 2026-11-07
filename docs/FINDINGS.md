@@ -83,7 +83,7 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
 17. **Which DINOv2 statistics carry treatment: early-layer first moments, not Gram matrices, not late layers.**
     Over 12 layers x {mean++std, 32-d projected covariance} (E26, analysis data only), mean/std of layers 2-4 match or
     beat the L4+L8 pair on cross-scene treatment retrieval (L3: val B 0.572 [0.538, 0.603] vs 0.467 [0.418, 0.514])
-    with less content leakage; Gram statistics are worse everywhere; layers >= 9 are content-heavy. The real-film
+    with less content leakage but more generator fingerprint (share 0.594 vs 0.541, E27a); Gram statistics are worse everywhere; layers >= 9 are content-heavy. The real-film
     check used (BlueNeg blue-corrupted) cannot separate candidates (chance 0.565, CI +-0.13), so the choice of target
     stays open until the Commons evaluation (E27). (medium on synthetic; none on real film yet)
 

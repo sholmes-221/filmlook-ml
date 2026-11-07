@@ -61,10 +61,11 @@ def _explicit_real(p):
 
 
 class Dino:
-    def __init__(self, dev):
+    def __init__(self, dev, layers=(4, 8)):
+        """layers: hidden-state indices whose patch-token mean++std form the style vector (default L4+L8 = benchmark v1)."""
         from transformers import AutoModel
         self.m = AutoModel.from_pretrained("facebook/dinov2-small").to(dev).eval()
-        self.dev = dev
+        self.dev = dev; self.layers = tuple(layers)
 
     @torch.no_grad()
     def __call__(self, imgs: list[Image.Image]):
@@ -74,7 +75,7 @@ class Dino:
             out = self.m(pixel_values=px, output_hidden_states=True)
             h = out.last_hidden_state
             g.append(torch.cat([h[:, 0], h[:, 1:].mean(1)], 1).float().cpu().numpy())
-            st = [torch.cat([hs[:, 1:].mean(1), hs[:, 1:].std(1)], 1) for hs in (out.hidden_states[4], out.hidden_states[8])]
+            st = [torch.cat([hs[:, 1:].mean(1), hs[:, 1:].std(1)], 1) for hs in (out.hidden_states[l] for l in self.layers)]
             s.append(torch.cat(st, 1).float().cpu().numpy())
         return np.concatenate(g), np.concatenate(s)
 

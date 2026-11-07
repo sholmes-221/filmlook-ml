@@ -91,6 +91,7 @@ def main():
     ap.add_argument("--real-distil", action="store_true", help="E23: add unlabeled CommonCatalog TRAIN originals as distillation-only inputs (teacher targets, no labels)")
     ap.add_argument("--no-blueneg-eval", action="store_true", help="selection run: skip the BlueNeg (final-only) evaluation")
     ap.add_argument("--kd-only-generators", default="", help="E23c: generators whose TRAIN outputs are distillation-only inputs (no labels), e.g. sdxl")
+    ap.add_argument("--teacher-layers", default="4,8", help="E27: DINOv2 hidden-state layers (mean++std) in the teacher's style features; default L4+L8")
     a = ap.parse_args()
     SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
@@ -133,7 +134,9 @@ def main():
     kd_only = [g for g in a.kd_only_generators.split(",") if g]
     train_mask = (split == "train") & np.isin(gen, [*gens, "source"] + (["real"] if a.real_distil else []) + kd_only)
     treated_known = (gen != "real") & ~np.isin(gen, kd_only)
+    teacher_layers = tuple(int(x) for x in a.teacher_layers.split(","))
     rep = {"tag": a.tag, "train_generators": gens, "synth": a.synth, "n_train": int(train_mask.sum()), "real_distil": a.real_distil, "kd_only_generators": kd_only,
+           "teacher_layers": list(teacher_layers),
            "train_by_generator": dict(Counter(gen[train_mask].tolist())), "families": fams}
 
     # teacher: hybrid_style -> SupCon projection (filmsynth train sources only)
@@ -141,7 +144,7 @@ def main():
     paths = [r[0] for r in rows]
     with Pool(16) as pool:
         ex = np.stack(pool.starmap(_explicit_any, [(p, g in ("source", "real")) for p, g in zip(paths, gen)], chunksize=8))
-    dino = X.Dino(dev)
+    dino = X.Dino(dev, layers=teacher_layers)
     ims = [Image.open(p).convert("RGB") if g not in ("source", "real") else X.to_short(load_image(p, max_side=1280)) for p, g in zip(paths, gen)]
     dg, ds = dino(ims)
     hyb = np.hstack([ex, ds])
@@ -299,7 +302,7 @@ def main():
     torch.onnx.export(W(net.cpu().eval()), (torch.zeros(1, 3, 224, 224),), str(out / "model.onnx"), input_names=["pixel_values"],
                       output_names=["treated_logit", "family_logits", "style_embedding"], dynamic_axes={"pixel_values": {0: "batch"}},
                       opset_version=17, dynamo=False)
-    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens,
+    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers),
                                                "outputs": ["treated_logit", "family_logits", "style_embedding"], "input_size": 224,
                                                "label_sources": "synthetic parameter supervision + SupCon teacher distillation; no human labels"}, indent=1))
     import onnxruntime as ort

@@ -330,6 +330,23 @@ generators.
   5,477 pending, 7 without a usable rendition (<= 250 px). Dataset state `retryable_failure` (266 < 1,000 rows);
   evaluation waits on `dataset:commons_film` and runs automatically when it is ready.
 
+### E27a_student_l3_teacher_interim — a real-distil student (E23b recipe) distilled from a layer-3 mean/std hybrid teacher keeps the synthetic family signal and content invariance of the L4+L8 real-distil student (interim, synthetic/proxy only; the real-film decision is E27 on Commons)
+- Status: done; wall 54.7 s; peak GPU 7649.0 MB (total on card).
+- rank1_kd64 [proxy]: 0.2095 (baseline 0.181, regressed)
+- fam_f1 [proxy]: 0.6163 (baseline 0.6501, regressed)
+- treated_auroc [synthetic]: 0.8292
+- Decision rule: neutral: no credible real-film change
+- Learned: decision inconclusive: neutral: no credible real-film change; rank1_kd64=0.2095 <= 0.231
+- Teacher-side reading (`reports/style_benchmark_val_e27.json`, val only): the L3 mean/std hybrid SupCon teacher
+  has B fs 0.572 vs 0.467 for L4+L8, A 0.934 vs 0.907, own-source rank-1 0.262 vs 0.369, subject probe 0.212 vs
+  0.242 - but a higher same-generator share (0.594 vs 0.541; prior 0.396) and no gain on the held-out generators
+  (B sdxl 0.324, B zimage 0.364, both at chance). L2-4 concatenated sits between the two. So early-layer statistics
+  buy within-generator treatment sensitivity and content invariance at the price of more generator fingerprint; the
+  student distilled from it loses a little family F1 (0.616 vs 0.650) and content invariance (rank-1 0.21 vs 0.18).
+  Nothing here is a real-film result; `student_style_l3_real` is an eligible candidate of the evaluation pipeline and
+  E27 decides on the Commons analysis half.
+- Next: checkpoint student_style_l3_real becomes an eligible candidate of research.eval_pipeline; E27 decides on the Commons analysis half
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

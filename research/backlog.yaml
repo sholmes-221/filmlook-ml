@@ -260,9 +260,67 @@ experiments:
   - student capacity (MobileNetV3) may not fit the new target
   falsified_if: on the Commons analysis half the L3 teacher's same-stock p@5 is not >= the L4+L8 teacher's lower CI, or its
     uploader-share excess exceeds the baseline's by > 0.02
-  needs: scripts/train_style_student.py --teacher-layers option; a research.candidates_e27 module exposing L3 / L2-4 hybrid
-    SupCon candidates to style_benchmark and eval_commons_film
+  needs: 'done: scripts/train_style_student.py --teacher-layers, research/candidates_e27.py, checkpoint student_style_l3_real;
+    waiting on dataset:commons_film'
   next_step: 'if supported: switch the distillation target and re-run the full benchmark on a fresh test set (v1 test is spent);
     if rejected: keep L4+L8 and move to augmentation-based invariance'
   status: pending
   blocked_by: dataset:commons_film ready (acquisition rate-limited, resumable)
+- id: E27a_student_l3_teacher_interim
+  hypothesis: a real-distil student (E23b recipe) distilled from a layer-3 mean/std hybrid teacher keeps the synthetic family
+    signal and content invariance of the L4+L8 real-distil student (interim, synthetic/proxy only; the real-film decision
+    is E27 on Commons)
+  motivation: 'E26: L3 mean/std beats L4+L8 on cross-scene treatment retrieval with less content leakage; produces the checkpoint
+    the evaluation pipeline will score when commons_film is ready'
+  value: 4
+  gpu_minutes: 2
+  gpu_mb: 4000
+  cpu_minutes: 2
+  disk_gb: 0.01
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  metric: 'student report: family macro-F1 (synthetic test), own-source rank-1 of the 64-d head (content invariance test);
+    compared with E23b under the evaluator rules (proxies only: no promotion possible from this run)'
+  confounders:
+  - student capacity
+  - teacher SupCon seed
+  falsified_if: fam_f1 below E23b's by more than 0.05 or rank1_kd64 above E23b's by more than 0.05 (interim; recorded, no
+    real-film claim)
+  falsify:
+    metric: rank1_kd64
+    above: 0.231
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/train_style_student.py
+  - --synth
+  - film_synth_v2
+  - --train-generators
+  - filmsynth
+  - --no-blueneg-eval
+  - --real-distil
+  - --teacher-layers
+  - '3'
+  - --tag
+  - style_l3_real
+  result_json: reports/student_style_l3_real.json
+  baseline_id: E23b_student_real_distil
+  watched_paths:
+  - checkpoints/student_style_l3_real
+  metrics_of_interest:
+    rank1_kd64:
+      path: content_invariance_test.own_source_rank1_kd64
+      kind: proxy
+      higher_is_better: false
+    fam_f1:
+      path: synthetic_test.family_macro_f1
+      kind: proxy
+    treated_auroc:
+      path: synthetic_test.treated_auroc_filmsynth
+      kind: synthetic
+  next_step: checkpoint student_style_l3_real becomes an eligible candidate of research.eval_pipeline; E27 decides on the
+    Commons analysis half
+  status: inconclusive
+  result: 'inconclusive (interim): student fam F1 0.616 vs 0.650, rank-1 0.21 vs 0.18 (within thresholds); teacher val B 0.572
+    vs 0.467, rank-1 0.262 vs 0.369, generator share 0.594 vs 0.541. Checkpoint student_style_l3_real awaits the Commons evaluation
+    (E27).'

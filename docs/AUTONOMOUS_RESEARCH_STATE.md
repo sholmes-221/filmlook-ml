@@ -72,9 +72,9 @@ RTX 4090 24 GB shared (another job holds ~5.7 GB); 32 cores; 61 GB RAM. Session 
 1. Let the acquisition finish (automatic). When `commons_film` is ready the evaluation task runs; read
    `reports/eval_pipeline/history.jsonl` and `python -m research.eval_pipeline status`. Decide on
    `student_style_fs_v2_real` from the analysis half only.
-2. E27: add `--teacher-layers` to `scripts/train_style_student.py` and a `research/candidates_e27.py` (L3 and
-   L2-L4 hybrid SupCon), evaluate on the Commons analysis half under the eval-pipeline rules; only then consider the
-   distillation target.
+2. E27: the L3 teacher candidates (`research/candidates_e27.py`) and the student `student_style_l3_real`
+   (E27a, interim inconclusive: more treatment sensitivity, more generator share) exist; the evaluation pipeline scores
+   them on the Commons analysis half automatically; only then consider the distillation target.
 3. If a Commons snapshot is partial for long, validate `--allow-partial` once (snapshot recorded) rather than waiting
    indefinitely; never evaluate the test half until the candidate set is final.
 4. Product: deterministic attribute layer plus the shadow-mode record with the abstention threshold; no deployment.

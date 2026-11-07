@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 5048.1163550949095,
- "disk_bytes": 457563426,
+ "gpu_seconds": 5102.859602603912,
+ "disk_bytes": 461962768,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -215,6 +215,14 @@
    "gpu": true,
    "disk_bytes": 116435840,
    "peak_gpu_mb_total": 7305.0,
+   "returncode": 0
+  },
+  {
+   "id": "E27a_student_l3_teacher_interim",
+   "wall_seconds": 54.7,
+   "gpu": true,
+   "disk_bytes": 4399342,
+   "peak_gpu_mb_total": 7649.0,
    "returncode": 0
   }
  ],
