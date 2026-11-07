@@ -38,7 +38,7 @@ python -m research.eval_pipeline run --dataset commons_film --split test --final
 python -m research.orchestrator seed [--auto-research]     # standard tasks (idempotent)
 python -m research.orchestrator status
 python -m research.orchestrator tick                       # one scheduling pass
-python -m research.orchestrator loop --interval 900        # periodic ticks; sleeps between them
+python -m research.orchestrator loop --interval 900        # periodic ticks for 20 h (--max-hours; --started-at/--resume keep an earlier start)
 python -m research.orchestrator add <task_id> <data|research|eval> --command "..." [--depends dataset:commons_film] [--gpu-mb 6000]
 ```
 

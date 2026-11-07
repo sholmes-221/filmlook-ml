@@ -3,7 +3,9 @@
   python -m research.orchestrator seed                 # register the standard tasks (idempotent)
   python -m research.orchestrator status
   python -m research.orchestrator tick                 # one scheduling pass: recover, launch what is runnable, report
-  python -m research.orchestrator loop --interval 600  # periodic ticks (sleeps between them; no busy-waiting)
+  python -m research.orchestrator loop --interval 900 [--max-hours 20] [--started-at 2026-11-07T21:47:57 | --resume]
+      # periodic ticks for a bounded runtime (default 20 h = 72,000 s from the start time); SIGTERM/SIGINT stop it
+      # gracefully after the current tick; detached tasks keep running; state in reports/orchestrator/loop_state.json
   python -m research.orchestrator add <id> <pipeline> --command "..." [--depends dataset:commons_film] [--gpu-mb 6000]
 
 Each tick: crash recovery (running tasks with dead processes are re-queued), dataset refresh, dependency check
@@ -106,12 +108,73 @@ def status_text(tasks_path: Path | None = None) -> str:
     return "\n".join(lines)
 
 
+LOOP_STATE = R.ROOT / "reports" / "orchestrator" / "loop_state.json"
+DEFAULT_MAX_HOURS = 20.0
+
+
+def loop_deadline(started_at: float, max_hours: float = DEFAULT_MAX_HOURS) -> float:
+    """Absolute stop time (epoch seconds) for a loop that started at `started_at` (default budget 20 h = 72,000 s)."""
+    return started_at + max_hours * 3600.0
+
+
+def run_loop(interval: float = 900, max_parallel: int = 3, max_hours: float = DEFAULT_MAX_HOURS, max_ticks: int = 0,
+             started_at: float | None = None, tasks_path: Path | None = None, state_path: Path | None = None,
+             clock=time.time, sleep=time.sleep, tick_fn=None, install_signals: bool = True, poll_seconds: float = 5.0) -> dict:
+    """Periodic ticks until the runtime budget (`max_hours` after `started_at`, default now) is spent, `max_ticks` is
+    reached, or SIGTERM/SIGINT arrives (graceful: the current tick finishes, state is written, tasks keep running
+    detached). A tick that raises is logged and the loop continues; the loop state (pid, start, deadline, ticks) is
+    persisted to reports/orchestrator/loop_state.json so a restarted loop can keep the original start time
+    (`--started-at` / `--resume`)."""
+    import os
+    import signal
+    state_path = state_path or LOOP_STATE; tick_fn = tick_fn or (lambda: tick(max_parallel, tasks_path))
+    started = float(started_at) if started_at is not None else clock(); deadline = loop_deadline(started, max_hours)
+    stop = {"reason": None}
+
+    def _write(**extra):
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        st = {"pid": os.getpid(), "started_at": started, "started": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(started)), "max_hours": max_hours,
+              "deadline_at": deadline, "deadline": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(deadline)), "interval": interval, "ticks": n,
+              "last_tick": last, "stop_reason": stop["reason"], "updated": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(clock())), **extra}
+        tmp = state_path.with_suffix(".json.part"); tmp.write_text(json.dumps(st, indent=1, default=str)); tmp.replace(state_path)
+        return st
+
+    def _on_signal(signum, _frame):
+        stop["reason"] = stop["reason"] or f"signal {signum}"
+
+    if install_signals:
+        for s in (signal.SIGTERM, signal.SIGINT):
+            signal.signal(s, _on_signal)
+    n, last, errors = 0, None, 0
+    _write(); event("loop_start", pid=os.getpid(), started=started, deadline=deadline, max_hours=max_hours)
+    while stop["reason"] is None:
+        if clock() >= deadline:
+            stop["reason"] = "deadline"; break
+        try:
+            rep = tick_fn(); last = rep.get("ts")
+            print(f"{rep['ts']} launched={rep['launched']} running={rep['running']} skipped={rep['skipped']} datasets={rep['datasets']}", flush=True)
+        except Exception as ex:                                            # a failing tick must not end the loop
+            errors += 1; last = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(clock())); event("tick_error", error=repr(ex)); print(f"{last} tick error: {ex!r}", flush=True)
+        n += 1; _write(tick_errors=errors)
+        if max_ticks and n >= max_ticks:
+            stop["reason"] = "max_ticks"; break
+        wake = min(clock() + interval, deadline)
+        while stop["reason"] is None and clock() < wake:                 # interruptible sleep (graceful shutdown)
+            sleep(min(poll_seconds, max(wake - clock(), 0)))
+    st = _write(tick_errors=errors); event("loop_stop", reason=stop["reason"], ticks=n)
+    print(f"loop stopped: {stop['reason']} after {n} ticks (deadline {st['deadline']})", flush=True)
+    return st
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("cmd", choices=["seed", "status", "tick", "loop", "add"])
     ap.add_argument("task_id", nargs="?"); ap.add_argument("pipeline", nargs="?")
     ap.add_argument("--command", default=None); ap.add_argument("--depends", default=""); ap.add_argument("--gpu-mb", type=float, default=0)
-    ap.add_argument("--interval", type=float, default=600); ap.add_argument("--max-parallel", type=int, default=3); ap.add_argument("--max-ticks", type=int, default=0)
+    ap.add_argument("--interval", type=float, default=900); ap.add_argument("--max-parallel", type=int, default=3); ap.add_argument("--max-ticks", type=int, default=0)
+    ap.add_argument("--max-hours", type=float, default=DEFAULT_MAX_HOURS, help="runtime budget of `loop` from its start time (default 20 h)")
+    ap.add_argument("--started-at", default=None, help="epoch seconds or ISO local time of the original start (keeps the budget of a restarted loop)")
+    ap.add_argument("--resume", action="store_true", help="take the start time from reports/orchestrator/loop_state.json")
     ap.add_argument("--auto-research", action="store_true"); ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args(argv)
     if a.cmd == "seed":
@@ -124,13 +187,15 @@ def main(argv=None):
     elif a.cmd == "tick":
         print(json.dumps(tick(a.max_parallel, dry_run=a.dry_run), indent=1, default=str))
     elif a.cmd == "loop":
-        n = 0
-        while True:
-            rep = tick(a.max_parallel); n += 1
-            print(f"{rep['ts']} launched={rep['launched']} running={rep['running']} skipped={rep['skipped']} datasets={rep['datasets']}", flush=True)
-            if a.max_ticks and n >= a.max_ticks:
-                break
-            time.sleep(a.interval)
+        started = None
+        if a.resume and LOOP_STATE.exists():
+            started = json.loads(LOOP_STATE.read_text()).get("started_at")
+        if a.started_at:
+            try:
+                started = float(a.started_at)
+            except ValueError:
+                started = time.mktime(time.strptime(a.started_at, "%Y-%m-%dT%H:%M:%S"))
+        run_loop(a.interval, a.max_parallel, a.max_hours, a.max_ticks, started)
 
 
 if __name__ == "__main__":

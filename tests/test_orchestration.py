@@ -192,3 +192,69 @@ def test_registry_and_backlog_consistency_in_repo():
             assert r["decision"] == e["status"], e["id"]
         if r and r.get("status") == "running":
             pytest.fail(f"{e['id']} marked running in the registry (crash without recovery?)")
+
+
+# ---- 20-hour runtime budget, graceful shutdown, resilience, resume -------------------------------------------------
+
+def test_loop_default_budget_is_20_hours():
+    assert O.DEFAULT_MAX_HOURS == 20.0
+    assert O.loop_deadline(1000.0) == 1000.0 + 72000.0
+    assert O.loop_deadline(0.0, 10) == 36000.0
+
+
+def _fake_clock(start=1_000_000.0):
+    t = {"now": start}
+    def clock(): return t["now"]
+    def sleep(s): t["now"] += s
+    return t, clock, sleep
+
+
+def test_loop_stops_at_deadline_and_persists_state(tmp_path, monkeypatch):
+    monkeypatch.setattr(O, "EVENTS", tmp_path / "events.jsonl")
+    t, clock, sleep = _fake_clock(); ticks = []
+    fake = lambda: (ticks.append(clock()) or {"ts": str(clock()), "launched": [], "running": [], "skipped": [], "datasets": {}})
+    st = O.run_loop(interval=900, max_hours=20, state_path=tmp_path / "loop_state.json", clock=clock, sleep=sleep, tick_fn=fake, install_signals=False)
+    assert st["stop_reason"] == "deadline" and st["deadline_at"] == 1_000_000.0 + 72000
+    assert len(ticks) == 80 and t["now"] >= 1_000_000.0 + 72000           # one tick per 15 min over 20 h, then stop
+    saved = json.loads((tmp_path / "loop_state.json").read_text())
+    assert saved["ticks"] == 80 and saved["started_at"] == 1_000_000.0 and saved["max_hours"] == 20
+    events = [json.loads(l)["event"] for l in (tmp_path / "events.jsonl").read_text().splitlines()]
+    assert events[0] == "loop_start" and events[-1] == "loop_stop"
+
+
+def test_loop_resume_keeps_original_start_time(tmp_path, monkeypatch):
+    monkeypatch.setattr(O, "EVENTS", tmp_path / "events.jsonl")
+    t, clock, sleep = _fake_clock(start=1_000_000.0 + 70000)             # restarted 19.4 h after the original start
+    fake = lambda: {"ts": "x", "launched": [], "running": [], "skipped": [], "datasets": {}}
+    st = O.run_loop(interval=900, max_hours=20, started_at=1_000_000.0, state_path=tmp_path / "s.json", clock=clock, sleep=sleep, tick_fn=fake, install_signals=False)
+    assert st["stop_reason"] == "deadline" and st["ticks"] == 3 and st["deadline_at"] == 1_072_000.0
+
+
+def test_loop_survives_tick_errors_and_stops_gracefully_on_signal(tmp_path, monkeypatch):
+    monkeypatch.setattr(O, "EVENTS", tmp_path / "events.jsonl")
+    t, clock, sleep = _fake_clock(); calls = {"n": 0}
+    def flaky():
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("nvidia-smi exploded")
+        return {"ts": "x", "launched": [], "running": [], "skipped": [], "datasets": {}}
+    import signal
+    import threading
+    def raise_term():
+        time.sleep(0.2); os.kill(os.getpid(), signal.SIGTERM)
+    threading.Thread(target=raise_term, daemon=True).start()
+    real_sleep = time.sleep
+    def slow_sleep(s): real_sleep(0.05); t["now"] += s             # lets the signal arrive during the interruptible sleep
+    st = O.run_loop(interval=900, max_hours=20, state_path=tmp_path / "s.json", clock=clock, sleep=slow_sleep, tick_fn=flaky, install_signals=True)
+    assert st["stop_reason"].startswith("signal") and st["tick_errors"] == 1 and st["ticks"] >= 1
+    assert t["now"] < 1_000_000.0 + 72000                                 # stopped long before the deadline
+    assert "tick_error" in [json.loads(l)["event"] for l in (tmp_path / "events.jsonl").read_text().splitlines()]
+
+
+def test_loop_cli_parses_started_at_and_max_hours(tmp_path, monkeypatch):
+    seen = {}
+    monkeypatch.setattr(O, "run_loop", lambda interval, max_parallel, max_hours, max_ticks, started: seen.update(interval=interval, max_hours=max_hours, started=started))
+    O.main(["loop", "--interval", "900", "--max-hours", "20", "--started-at", "2026-11-07T21:47:57"])
+    assert seen["max_hours"] == 20 and seen["interval"] == 900 and abs(seen["started"] - time.mktime(time.strptime("2026-11-07T21:47:57", "%Y-%m-%dT%H:%M:%S"))) < 1
+    O.main(["loop", "--started-at", "12345"])
+    assert seen["started"] == 12345.0 and seen["max_hours"] == 20.0
