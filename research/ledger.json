@@ -1,0 +1,24 @@
+{
+ "gpu_seconds": 367.87220287323,
+ "disk_bytes": 10945,
+ "runs": [
+  {
+   "id": "E9_layer_ablation",
+   "wall_seconds": 179.6,
+   "gpu": true,
+   "disk_bytes": 7048,
+   "peak_gpu_mb_total": 20714.0,
+   "returncode": 0
+  },
+  {
+   "id": "E9b_layer_combos",
+   "wall_seconds": 188.3,
+   "gpu": true,
+   "disk_bytes": 3897,
+   "peak_gpu_mb_total": 20734.0,
+   "returncode": 0
+  }
+ ],
+ "session_started": "2026-11-07T07:03:54Z",
+ "note": "budget: 4 h GPU, 20 GB disk per session; the Z-Image generation already running at session start is charged on completion"
+}

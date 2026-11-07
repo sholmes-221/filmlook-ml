@@ -85,6 +85,7 @@ def main():
     src_ids = sorted({x["source_image_id"] for x in prev})[: a.sources]
     rows = [by_id[i] for i in src_ids if i in by_id]
     (OUT / "images").mkdir(parents=True, exist_ok=True)
+    done = {x["variant_id"] for x in read_jsonl(OUT / "annotations.jsonl")} if (OUT / "annotations.jsonl").exists() else set()
     anns, t0 = [], time.time()
     torch.cuda.reset_peak_memory_stats()
     for r in rows:
@@ -93,13 +94,13 @@ def main():
             cfg = TREATMENTS[t]
             vid = f"{r['family_id']}__zimage_{t}"
             path = OUT / "images" / f"{vid}.jpg"
-            if path.exists():
-                continue
+            if vid in done:
+                continue                                      # an image without an annotation row is regenerated
             seed = variant_seed(r["image_id"], f"zimage_{t}", a.seed, "zimage-i2i-v1")
             if t == "vae_identity":
                 with torch.no_grad():
                     vae = pipe.vae
-                    x = pipe.image_processor.preprocess(img).to(vae.device, vae.dtype)
+                    x = pipe.image_processor.preprocess(img).to(pipe._execution_device, vae.dtype)   # offload hooks move weights, not inputs
                     lat = vae.encode(x).latent_dist.mode()
                     dec = vae.decode(lat).sample
                 out = pipe.image_processor.postprocess(dec.float(), output_type="pil")[0]

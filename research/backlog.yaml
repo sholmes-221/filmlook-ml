@@ -1,0 +1,65 @@
+# Research backlog. value: 1-5 expected scientific value; costs are estimates; the planner ranks value / cost.
+# metric: the decisive measurement; falsified_if: what result kills the hypothesis. Keep entries small and decisive.
+experiments:
+  - id: E8_zimage_third_generator
+    hypothesis: grain-randomised synthetic training generalises to an unseen diffusion family (Z-Image-Turbo), not only to SDXL
+    motivation: v3 C3 showed 0.58 fs->sdxl but 0.48 sdxl->fs; a third family separates "learned film treatment" from "learned SDXL"
+    value: 5
+    gpu_minutes: 40
+    disk_gb: 0.2
+    datasets: [film_synth_v2, sdxl_i2i_v1, zimage_i2i_v1, blueneg, commoncatalog]
+    metric: held-out-Z-Image treated AUROC (train filmsynth+SDXL) with source bootstrap CI; 4-way generator identity; BlueNeg AUROC; same-stock p@5
+    confounders: [Z-Image VAE signature, content drift at strength 0.35, shared sources across generators]
+    falsified_if: held-out Z-Image AUROC CI includes 0.5
+    stop: one run at 100 sources; scale to 500 only if the CI excludes 0.5 and generator-ID does not rise
+    status: pending
+  - id: E9_layer_ablation
+    hypothesis: transferable style lives in specific DINOv2 layers; layers 4/8 were an untested guess
+    motivation: cheap, informs every later architecture choice (student distillation target)
+    value: 4
+    gpu_minutes: 8
+    cpu_minutes: 10
+    disk_gb: 0
+    metric: per-layer (mean++std of patch tokens) held-out-generator AUROC and BlueNeg same-stock p@5
+    confounders: [dimensionality differences, probe capacity]
+    falsified_if: no layer beats the 4/8 pair by more than the CI width
+    status: pending
+  - id: E10_sdxl_strength_050
+    hypothesis: the weak reverse direction (sdxl->filmsynth 0.48) is because strength-0.35 treatments barely change rendering
+    motivation: generator_signature_diagnostic shows SDXL moves saturation/contrast little
+    value: 3
+    gpu_minutes: 8
+    disk_gb: 0.1
+    metric: pairwise LOGO both directions at strength 0.5 vs 0.35; content own-source rank-1 (must stay > 0.9)
+    confounders: [content drift at higher strength]
+    falsified_if: sdxl->filmsynth AUROC does not rise above 0.55 or rank-1 drops below 0.9
+    status: pending
+  - id: E11_parameter_similarity_supcon
+    hypothesis: a style embedding trained with continuous parameter-vector similarity (across sources and generators) retrieves same-stock real scans better than family-label SupCon
+    motivation: product goal is cross-photo style similarity, not family classification
+    value: 4
+    gpu_minutes: 5
+    cpu_minutes: 10
+    disk_gb: 0
+    metric: BlueNeg same-stock p@5 (chance 0.12) and cross-generator treated retrieval
+    confounders: [parameters undefined for diffusion outputs; only filmsynth carries them]
+    falsified_if: same-stock p@5 does not exceed 0.25 (family SupCon) by more than 0.03
+    status: pending
+  - id: E12_spatial_student
+    hypothesis: a MobileNetV3 student with a 2x2 feature-map grid head recovers framing offsets as well as the DINOv2 grid probe (R^2 ~0.23)
+    value: 3
+    gpu_minutes: 10
+    disk_gb: 0
+    metric: crop offset R^2 on held-out sources; mirror sensitivity
+    falsified_if: R^2 < 0.1
+    status: pending
+    blocked_by: null
+  - id: E13_scale_500_sources
+    hypothesis: scaling v2-style synthesis to 500 sources improves cross-generator and real-film metrics
+    value: 3
+    gpu_minutes: 60
+    disk_gb: 2
+    metric: v4 benchmark at 500 sources vs 100
+    falsified_if: no CI-separated gain on held-out generator AUROC or same-stock p@5
+    status: pending
+    blocked_by: E8_zimage_third_generator

@@ -1,0 +1,10 @@
+# Research backlog (generated from research/backlog.yaml; edit the YAML)
+
+| id | hypothesis | value (1-5) | GPU min | disk GB | metric | falsified if | status |
+|---|---|---|---|---|---|---|---|
+| E8_zimage_third_generator | grain-randomised synthetic training generalises to an unseen diffusion family (Z-Image-Turbo), not only to SDXL | 5 | 40 | 0.2 | held-out-Z-Image treated AUROC (train filmsynth+SDXL) with source bootstrap CI; 4-way generator identity; BlueNeg AUROC; same-stock p@5 | held-out Z-Image AUROC CI includes 0.5 | pending |
+| E9_layer_ablation | transferable style lives in specific DINOv2 layers; layers 4/8 were an untested guess | 4 | 8 | 0 | per-layer (mean++std of patch tokens) held-out-generator AUROC and BlueNeg same-stock p@5 | no layer beats the 4/8 pair by more than the CI width | pending |
+| E10_sdxl_strength_050 | the weak reverse direction (sdxl->filmsynth 0.48) is because strength-0.35 treatments barely change rendering | 3 | 8 | 0.1 | pairwise LOGO both directions at strength 0.5 vs 0.35; content own-source rank-1 (must stay > 0.9) | sdxl->filmsynth AUROC does not rise above 0.55 or rank-1 drops below 0.9 | pending |
+| E11_parameter_similarity_supcon | a style embedding trained with continuous parameter-vector similarity (across sources and generators) retrieves same-stock real scans better than family-label SupCon | 4 | 5 | 0 | BlueNeg same-stock p@5 (chance 0.12) and cross-generator treated retrieval | same-stock p@5 does not exceed 0.25 (family SupCon) by more than 0.03 | pending |
+| E12_spatial_student | a MobileNetV3 student with a 2x2 feature-map grid head recovers framing offsets as well as the DINOv2 grid probe (R^2 ~0.23) | 3 | 10 | 0 | crop offset R^2 on held-out sources; mirror sensitivity | R^2 < 0.1 | pending |
+| E13_scale_500_sources | scaling v2-style synthesis to 500 sources improves cross-generator and real-film metrics | 3 | 60 | 2 | v4 benchmark at 500 sources vs 100 | no CI-separated gain on held-out generator AUROC or same-stock p@5 | pending |

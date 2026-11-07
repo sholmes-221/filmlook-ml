@@ -106,6 +106,14 @@ generators.
   same-stock 0.21 (E3: 0.24), content rank-1 0.34. No credible real-film difference at these sizes; cross-generator
   behaviour no longer inverted. Kept as a research variant, not promoted.
 
+### E9_layer_ablation — transferable style lives in specific DINOv2 layers; the 4/8 pair was untested
+- Status: done; wall 179.6 s; peak GPU 20714.0 MB (total on card).
+- best_layer_fs_to_sdxl [synthetic]: 0.6444 CI [0.545, 0.77]
+- best_layer_same_stock [real]: 0.2471
+- Decision rule: neutral: no credible real-film change
+- Learned: Cross-generator transfer rises with depth (SDXL->filmsynth 0.31 at L2 to 0.53 at L12; filmsynth->SDXL best at L9, 0.64 [0.55, 0.77]); real-film signal peaks at mid layers (BlueNeg 0.71 and same-stock 0.25 at L4-L5) and collapses at depth (0.14). Shallow layers carry generator texture signatures, deep layers are generator-invariant but blind to real film texture. No single layer beats L4+L8 beyond the CI width.
+- Next: E9b: mid+deep pairs (L4+L9, L5+L9, L5+L12) to test whether one feature set can hold both signals.
+
 ## Decisions taken from these runs
 
 1. Grain randomisation (film-synth-v2) is the fix that worked for cross-generator leakage; standardisation and the
