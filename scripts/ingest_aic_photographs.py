@@ -44,21 +44,30 @@ def half_of(artist: str) -> str:
     return "analysis" if int.from_bytes(hashlib.sha256((DS + ":" + str(artist)).encode()).digest()[:2], "little") % 2 == 0 else "test"
 
 
-def listing(max_pages: int = 60, spacing: float = 1.2) -> list[dict]:
-    """Page through the search API (metadata only) once; cached in listing.json."""
+def listing(max_pages: int = 10, spacing: float = 1.2) -> list[dict]:
+    """Page through the search API (metadata only) once; cached in listing.json. The API refuses more than 1,000 results
+    per query (HTTP 403 "too many results"), so the query is partitioned by decade of date_start (each bucket < 1,000)
+    plus one bucket for works without a date."""
     if LISTING.exists():
         return json.loads(LISTING.read_text())["works"]
-    works, page = [], 1
-    while page <= max_pages:
-        body = {"fields": FIELDS.split(","), "limit": 100, "page": page, "sort": [{"id": "asc"}],
-                "query": {"bool": {"must": [{"term": {"is_public_domain": True}}, {"term": {"department_title.keyword": "Photography and Media"}}, {"exists": {"field": "image_id"}}]}}}
-        req = urllib.request.Request(API, data=json.dumps(body).encode(), headers={**UA, "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=40) as r:
-            d = json.load(r)
-        works += [w for w in d.get("data", []) if w.get("image_id") and w.get("is_public_domain")]
-        if page >= d.get("pagination", {}).get("total_pages", 0):
-            break
-        page += 1; time.sleep(spacing)
+    must = [{"term": {"is_public_domain": True}}, {"term": {"department_title.keyword": "Photography and Media"}}, {"exists": {"field": "image_id"}}]
+    buckets = [[{"range": {"date_start": {"gte": lo, "lt": lo + 10}}}] for lo in range(1800, 2030, 10)]
+    queries = [{"bool": {"must": must + b}} for b in buckets] + [{"bool": {"must": must, "must_not": [{"exists": {"field": "date_start"}}]}}]
+    works, seen = [], set()
+    for q in queries:
+        page = 1
+        while page <= max_pages:
+            body = {"fields": FIELDS.split(","), "limit": 100, "page": page, "sort": [{"id": "asc"}], "query": q}
+            req = urllib.request.Request(API, data=json.dumps(body).encode(), headers={**UA, "Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=40) as r:
+                d = json.load(r)
+            for w in d.get("data", []):
+                if w.get("image_id") and w.get("is_public_domain") and w["id"] not in seen:
+                    seen.add(w["id"]); works.append(w)
+            time.sleep(spacing)
+            if page >= d.get("pagination", {}).get("total_pages", 0):
+                break
+            page += 1
     RAW.mkdir(parents=True, exist_ok=True); LISTING.write_text(json.dumps({"works": works, "fetched": time.strftime("%Y-%m-%dT%H:%M:%S"), "n": len(works)}))
     return works
 
