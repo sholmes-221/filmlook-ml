@@ -192,6 +192,15 @@ generators.
 - Learned: Texture-neutralised DINOv2 (downsample to 64/96/128 px before encoding) transfers WORSE across generator types (cross-type mean 0.45-0.51 vs 0.635 for the 16 colour/tone statistics; Z-Image->filmsynth inverts to 0.32-0.38), is fully content-dominated (own-source rank-1 1.00) and does not improve same-stock retrieval (0.20-0.24 vs 0.25 hybrid, CIs overlap). Deep features encode content-tied colour shifts; global low-dimensional statistics are what transfers.
 - Next: Rejected. Build the aesthetics representation from richer GLOBAL colour-rendition statistics instead (E17); keep DINOv2 texture for authenticity.
 
+### E17_colour_rendition_descriptor — a richer global explainable colour-rendition descriptor transfers across generator types at least as well as the 16-d set and lifts real-scan same-stock retrieval above 0.19
+- Status: done; wall 37.9 s; peak GPU 6271.0 MB (total on card).
+- cr80_cross_type_mean [synthetic]: 0.4279
+- cr80_same_stock_supcon [real]: 0.1776 CI [0.113, 0.237]
+- cr80_same_stock_raw [real]: 0.16 CI [0.066, 0.258]
+- Decision rule: neutral: no credible real-film change
+- Learned: The 80-d colour-rendition descriptor transfers WORSE than the 16 coarse statistics (cross-type mean 0.43 vs 0.635; SDXL->filmsynth 0.34, Z-Image->filmsynth 0.33, inverted), is fully scene-identifying (own-source rank-1 1.00) and does not lift same-stock retrieval (0.18 [0.11, 0.24]). Concatenating it with the 16-d set drags the 16-d set down to 0.46. Per-channel percentiles and histograms are scene fingerprints; probes on them learn content-tied hue shifts. Richer is not more transferable: the generator-agnostic aesthetics signal lives in a few coarse treatment-level statistics.
+- Next: Ablate the 16 statistics to the minimal transferable set (E18, CPU); seek a second real-film source for the retrieval benchmark rather than more descriptors.
+
 ## Decisions taken from these runs
 
 1. Grain randomisation (film-synth-v2) is the fix that worked for cross-generator leakage; standardisation and the

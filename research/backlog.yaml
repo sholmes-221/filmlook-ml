@@ -108,3 +108,14 @@ experiments:
   - more dimensions with 700 training rows can overfit generator-specific hues
   falsified_if: cross-type mean < 0.635 or same-stock SupCon <= 0.19
   status: pending
+- id: E18_minimal_transferable_statistics
+  hypothesis: a subset of the 16 coarse colour/tone statistics carries all of the cross-type transfer; the rest add scene
+    identity
+  value: 4
+  gpu_minutes: 0
+  cpu_minutes: 3
+  disk_gb: 0
+  metric: leave-one-out and greedy forward selection on cross-type mean AUROC (4 cross-type pairs) with source CIs; same-stock
+    p@5 of the chosen set
+  falsified_if: no subset of <= 8 statistics reaches the full set's cross-type mean within 0.02
+  status: pending

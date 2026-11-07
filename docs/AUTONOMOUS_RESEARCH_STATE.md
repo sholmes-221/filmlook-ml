@@ -40,6 +40,9 @@ embedding, E12 spatial student, E13 scale to 500 sources (blocked by E8).
 - E12 spatial student: rejected (framing R^2 < 0.1; frozen DINOv2 grid probe stays the reference).
 - E8/E8b third generator: held-out Z-Image 0.63 [0.52, 0.75]; gains are diffusion<->diffusion; real film unimproved; E13 scaling deferred.
 - E14 artifact probe: diffusion transfer is not a VAE signature (B 0.52).
+- E15 colour/tone vs texture: 16 coarse colour/tone statistics transfer across generator TYPES (SDXL->fs 0.74, Z-Image->fs 0.71); texture = authenticity axis.
+- E16 texture-neutral DINOv2: rejected (content-dominated, transfer worse).
+- E17 80-d colour-rendition descriptor: rejected (scene fingerprint, transfer inverted).
 
 ## Rejected approaches (do not repeat without a new hypothesis)
 - Training "treated vs untreated" on both generators with pristine-only controls: real-film regression (E3 `style_both`).
@@ -47,6 +50,8 @@ embedding, E12 spatial student, E13 scale to 500 sources (blocked by E8).
 - Resolution/JPEG standardisation or VAE controls as the leakage fix alone: little effect (E4 C1/C2).
 - Fine parameter-similarity contrastive objective (E11): fits synthetic geometry, hurts real-scan retrieval.
 - Searching DINOv2 layers for a single best style layer (E9/E9b): within CI; mid layers = real texture, deep = generator-invariant.
+- Deep or rich descriptors for generator-agnostic aesthetics (E16, E17): they re-encode scene identity; only coarse global statistics transfer.
+- Direct geometry regression into a MobileNetV3 spatial student (E12).
 
 ## Resource usage
 See `research/ledger.json`.
