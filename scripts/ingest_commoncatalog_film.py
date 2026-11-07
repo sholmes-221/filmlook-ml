@@ -175,7 +175,10 @@ def do_download(max_minutes: float, seed: int, workers: int = 2) -> int:
     from filmlook_ml.datasets.commoncatalog import fetch_rows, jpeg_ok
     if not CAND.exists():
         log("no candidates: run --scan first"); return 2
-    cands = [json.loads(l) for l in open(CAND)]; selected = select(cands, seed, exclude_uploaders=training_uploaders())
+    cands = [json.loads(l) for l in open(CAND)]
+    for c in cands:                                                          # claims are recomputed from the stored tags: parser fixes apply without a rescan
+        c.update(stock_claim(c.get("usertags")))
+    selected = select(cands, seed, exclude_uploaders=training_uploaders())
     IMG.mkdir(parents=True, exist_ok=True); state = DownloadState(STATE); t0 = time.time(); deadline = t0 + max_minutes * 60
     todo = [c for c in selected if state.get(c["photoid"]).get("status") not in ("validated", "permanent_failure")]
     log(f"download: {len(selected)} selected from {len(cands)} candidates ({len({c['uid'] for c in selected})} uploaders); {len(todo)} to fetch; state {state.counts()}")
