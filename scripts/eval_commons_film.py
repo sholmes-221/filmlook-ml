@@ -19,6 +19,7 @@ Metrics
                   linear probes on texture 12 / colour-tone 16 / hybrid (which axis separates them)
 """
 import argparse
+import os
 import hashlib
 import json
 import sys
@@ -58,7 +59,8 @@ def do_features():
     explicit = np.stack([X.explicit_of(im) for im in ims]).astype(np.float32)
     dg, ds = X.Dino(dev)(ims)
     feats = {"explicit": explicit, "dino_global": dg.astype(np.float32), "dino_style": ds.astype(np.float32)}
-    for name, ck, outs in (("student64", "student_style_fs_v2", ["style_embedding"]), ("student_sup", "student_sup", ["capture_type"])):
+    extra = [("student_" + t, "student_" + t, ["style_embedding"]) for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]
+    for name, ck, outs in (("student64", "student_style_fs_v2", ["style_embedding"]), ("student_sup", "student_sup", ["capture_type"]), *extra):
         sess = ort.InferenceSession(str(P.CHECKPOINTS / ck / "model.onnx"), providers=["CPUExecutionProvider"])
         meta = json.loads((P.CHECKPOINTS / ck / "meta.json").read_text()); oi = meta["outputs"].index(outs[0]); acc = []
         for i in range(0, len(ims), 64):
@@ -68,7 +70,8 @@ def do_features():
             e = np.exp(a - a.max(1, keepdims=True)); a = (e / e.sum(1, keepdims=True))[:, meta["heads"]["capture_type"].index("film_scan")]
         feats[name] = a
     np.savez(OUT.with_suffix(".npz"), **feats)
-    OUT.with_suffix(".json").write_text(json.dumps({"version": "commons-film-features-v1", "n": len(rows), "rows": rows, "seconds": round(time.time() - t0, 1)}))
+    OUT.with_suffix(".json").write_text(json.dumps({"version": "commons-film-features-v1", "n": len(rows), "rows": rows, "seconds": round(time.time() - t0, 1),
+                                                    "student_tags": [t for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]}))
     print(json.dumps({"n": len(rows), "seconds": round(time.time() - t0, 1)}))
 
 
@@ -137,6 +140,9 @@ def do_eval(split):
     hyb = np.hstack([F["explicit"], F["dino_style"]])
     cands = {"raw_dino_global": F["dino_global"], "raw_hybrid": hyb, "hybrid_supcon_family": proj(hyb), "student_fs_v2_64": F["student64"],
              "colour_tone16": F["explicit"][:, IDX_C], "texture12": F["explicit"][:, IDX_T]}
+    for t in [t for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]:
+        if "student_" + t in F:
+            cands[f"student_{t}_64"] = F["student_" + t]
     up = np.array([r["uploader"] for r in rows]); half = np.array([half_of(u) for u in up]); kind = np.array([r["kind"] for r in rows])
     stock = np.array([r["film_stock_claim"] or "?" for r in rows]); ftype = np.array([r["film_type"] for r in rows]); scanner = np.array([r["scanner_category"] or "" for r in rows])
     m = half == split; film = m & (kind == "film"); emu = m & (kind == "digital_emulation")

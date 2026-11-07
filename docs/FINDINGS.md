@@ -60,6 +60,33 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
 12. **The benchmark's real-film evidence rests on one source.** CI widths of ±0.08 on D are the floor with 27 rolls;
     a second rights-cleared film source with stock records is worth more than any further model variant. (high)
 
+13. **The student's failure on real scans is an input-domain shift of the distillation, not a capacity limit.**
+    student_fs_v2 reproduces its teacher's neighbourhoods on filmsynth (top-10 Jaccard 0.35) but not on real
+    photographs (0.04-0.05); distilling on unlabeled real CommonCatalog train originals (E23b) raises held-out real
+    agreement (Spearman 0.53 -> 0.62) and BlueNeg-corrupted agreement (0.38 -> 0.47) with no loss of synthetic
+    treatment retrieval (val B 0.557 vs 0.520), while SDXL outputs as distillation inputs do not (E23c). (medium:
+    agreement metrics are proxies; no real-film labels were used)
+14. **Scanner family is not what style embeddings retrieve on real scans.** On CommonCatalog film scans with EXIF
+    scanner fields (train+val only), an uploader-grouped scanner probe sits at the majority rate (0.51) for every style
+    embedding; only colour_tone16 recovers it slightly (0.59). Photographer identity leaks more than the scanner
+    (same-uploader share 0.02-0.05 vs prior 0.007). (medium: 4 coarse scanner families, EXIF coverage partial)
+15. **Linear content residualisation destroys the treatment signal.** Regressing hybrid features on DINOv2-global and
+    projecting the residual (E25) drops val B to 0.12-0.26 and raises own-source rank-1 to 0.57-0.69; a
+    random-projection control keeps B at 0.40. DINOv2-global is not a content-only vector; subtraction is the wrong
+    operation, selection of statistics (E26) is the open alternative. (high)
+16. **A second real-film source exists and is rights-cleared for evaluation.** Wikimedia Commons' film-brand category
+    tree yields 5,632 CC0/PD/CC-BY(-SA) photographs from 401 uploaders across 112 uploader-asserted stocks, with
+    roll-level categories for some and scanner categories for 162. Labels are uploader claims (like CommonCatalog
+    tags), not owner records (BlueNeg). Acquisition is rate-limited by Wikimedia and resumable; the dataset is
+    evaluation-only (`training_allowed: false`). (high for existence; the evaluation itself is pending)
+
+17. **Which DINOv2 statistics carry treatment: early-layer first moments, not Gram matrices, not late layers.**
+    Over 12 layers x {mean++std, 32-d projected covariance} (E26, analysis data only), mean/std of layers 2-4 match or
+    beat the L4+L8 pair on cross-scene treatment retrieval (L3: val B 0.572 [0.538, 0.603] vs 0.467 [0.418, 0.514])
+    with less content leakage; Gram statistics are worse everywhere; layers >= 9 are content-heavy. The real-film
+    check used (BlueNeg blue-corrupted) cannot separate candidates (chance 0.565, CI +-0.13), so the choice of target
+    stays open until the Commons evaluation (E27). (medium on synthetic; none on real film yet)
+
 ## What is not established
 - That any embedding captures aesthetics as a person would judge them (no human evaluation exists).
 - That same-stock retrieval generalises beyond one photographer's 1990s consumer stocks.

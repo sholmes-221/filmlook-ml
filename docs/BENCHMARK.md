@@ -84,3 +84,22 @@ precision rises from 0.22 to 0.37 (0.50 at 25 %, 48 queries, so ±0.14). The stu
 synthetic data only; its real-scan ordering is close to random. Deployment rule for the research embedding:
 abstain from "similar film look" suggestions below the top1_sim value that gives 50 % coverage on the benchmark,
 and report the coverage, not a probability. No score here is a calibrated probability of a correct match.
+
+## Real-film evaluation on a second source (session 3): `scripts/eval_commons_film.py`
+Commons film set (`docs/FILM_DATASET_RESEARCH.md`, session 3): 5.6k stock-labelled scans from 401 uploaders, plus
+111 digital film-emulation controls. Uploaders are hashed into an analysis half (selection, diagnostics) and a test
+half (final only). Metrics, each with the query's uploader excluded from the bank and an uploader bootstrap:
+same-stock p@5 (chance = bank prior), same-film-type p@5, same-uploader share when not excluded (photographer bias),
+uploader-grouped scanner probe (scanner effect), and real-film-vs-emulation AUROC for the authenticity head and for
+grouped linear probes on texture / colour-tone / hybrid features (which axis separates real film from a software
+film look). Labels are uploader-asserted; the numbers measure consistency with those claims, not ground truth.
+
+## Pre-registered rules for the evaluation pipeline (session 3)
+`research/eval_pipeline.py` applies these to every candidate against `hybrid_supcon_family` on a ready real-film
+dataset (Commons analysis half; the test half once, with `--final`):
+- primary: same-stock precision@5 with the query's uploader excluded, bootstrap CI over uploaders; `improved` needs
+  delta >= 0.02 and non-overlapping CIs, `regressed` symmetrically, otherwise `inconclusive`;
+- leakage guards: uploader-share excess over its prior may not exceed the baseline's by more than 0.02; the scanner
+  probe accuracy (where scanner categories exist) may not exceed the baseline's by more than 0.05; a guard failure is
+  `reject: leakage` whatever the primary metric;
+- a candidate is never promoted on synthetic metrics alone, and test-half results are never used for selection.

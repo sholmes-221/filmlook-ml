@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 4998.704483184814,
- "disk_bytes": 341123912,
+ "gpu_seconds": 5048.1163550949095,
+ "disk_bytes": 457563426,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -175,6 +175,46 @@
    "gpu": true,
    "disk_bytes": 4399318,
    "peak_gpu_mb_total": 7655.0,
+   "returncode": 0
+  },
+  {
+   "id": "E24_scanner_effects",
+   "wall_seconds": 3.4,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6257.0,
+   "returncode": 0
+  },
+  {
+   "id": "E25_content_residualisation",
+   "wall_seconds": 5.7,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6305.0,
+   "returncode": 0
+  },
+  {
+   "id": "D1_commons_film_download",
+   "wall_seconds": 212.6,
+   "gpu": false,
+   "disk_bytes": 3674,
+   "peak_gpu_mb_total": 5761.0,
+   "returncode": 3
+  },
+  {
+   "id": "E26_layer_statistic_ablation",
+   "wall_seconds": 7.7,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6249.0,
+   "returncode": 1
+  },
+  {
+   "id": "E26_layer_statistic_ablation",
+   "wall_seconds": 32.6,
+   "gpu": true,
+   "disk_bytes": 116435840,
+   "peak_gpu_mb_total": 7305.0,
    "returncode": 0
   }
  ],

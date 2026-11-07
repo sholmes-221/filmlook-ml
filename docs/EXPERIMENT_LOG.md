@@ -275,6 +275,61 @@ generators.
 - Learned: SDXL train outputs as distillation-only inputs (same recipe as E23b but synthetic instead of real) do not reproduce the gain: held-out CommonCatalog agreement Spearman 0.55 (control 0.53, real-distil 0.62) and BlueNeg blue-corrupted 0.32 (control 0.38, real-distil 0.47). The E23b gain is specific to real photographs in the distillation input, not to input diversity.
 - Next: Falsified as an alternative explanation. Real unlabeled photographs are the cheap lever for the student; more of them (CC originals are 534) is the next scaling question, not more synthesis.
 
+### E24_scanner_effects — Scanner family (Noritsu / Frontier / flatbed) is recoverable from style embeddings of real film scans and drives same-look neighbours more than the film does (scanner confound)
+- Status: done; wall 3.4 s; peak GPU 6257.0 MB (total on card).
+- scanner_acc_hybrid_supcon [real]: 0.4566
+- scanner_share_hybrid_supcon [real]: 0.3992
+- Decision rule: neutral: no credible real-film change
+- Learned: On 265 CommonCatalog film scans (138 uploaders; Noritsu 134, Fuji Frontier 93, flatbed/dedicated 26) the scanner family is barely recoverable: uploader-grouped probe accuracy 0.46 (hybrid SupCon), 0.47-0.48 (students), 0.44 (texture 12) against a 0.51 majority; only the 16 colour/tone statistics (0.59 [0.51, 0.67]) and raw hybrid (0.57) exceed it. Same-scanner share of the top-5 with the uploader excluded is at the prior for every embedding (0.38-0.42 vs 0.38). Photographer bias is small (same-uploader share 0.02-0.03 vs prior 0.007; DINOv2 content 0.055). The scanner is not the confound behind the real-scan gap in this population; the weak scanner signal sits in colour/tone, where the deterministic badges live.
+- Next: No scanner correction needed for the learned embeddings; note the colour/tone scanner sensitivity in the badge documentation. The remaining real-film question is photographer/roll confounds, which the Commons set (multi-uploader stocks) can measure.
+
+### E25_content_residualisation — Residualising hybrid features against DINOv2-global content (ridge fit on unlabeled train images) before the family SupCon lowers own-source rank-1 and subject leakage on val without lowering B filmsynth; a random-projection control does not
+- Status: done; wall 5.7 s; peak GPU 6305.0 MB (total on card).
+- B_fs_a10 [proxy]: 0.1317
+- rank1_a10 [proxy]: 0.6872
+- subj_a10 [proxy]: 0.1616
+- C_share_a10 [proxy]: 0.4349
+- Decision rule: neutral: no credible real-film change
+- Learned: Regressing the hybrid features on DINOv2-global 'content' (ridge on unlabeled train images) and projecting the residual removes the treatment signal together with the content: B filmsynth 0.12-0.26 (vs 0.47), A2 0.2-0.4 (vs 1.7), and own-source rank-1 rises to 0.57-0.69 (vs 0.37); the random-projection control keeps most of the style (B 0.40, A2 1.05). DINOv2-global is not a content-only vector: it linearly predicts the style part of the hybrid as well, so linear content removal is the wrong tool.
+- Next: Rejected. Content/appearance separation needs a content representation that is itself style-blind (e.g. same-source invariance across treatments), not the raw global token; parked.
+
+### E26_layer_statistic_ablation — a (DINOv2 layer, patch statistic) choice exists that keeps L4+L8 mean/std treatment sensitivity, retrieves real same-stock scans at least as well and leaks less content; second-order (Gram) statistics of early layers are the classic style carrier
+- Status: done; wall 32.6 s; peak GPU 7305.0 MB (total on card).
+- beats [proxy]: 0.0
+- best_real_same_stock [real]: 0.6085 CI [0.463, 0.723]
+- baseline_real_same_stock [real]: 0.5759 CI [0.428, 0.698]
+- best_real_val_B [synthetic]: 0.3367 CI [0.29, 0.383]
+- best_real_rank1 [proxy]: 0.3231
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: beats=0.0000 < 0.5
+- Reading the table (`reports/layer_stat_ablation.json`, 28 candidates, analysis data only): (1) the real-film
+  condition could not be met by anything: BlueNeg blue-corrupted same-stock p@5 has chance 0.565 (218 of 297 frames
+  are one stock) and every candidate sits at 0.55-0.61 with a roll CI of about +-0.13, so this partition is not a
+  discriminating analysis metric and is retired for selection; (2) on the synthetic side, layer-3 mean/std is
+  CI-separated above the L4+L8 baseline for cross-scene treatment retrieval (val B 0.572 [0.538, 0.603] vs 0.467
+  [0.418, 0.514]) with less content leakage (own-source rank-1 0.262 vs 0.369, subject probe 0.212 vs 0.242); layers
+  2-4 mean/std are all at or above the baseline, layers >= 9 are content-heavy (rank-1 up to 0.477 at L12);
+  (3) Gram/covariance statistics (32-d projection) are worse than mean/std at every layer (B 0.25-0.41): the classic
+  "style = second-order statistics" carrier does not transfer here, at least at this projection size. The decision
+  stays `rejected` under the pre-registered rule; the L3 observation is a new hypothesis (E27), not a result.
+- Next: if supported: retrain the real-distil student (E23b recipe) on the winning target and evaluate on CommonCatalog film scans; if rejected: keep L4+L8 mean/std and move to augmentation-based invariance (E27)
+
+### D1_commons_film_download — Data pipeline incident and recovery (Wikimedia Commons acquisition)
+- First run (18:16-21:26): 244 files in 3.1 h, no stdout (the runner captures it), manifest only written at exit.
+  Diagnosis from the runner log: all 168 HTTP 429s were on original-file URLs (`Retry-After: 600`); 16 ten-minute
+  sleeps account for 2.7 h. Thumbnails of large files were fine. Process was alive (`hrtimer_nanosleep`), not deadlocked.
+- Second cause found while fixing: files whose requested width rounds up to the original get the `thumbnail_unscaled`
+  alias (= the original, throttled), and the thumbnail service rejects every non-standard width with HTTP 400
+  (standard: 20...330, 500, 960, 1280, 1920, 3840 px).
+- Fix: `research/downloader.py` (resumable per-file state, atomic writes, sha256 verification, bounded backoff,
+  Retry-After capped at 120 s, exit after 20 consecutive rate-limit waits, no-response stall timeout, wall-clock cap,
+  heartbeat + status file, manifest checkpoints) and standard-width renditions only. Existing 244 files adopted after
+  re-validation; 22 more fetched in a 2.5-minute smoke run; 34 bogus failures from the wrong URL scheme reset.
+- Current blocker: after the incident the client is throttled on every rendition (`Retry-After: 10`, Varnish
+  front). The acquisition task retries with a 30-minute doubling backoff (orchestrator); 266 of 5,743 items stored,
+  5,477 pending, 7 without a usable rendition (<= 250 px). Dataset state `retryable_failure` (266 < 1,000 rows);
+  evaluation waits on `dataset:commons_film` and runs automatically when it is ready.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
@@ -296,6 +351,15 @@ generators.
 7. Deep or rich descriptors re-encode scene identity (E16, E17); coarse global statistics are the explainable
    attribute layer. Composition: frozen DINOv2 grid probe only (E12 student failed).
 8. Scaling synthesis (E13) is not justified by E8; a third generator improved nothing real.
+12. Session 3 (data pipeline, E22-E26): the student's real-scan failure is a distillation input-domain shift
+   (E22); real unlabeled inputs fix part of it (E23b, kept as `student_style_fs_v2_real`, not promoted until the
+   Commons evaluation); SDXL inputs do not (E23c). Scanner identity is not the retrieved signal (E24). Linear content
+   residualisation is rejected (E25). No layer/statistic beats L4+L8 under the pre-registered three-part rule (E26),
+   but BlueNeg blue-corrupted is retired as a selection metric (chance 0.565) and early-layer mean/std (L2-L4) is the
+   open hypothesis E27; Gram statistics are dropped.
+13. Acquisition and evaluation are now separate pipelines (`docs/PIPELINES.md`): the Commons download is resumable
+   and rate-limit aware, dataset readiness is persistent, and the real-film evaluation of every eligible student
+   runs automatically on the analysis half when `commons_film` is ready; the test half runs once, with `--final`.
 
 ## Decisions taken from these runs (earlier)
 

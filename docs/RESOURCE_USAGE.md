@@ -23,6 +23,17 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
 - Disk charged: 0.11 GB (benchmark cache 37 MB, SDXL strength-0.5 set 70 MB, reports).
 - Ledger totals across both sessions: 81 GPU-minutes, 0.33 GB.
 
+## Session 3 (2026-11-07, Commons acquisition, E22-E26, pipeline separation)
+- GPU: 3.0 metered minutes of 240 (E22 0.05, E23a/b/c 2.1 for three student trainings, E24 0.06, E25 0.1,
+  E26 0.5 incl. the 12-layer feature pass at 7.3 GB peak on the card) plus about 8 unmetered minutes (two
+  `student_bench_embed.py` passes, two `style_benchmark.py` runs with extra candidates, the E26 attempt that failed on
+  a script bug): about 11 minutes in total.
+- CPU/network: the Commons enumeration (~50 min of serial API calls, repeated once after a crash) and the download
+  (3.1 h first run, mostly asleep on `Retry-After: 600`; see D1 in `docs/EXPERIMENT_LOG.md`), all off-GPU.
+- Disk charged: 0.02 GB (three student checkpoints 13 MB, 266 Commons renditions 63 MB, per-layer feature cache
+  `data/embeddings/bench_layers_v1.npz` 115 MB, reports).
+- Ledger totals across the three sessions: 84 GPU-minutes, 0.34 GB.
+
 ## Standing storage (not charged to any session)
-`data/hf_cache` 39 GB (SDXL, Z-Image-Turbo, LoRAs, BlueNeg previews), `data/synthetic` 0.2 GB,
-`data/embeddings` 0.1 GB + benchmark cache, `checkpoints` 0.3 GB. Nothing is deleted without approval.
+`data/hf_cache` 39 GB (SDXL, Z-Image-Turbo, LoRAs, BlueNeg previews), `data/synthetic` 0.2 GB, `data/raw/commons_film` 0.07 GB (growing; evaluation-only),
+`data/embeddings` 0.1 GB + benchmark caches (0.15 GB), `checkpoints` 0.3 GB. Nothing is deleted without approval.

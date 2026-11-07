@@ -33,7 +33,8 @@ experiments:
   - dimensionality differences
   - probe capacity
   falsified_if: no layer beats the 4/8 pair by more than the CI width
-  status: pending
+  status: superseded
+  result: superseded by E26_layer_statistic_ablation (benchmark v1 metrics, adds Gram statistics)
 - id: E10_sdxl_strength_050
   hypothesis: the weak reverse direction (sdxl->filmsynth 0.48) is because strength-0.35 treatments barely change rendering
   motivation: 'E19 diagnostic: SDXL treatments at 0.35 differ by 0.19x nuisance; labels meaningless'
@@ -138,9 +139,10 @@ experiments:
   disk_gb: 2
   metric: same-stock p@5 with roll CI on the new source; cross-source retrieval
   falsified_if: hybrid SupCon not above DINOv2 reference on the new source
-  status: blocked
+  status: in_progress
   blocker: no rights-cleared source found yet (docs/FILM_DATASET_RESEARCH.md); needs owner decision on the app's self-reported
     stock flow
+  result: Wikimedia Commons film-stock categories identified; acquisition running in the data pipeline (rate-limited; resumable)
 - id: E21_abstention_threshold_shadow
   hypothesis: the top1_sim 50%-coverage threshold from benchmark v1 holds its precision on shadow-mode traffic (hash-only
     logging) once a privacy review allows it
@@ -151,3 +153,116 @@ experiments:
   falsified_if: coverage < 20% or > 80% on real traffic
   status: blocked
   blocker: privacy and retention review before any user-photo logging
+- id: E22_student_teacher_agreement
+  hypothesis: 'student_fs_v2 fails on real scans because it never saw real inputs: agreement with its teacher is high on filmsynth
+    and low on real photographs'
+  value: 4
+  gpu_minutes: 0
+  cpu_minutes: 3
+  status: supported
+  result: neighbour Jaccard 0.35 synthetic vs 0.04-0.05 real; Spearman 0.62 vs 0.35-0.48 (session 3)
+- id: E23_real_image_distillation
+  hypothesis: adding real photographs as KD-only inputs closes the student-teacher gap on real scans without hurting synthetic
+    metrics
+  value: 5
+  gpu_minutes: 25
+  status: supported
+  result: 'E23b real-distil: held-out CC Spearman 0.53->0.62, BlueNeg-corrupted 0.38->0.47, val B fs 0.557 vs 0.520; E23c
+    SDXL-input control rejected (CC 0.55, BlueNeg 0.32)'
+- id: E24_scanner_effects
+  hypothesis: style embeddings of real scans recover the lab scanner (Noritsu / Frontier / flatbed) rather than the film
+  value: 4
+  gpu_minutes: 0
+  cpu_minutes: 2
+  status: rejected
+  result: scanner probe ~ majority (0.51) for all style embeddings; colour_tone16 0.59; same-scanner share ~ prior; uploader
+    share 0.02-0.05 vs prior 0.007
+- id: E25_linear_content_residualisation
+  hypothesis: ridge-residualising the hybrid features on DINOv2-global content before the SupCon projection removes content
+    and keeps treatment
+  value: 3
+  gpu_minutes: 2
+  status: rejected
+  result: 'destroys style: B 0.12-0.26, rank-1 0.57-0.69; random-projection control B 0.40. DINOv2-global is not a content-only
+    vector. Do not repeat unchanged.'
+- id: E26_layer_statistic_ablation
+  hypothesis: a (DINOv2 layer, patch statistic) choice exists that keeps L4+L8 mean/std treatment sensitivity, retrieves real
+    same-stock scans at least as well and leaks less content; second-order (Gram) statistics of early layers are the classic
+    style carrier
+  motivation: E9 was never run; the distillation target for every student is this guess. E25 showed subtraction of content
+    fails; selection of statistics is the untested alternative
+  value: 5
+  gpu_minutes: 8
+  gpu_mb: 5000
+  cpu_minutes: 6
+  disk_gb: 0.25
+  datasets:
+  - bench_features_v1
+  metric: 'per-(layer,statistic) family-SupCon candidates: val B filmsynth p@5 (CI), E own-source rank-1, E subject probe,
+    BlueNeg blue-corrupted same-stock p@5 (roll CI). Analysis data only.'
+  confounders:
+  - dimensionality differences between mean/std (768) and gram32 (528)
+  - SupCon capacity fixed at 64-d
+  - BlueNeg-corrupted is dominated by one stock (218/297 Kodak Gold 100-5)
+  falsified_if: 'no candidate satisfies all three pre-registered conditions: real same-stock lower CI above the baseline point
+    estimate, val B fs not below the baseline lower CI, own-source rank-1 not worse by more than 0.05'
+  falsify:
+    metric: beats
+    below: 0.5
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/layer_stat_ablation.py
+  result_json: reports/layer_stat_ablation.json
+  watched_paths:
+  - data/embeddings/bench_layers_v1.npz
+  metrics_of_interest:
+    beats:
+      path: summary.beats
+      kind: proxy
+    best_real_same_stock:
+      path: summary.best_real.blueneg_corrupted_same_stock
+      kind: real
+    baseline_real_same_stock:
+      path: summary.baseline.blueneg_corrupted_same_stock
+      kind: real
+    best_real_val_B:
+      path: summary.best_real.val_B_filmsynth
+      kind: synthetic
+    best_real_rank1:
+      path: summary.best_real.val_E_rank1
+      kind: proxy
+      higher_is_better: false
+  next_step: 'if supported: retrain the real-distil student (E23b recipe) on the winning target and evaluate on CommonCatalog
+    film scans; if rejected: keep L4+L8 mean/std and move to augmentation-based invariance (E27)'
+  status: rejected
+  result: 'rejected under the pre-registered rule: no candidate''s BlueNeg-corrupted CI clears the baseline because that partition
+    is at chance (0.565, one stock = 73%). Synthetic side: L3 mean/std B 0.572 [0.538,0.603] vs 0.467 [0.418,0.514], rank-1
+    0.262 vs 0.369; L2-L4 ms >= baseline; gram32 worse everywhere; L9+ content-heavy. -> E27'
+- id: E27_early_layer_teacher
+  hypothesis: a hybrid teacher built on early-layer mean/std (L3, or L2-L4 concatenated) instead of L4+L8 retrieves same-stock
+    real film at least as well as the current teacher on an informative real source, with lower photographer leakage, and
+    a student distilled from it with the E23b recipe inherits the gain
+  motivation: 'E26: L3 mean/std is CI-separated better on cross-scene treatment retrieval with less content leakage; the real-film
+    check used there was uninformative. Must be judged on real film before any target change.'
+  value: 5
+  gpu_minutes: 4
+  gpu_mb: 5000
+  cpu_minutes: 10
+  disk_gb: 0.05
+  datasets:
+  - commons_film
+  metric: 'Commons analysis half (research.eval_pipeline rules): same-stock p@5 uploader-excluded with CI, uploader share
+    excess, scanner probe; plus val benchmark B/E and CommonCatalog film-scan uploader share (scripts/scanner_effects.py)'
+  confounders:
+  - Commons stock labels are uploader claims
+  - early layers may encode scanner/JPEG texture rather than film
+  - student capacity (MobileNetV3) may not fit the new target
+  falsified_if: on the Commons analysis half the L3 teacher's same-stock p@5 is not >= the L4+L8 teacher's lower CI, or its
+    uploader-share excess exceeds the baseline's by > 0.02
+  needs: scripts/train_style_student.py --teacher-layers option; a research.candidates_e27 module exposing L3 / L2-4 hybrid
+    SupCon candidates to style_benchmark and eval_commons_film
+  next_step: 'if supported: switch the distillation target and re-run the full benchmark on a fresh test set (v1 test is spent);
+    if rejected: keep L4+L8 and move to augmentation-based invariance'
+  status: pending
+  blocked_by: dataset:commons_film ready (acquisition rate-limited, resumable)

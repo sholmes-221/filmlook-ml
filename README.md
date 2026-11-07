@@ -75,7 +75,7 @@ Use `--status` for discovery, progress and distributions; it is a dry run unless
   `data_registry/film_datasets.json`; `scripts/gen_sdxl_film.py` (SDXL img2img), `scripts/ingest_blueneg.py`.
 - Experiments: `scripts/synth_experiment_v2.py` (cross-generator + real film), `scripts/train_style_student.py`;
   leaderboard and decisions in `docs/EXPERIMENT_LOG.md`; content-invariance benchmark `docs/BENCHMARK.md`
-  (`scripts/style_benchmark.py`, `scripts/abstention_analysis.py`); validated findings `docs/FINDINGS.md`; research
+  (`scripts/style_benchmark.py`, `scripts/abstention_analysis.py`); validated findings `docs/FINDINGS.md`; three-pipeline orchestration (data / research / evaluation) `docs/PIPELINES.md`; research
   model card `docs/MODEL_CARD.md`; leakage benchmark `scripts/synth_experiment_v3.py`
   (film-synth-v2 presets with label-independent grain), `scripts/spatial_probe.py`, `scripts/eval_film_authenticity.py`.
 - Research interfaces: `filmlook_infer.shadow.ShadowAnalyzer` (`docs/SHADOW_MODE_INTEGRATION.md`),
