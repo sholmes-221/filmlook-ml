@@ -71,6 +71,10 @@ def _sq_real(p):
     return S.load_square(p, 256)
 
 
+def _explicit_any(p, real):
+    return X.explicit_of(X.to_short(load_image(p, max_side=1280))) if real else X._explicit_path(p)
+
+
 def auroc(y, s):
     from sklearn.metrics import roc_auc_score
     return round(float(roc_auc_score(y, s)), 4)
@@ -84,6 +88,9 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--kd", type=float, default=1.0)
     ap.add_argument("--synth", default="film_synth_v1", help="filmsynth folder under data/synthetic/")
+    ap.add_argument("--real-distil", action="store_true", help="E23: add unlabeled CommonCatalog TRAIN originals as distillation-only inputs (teacher targets, no labels)")
+    ap.add_argument("--no-blueneg-eval", action="store_true", help="selection run: skip the BlueNeg (final-only) evaluation")
+    ap.add_argument("--kd-only-generators", default="", help="E23c: generators whose TRAIN outputs are distillation-only inputs (no labels), e.g. sdxl")
     a = ap.parse_args()
     SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
@@ -113,23 +120,29 @@ def main():
         rows.append((str(P.ROOT / x["path"]), "sdxl", split_of[x["source_image_id"]], x["source_image_id"], -1, None, False, True))
     for s in srcs:
         rows.append((by_id[s]["path"], "source", split_of[s], s, -1, None, False, False))
+    if a.real_distil:                                       # real photographs: distillation input only; treated label unknown -> masked
+        for r in eligible:
+            if r["dataset_id"] == "commoncatalog_ccby" and r["edit_type"] == "original" and r["image_id"] not in split_of and r["split"] == "train":
+                rows.append((r["path"], "real", "train", r["image_id"], -1, None, False, False))
     gen = np.array([r[1] for r in rows]); split = np.array([r[2] for r in rows]); src = np.array([r[3] for r in rows])
     fam_i = np.array([r[4] for r in rows]); treated = np.array([r[7] for r in rows])
     Y = np.array([r[5] if r[5] else [0.0] * len(TARGETS) for r in rows], dtype=np.float32)
     M = np.array([[r[5] is not None] * len(TARGETS) for r in rows])
     mono = np.array([r[6] for r in rows])
     M[mono, 0] = M[mono, 1] = False
-    train_mask = (split == "train") & np.isin(gen, [*gens, "source"])
-    rep = {"tag": a.tag, "train_generators": gens, "synth": a.synth, "n_train": int(train_mask.sum()),
+    kd_only = [g for g in a.kd_only_generators.split(",") if g]
+    train_mask = (split == "train") & np.isin(gen, [*gens, "source"] + (["real"] if a.real_distil else []) + kd_only)
+    treated_known = (gen != "real") & ~np.isin(gen, kd_only)
+    rep = {"tag": a.tag, "train_generators": gens, "synth": a.synth, "n_train": int(train_mask.sum()), "real_distil": a.real_distil, "kd_only_generators": kd_only,
            "train_by_generator": dict(Counter(gen[train_mask].tolist())), "families": fams}
 
     # teacher: hybrid_style -> SupCon projection (filmsynth train sources only)
     t0 = time.time()
     paths = [r[0] for r in rows]
     with Pool(16) as pool:
-        ex = np.stack(pool.map(X._explicit_path, paths, chunksize=8))
+        ex = np.stack(pool.starmap(_explicit_any, [(p, g in ("source", "real")) for p, g in zip(paths, gen)], chunksize=8))
     dino = X.Dino(dev)
-    ims = [Image.open(p).convert("RGB") if g != "source" else X.to_short(load_image(p, max_side=1280)) for p, g in zip(paths, gen)]
+    ims = [Image.open(p).convert("RGB") if g not in ("source", "real") else X.to_short(load_image(p, max_side=1280)) for p, g in zip(paths, gen)]
     dg, ds = dino(ims)
     hyb = np.hstack([ex, ds])
     fs_tr = (gen == "filmsynth") & (split == "train")
@@ -149,7 +162,7 @@ def main():
     steps = a.epochs * int(np.ceil(len(tr) / 64))
     sched = torch.optim.lr_scheduler.OneCycleLR(opt, max_lr=[3e-4, 1e-3], total_steps=steps)
     Tt = torch.tensor(T, dtype=torch.float32, device=dev)
-    yt = torch.tensor(treated.astype(np.float32), device=dev); yf = torch.tensor(fam_i, device=dev)
+    yt = torch.tensor(treated.astype(np.float32), device=dev); yf = torch.tensor(fam_i, device=dev); tk = torch.tensor(treated_known, device=dev)
     Yt, Mt = torch.tensor(Y, device=dev), torch.tensor(M, device=dev)
     torch.cuda.reset_peak_memory_stats()
     t0 = time.time()
@@ -169,7 +182,8 @@ def main():
                 f, lt, lf, lp, kd = net(x)
             lt, lf, lp, kd = lt.float(), lf.float(), lp.float(), kd.float()
             bi_t = torch.as_tensor(bi, device=dev)
-            loss = nn.functional.binary_cross_entropy_with_logits(lt, yt[bi_t])
+            km = tk[bi_t]
+            loss = nn.functional.binary_cross_entropy_with_logits(lt[km], yt[bi_t][km]) if km.any() else lt.sum() * 0
             fm = yf[bi_t] >= 0
             if fm.any():
                 loss = loss + nn.functional.cross_entropy(lf[fm], yf[bi_t][fm])
@@ -215,18 +229,21 @@ def main():
                                       "own_source_rank1_kd64": rank1(O["kd"], fs_te & treated, so_te),
                                       "reading": "1.0 = embedding retrieves the same photo regardless of treatment (content-dominated)"}
 
-    # real film: BlueNeg vs CommonCatalog digital
-    bn = read_jsonl(P.MANIFESTS / "blueneg_manifest.jsonl")
+    # real film: BlueNeg vs CommonCatalog digital (final-only; skipped on selection runs)
+    bn = [] if a.no_blueneg_eval else read_jsonl(P.MANIFESTS / "blueneg_manifest.jsonl")
     used = set(srcs)
     dig = [r for r in eligible if r["image_id"] not in used and r.get("medium") in ("digital_camera", "smartphone") and r["split"] in ("val", "test")]
-    Xb = np.concatenate([preprocess(r["path"]) for r in bn]); Xd = np.concatenate([preprocess(r["path"]) for r in dig])
-    Ob, Od = run(Xb), run(Xd)
-    intact = np.array([r["partition"] == "blue-intact" for r in bn])
-    real = {"film_vs_digital_auroc_p_treated": {"all": auroc(np.r_[np.ones(len(bn)), np.zeros(len(dig))], np.r_[Ob["t"], Od["t"]]),
-                                                 "blue_intact": auroc(np.r_[np.ones(int(intact.sum())), np.zeros(len(dig))], np.r_[Ob["t"][intact], Od["t"]]),
-                                                 "n_blueneg": len(bn), "n_digital": len(dig)}}
+    Xd = np.concatenate([preprocess(r["path"]) for r in dig]); Od = run(Xd)
+    if bn:
+        Xb = np.concatenate([preprocess(r["path"]) for r in bn]); Ob = run(Xb)
+        intact = np.array([r["partition"] == "blue-intact" for r in bn])
+        real = {"film_vs_digital_auroc_p_treated": {"all": auroc(np.r_[np.ones(len(bn)), np.zeros(len(dig))], np.r_[Ob["t"], Od["t"]]),
+                                                     "blue_intact": auroc(np.r_[np.ones(int(intact.sum())), np.zeros(len(dig))], np.r_[Ob["t"][intact], Od["t"]]),
+                                                     "n_blueneg": len(bn), "n_digital": len(dig)}}
+    else:
+        Xb, Ob, real = Xd[:0], None, {"skipped": "selection run (--no-blueneg-eval); BlueNeg is final-only"}
     stock = np.array([r["film_stock_verified"] for r in bn]); roll = np.array([r["roll_id"] for r in bn])
-    for name, F in (("576d", Ob["f"]), ("kd64", Ob["kd"])):
+    for name, F in (() if a.no_blueneg_eval else (("576d", Ob["f"]), ("kd64", Ob["kd"]))):
         idx = np.where(intact)[0]
         Z = F[idx] / (np.linalg.norm(F[idx], axis=1, keepdims=True) + 1e-8); Sm = Z @ Z.T
         prec, ch = [], []
@@ -249,8 +266,9 @@ def main():
                 lg = sess.run(None, {"pixel_values": xs[i:i + 64]})[ci]
                 e = np.exp(lg - lg.max(1, keepdims=True)); out.append((e / e.sum(1, keepdims=True))[:, fi])
             return np.concatenate(out)
-        real["baseline_existing_student_p_film_scan_auroc"] = {"all": auroc(np.r_[np.ones(len(bn)), np.zeros(len(dig))], np.r_[pfilm(Xb), pfilm(Xd)]),
-                                                                "note": "checkpoints/student_sup trained on EXIF capture type of CommonCatalog originals"}
+        if bn:
+            real["baseline_existing_student_p_film_scan_auroc"] = {"all": auroc(np.r_[np.ones(len(bn)), np.zeros(len(dig))], np.r_[pfilm(Xb), pfilm(Xd)]),
+                                                                    "note": "checkpoints/student_sup trained on EXIF capture type of CommonCatalog originals"}
     except Exception as e:  # noqa: BLE001
         real["baseline_existing_student_p_film_scan_auroc"] = f"unavailable: {e}"
     rep["real_film_blueneg"] = real

@@ -124,8 +124,30 @@ datasets:
     name: Wikimedia Commons via MediaWiki API
     source_url: https://commons.wikimedia.org/w/api.php
     license: per-file
-    training_allowed: false     # robots.txt disallows /w/ and /api/ for generic agents; not used
+    training_allowed: false     # superseded by commons_film below (evaluation-only); never a training source
     verified_on: 2026-11-06
+
+  - id: commons_film
+    name: Wikimedia Commons "Photographs by film brand" tree (stock-labelled real film scans) + DxO FilmPack emulation controls
+    source_url: https://commons.wikimedia.org/wiki/Category:Photographs_by_film_brand
+    license: per-file           # only CC0 / public domain / CC BY x / CC BY-SA x files are ingested; licence kept per row
+    commercial_use: per-file
+    ml_training: false          # ShareAlike scope for trained models unresolved; this project does not train on it
+    num_images: ~6800 film files in ~170 categories (2026-11-07), plus ~1000 digital-emulation controls
+    labels: [film_stock_claim (uploader category), film_type (category tree), scanner_category, camera_category, roll_category (per-uploader roll cats), uploader, EXIF make/model/software when present]
+    download_method: >-
+      MediaWiki Action API (descriptive User-Agent, requests in series, 0.6 s spacing, maxlag=5, 429 backoff; API:Etiquette)
+      for category listing and per-file metadata; <=1024 px server renditions from upload.wikimedia.org. The site
+      robots.txt disallows /w/ for generic crawlers; the Action API is the documented programmatic interface and is used
+      as its etiquette page prescribes. Owner may veto: delete data/raw/commons_film and this entry.
+    attribution: required - author, licence and file page URL per row (data/raw/commons_film/ATTRIBUTION.jsonl)
+    redistribution: not done; images stay local
+    training_allowed: false     # EVALUATION ONLY (real-film retrieval, scanner/colour-shift analysis); split by uploader into analysis/test
+    risks: >-
+      Stock labels are uploader-asserted categories (like CommonCatalog tags), not owner records; many stocks are
+      dominated by one uploader (photographer confound), so every metric excludes the query's uploader and bootstraps
+      over uploaders. Mixed eras, scanners and scan workflows (also an asset for scanner-effect analysis).
+    verified_on: 2026-11-07
 
   - id: openverse_api
     name: Openverse API

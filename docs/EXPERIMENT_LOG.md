@@ -250,6 +250,31 @@ generators.
 - Learned: 500 SDXL variants at strength 0.5 (reports/sdxl_strength_sdxl_i2i_s050.json vs _sdxl_i2i_v1.json, same script). Per-image change grows (treatment-vs-treatment distance / nuisance: raw hybrid 0.60 -> 0.75, family SupCon 0.69 -> 2.15, colour/tone 3.4 -> 12.5) but it is not a consistent treatment: same-treatment retrieval across other sources stays at chance under every feature (0.26-0.31 vs chance 0.25; at 0.35: 0.34-0.36 vs 0.33), the treatment probe falls (raw hybrid 0.55 at 4-way vs 0.67 at 3-way), and content preservation drops (own-source rank-1 under DINOv2 global 0.97 -> 0.82). Higher strength makes diffusion rewrite each image more, differently for each image; it does not create a shared style signature.
 - Next: Falsified. Diffusion img2img treatment ids are retired as style labels at any strength tried; diffusion sets stay as generator-fingerprint and nuisance controls only. Do not scale diffusion generation (E13 stays deferred).
 
+### E22_student_teacher_agreement — H-domain: the student reproduces its teacher on filmsynth but not on real photographs (distillation input-domain shift), so distilling on unlabeled real images should close part of the synthetic-to-real gap
+- Status: done; wall 2.8 s; peak GPU 6257.0 MB (total on card).
+- jac_fs_val [proxy]: 0.3491
+- jac_blueneg_corr [real]: 0.0489
+- jac_cc [real]: 0.0418
+- Decision rule: neutral: no credible real-film change
+- Learned: The student reproduces its teacher on synthetic images (top-10 neighbour Jaccard 0.35 on filmsynth val/test, 0.32-0.38 on SDXL/Z-Image; similarity Spearman 0.59-0.68; the teacher's own nuisance self-agreement is 0.49 / 0.77) but not on real photographs: Jaccard 0.04-0.05 and Spearman 0.48 on CommonCatalog originals, 0.35 on BlueNeg blue-corrupted. Neither embedding follows DINOv2-global content on real images (Jaccard < 0.06), so the student's real-scan geometry is neither the teacher's nor content: it is undefined off the synthetic manifold. H-domain supported (reports/student_teacher_agreement.json).
+- Next: E23: re-distil the student with unlabeled real images (CommonCatalog train originals, filmsynth sources) in the distillation input set, teacher targets only; evaluate agreement on real sets and benchmark v1 val, then Commons analysis half.
+
+### E23b_student_real_distil — H-domain: adding unlabeled real CommonCatalog train originals as distillation-only inputs makes the student reproduce the teacher on real photographs (agreement up) without losing synthetic style retrieval
+- Status: done; wall 54.4 s; peak GPU 7647.0 MB (total on card).
+- rank1_kd64 [proxy]: 0.181
+- fam_f1 [proxy]: 0.6501
+- Decision rule: neutral: no credible real-film change
+- Learned: Adding 534 unlabeled CommonCatalog train originals as distillation-only inputs (teacher targets, treated/family/parameter losses masked; 9 s of training) raises the student's agreement with its teacher on held-out real photographs: CommonCatalog val/test originals Spearman 0.53 -> 0.62 (Jaccard 0.10 -> 0.13), BlueNeg blue-corrupted 0.38 -> 0.47 (0.047 -> 0.066), with synthetic agreement unchanged or better (SDXL 0.71 -> 0.76, Z-Image 0.57 -> 0.71). Benchmark v1 val vs the identically trained control (student_style_fs_v2_sel): B filmsynth 0.557 vs 0.520, generator share 0.586 vs 0.595, subject probe 0.192 vs 0.263 (majority 0.202), own-source rank-1 0.174 vs 0.097. The gap to the teacher on real images is still large (Spearman 0.62 vs 0.72 nuisance ceiling), so domain shift of the distillation input explains part, not all, of the synthetic-to-real gap.
+- Next: Keep the real-distil student as the candidate (not promoted); evaluate on the Commons analysis half when the set is in; E23c tests whether input diversity alone (SDXL outputs as distillation-only inputs) gives the same gain.
+
+### E23c_student_sdxl_kd_only — Input diversity alone: SDXL train outputs as distillation-only inputs (no labels) give the same real-agreement gain as real photographs (if so, the gain is about input diversity, not real images)
+- Status: done; wall 36.2 s; peak GPU 7655.0 MB (total on card).
+- rank1_kd64 [proxy]: 0.1429
+- fam_f1 [proxy]: 0.6577
+- Decision rule: neutral: no credible real-film change
+- Learned: SDXL train outputs as distillation-only inputs (same recipe as E23b but synthetic instead of real) do not reproduce the gain: held-out CommonCatalog agreement Spearman 0.55 (control 0.53, real-distil 0.62) and BlueNeg blue-corrupted 0.32 (control 0.38, real-distil 0.47). The E23b gain is specific to real photographs in the distillation input, not to input diversity.
+- Next: Falsified as an alternative explanation. Real unlabeled photographs are the cheap lever for the student; more of them (CC originals are 534) is the next scaling question, not more synthesis.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

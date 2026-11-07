@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 4870.745361719131,
- "disk_bytes": 327925963,
+ "gpu_seconds": 4998.704483184814,
+ "disk_bytes": 341123912,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -143,6 +143,38 @@
    "gpu": true,
    "disk_bytes": 69789798,
    "peak_gpu_mb_total": 20218.0,
+   "returncode": 0
+  },
+  {
+   "id": "E22_student_teacher_agreement",
+   "wall_seconds": 2.8,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6257.0,
+   "returncode": 0
+  },
+  {
+   "id": "E23a_student_baseline_rerun",
+   "wall_seconds": 34.7,
+   "gpu": true,
+   "disk_bytes": 4399315,
+   "peak_gpu_mb_total": 7633.0,
+   "returncode": 0
+  },
+  {
+   "id": "E23b_student_real_distil",
+   "wall_seconds": 54.4,
+   "gpu": true,
+   "disk_bytes": 4399316,
+   "peak_gpu_mb_total": 7647.0,
+   "returncode": 0
+  },
+  {
+   "id": "E23c_student_sdxl_kd_only",
+   "wall_seconds": 36.2,
+   "gpu": true,
+   "disk_bytes": 4399318,
+   "peak_gpu_mb_total": 7655.0,
    "returncode": 0
   }
  ],
