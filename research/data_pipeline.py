@@ -33,6 +33,18 @@ DATASETS: dict[str, dict] = {
     "commons_film": {"manifest": ROOT / "data" / "manifests" / "commons_film_manifest.jsonl", "min_rows": 1000, "sample": 40,
                      "acquire": [PY, "scripts/ingest_commons_film.py", "--download", "--max-minutes", "230", "--stall-minutes", "20", "--spacing", "2.0"],
                      "summary": ROOT / "data" / "raw" / "commons_film" / "summary.json", "max_attempts": 6, "training_allowed": False},
+    # evaluation-only real film from CommonCatalog CC-BY film scans with uploader stock tags (class B); official Hub reads
+    "commoncatalog_film": {"manifest": ROOT / "data" / "manifests" / "commoncatalog_film_manifest.jsonl", "min_rows": 300, "sample": 40,
+                           "acquire": [PY, "scripts/ingest_commoncatalog_film.py", "--download", "--max-minutes", "110"],
+                           "summary": ROOT / "data" / "raw" / "commoncatalog_film" / "summary.json", "max_attempts": 6, "training_allowed": False},
+    # evaluation-only: ARTeFACT damaged/restored 35mm scans with documented emulsions (class A, CC BY 4.0, figshare)
+    "artefact_film": {"manifest": ROOT / "data" / "manifests" / "artefact_film_manifest.jsonl", "min_rows": 40, "sample": 20,
+                      "acquire": [PY, "scripts/ingest_artefact_film.py", "--download", "--max-minutes", "60"],
+                      "summary": ROOT / "data" / "raw" / "artefact_film" / "summary.json", "max_attempts": 4, "training_allowed": False},
+    # curated photography (museum, CC0): Art Institute of Chicago public-domain photographs with process records
+    "aic_photographs": {"manifest": ROOT / "data" / "manifests" / "aic_photographs_manifest.jsonl", "min_rows": 200, "sample": 20,
+                        "acquire": [PY, "scripts/ingest_aic_photographs.py", "--download", "--max-minutes", "90"],
+                        "summary": ROOT / "data" / "raw" / "aic_photographs" / "summary.json", "max_attempts": 4, "training_allowed": True},
     # existing datasets: validated from their manifests (no acquisition command: already on disk)
     "commoncatalog_ccby": {"manifest": ROOT / "data" / "manifests" / "manifest.jsonl", "filter": {"dataset_id": "commoncatalog_ccby"}, "min_rows": 1000, "sample": 40},
     "pd12m_pilot": {"manifest": ROOT / "data" / "manifests" / "manifest.jsonl", "filter": {"dataset_id": "pd12m_pilot"}, "min_rows": 500, "sample": 20},

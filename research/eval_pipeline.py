@@ -41,7 +41,11 @@ BASELINE = "hybrid_supcon_family"
 RULES = {"primary": "same_stock", "min_delta": 0.02, "uploader_share_margin": 0.02, "scanner_probe_margin": 0.05}
 PY = sys.executable
 DATASET_SCRIPTS = {"commons_film": {"script": "scripts/eval_commons_film.py", "features": ROOT / "data" / "embeddings" / "commons_film_features_v1",
-                                    "report": lambda split: ROOT / "reports" / f"commons_film_{split}.json", "splits": ("analysis", "test")}}
+                                    "report": lambda split: ROOT / "reports" / f"commons_film_{split}.json", "splits": ("analysis", "test")},
+                   # same protocol on the CommonCatalog film-scan set (uploader stock tags, class B); split halves come from the manifest
+                   "commoncatalog_film": {"script": "scripts/eval_commons_film.py", "args": ["--dataset", "commoncatalog_film"],
+                                          "features": ROOT / "data" / "embeddings" / "commoncatalog_film_features_v1",
+                                          "report": lambda split: ROOT / "reports" / f"commoncatalog_film_{split}.json", "splits": ("analysis", "test")}}
 
 
 def eligible_students(exclude_default: bool = True) -> list[str]:
@@ -67,7 +71,7 @@ def ensure_features(dataset: str, snapshot: str, tags: list[str], log) -> dict:
         return {"computed": False, "seconds": 0}
     t0 = time.time()
     env = {**os.environ, "STUDENT_TAGS": ",".join(tags)}
-    rc = subprocess.run([PY, spec["script"], "--features"], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env).returncode
+    rc = subprocess.run([PY, spec["script"], *spec.get("args", []), "--features"], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env).returncode
     if rc != 0:
         raise RuntimeError(f"feature pass failed (exit {rc}); see log")
     meta = json.loads(j.read_text()); meta["manifest_sha256"] = snapshot; meta["student_tags"] = tags; j.write_text(json.dumps(meta))
@@ -112,7 +116,7 @@ def run(dataset: str, split: str = "analysis", final: bool = False, force_final:
     log = open(OUT / f"{dataset}_{split}_{short}.log", "a"); log.write(f"\n=== {time.strftime('%Y-%m-%dT%H:%M:%S')} split={split} snapshot={short} tags={tags}\n"); log.flush()
     feats = ensure_features(dataset, snapshot, tags, log)
     env = {**os.environ, "STUDENT_TAGS": ",".join(tags)}
-    rc = subprocess.run([PY, spec["script"], "--split", split], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env).returncode
+    rc = subprocess.run([PY, spec["script"], *spec.get("args", []), "--split", split], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env).returncode
     if rc != 0:
         raise RuntimeError(f"evaluation failed (exit {rc}); see {log.name}")
     rep = json.loads(spec["report"](split).read_text()); base = rep["candidates"][BASELINE]

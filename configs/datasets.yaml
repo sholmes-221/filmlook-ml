@@ -166,3 +166,54 @@ datasets:
     download_method: manual export into data/raw/user_consented/ with consent.jsonl
     training_allowed: true
     verified_on: null
+
+  - id: commoncatalog_film
+    name: CommonCatalog CC-BY film scans with uploader film-stock tags (evaluation-only real film, class B)
+    source_url: https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by
+    license: CC-BY-2.0          # per-row licenseurl checked (creativecommons.org/licenses/by/<v>/ only); the HF tag is not relied on
+    commercial_use: true
+    ml_training: false          # project policy: evaluation-only snapshot (independent of the students' distillation inputs)
+    num_images: "pilot target 300-1,500 (caps 20 per uploader, 6 per uploader x stock, 150 per stock)"
+    labels: [film_stock (uploader tag, canonicalised by filmlook_ml.datasets.film_stock), film_brand, film_type, scanner EXIF (capture device), uploader, caption]
+    download_method: metadata-only parquet scans + per-image parquet page-range reads via huggingface_hub (scripts/ingest_commoncatalog_film.py; no Flickr scraping); resumable, sha256 + phash, atomic writes
+    attribution: required - author, page URL and licence URL per image (data/raw/commoncatalog_film/ATTRIBUTION.jsonl)
+    redistribution: allowed with attribution; images stay local
+    training_allowed: false     # EVALUATION ONLY; uploaders present in the training manifest are excluded; split by uploader hash (analysis/test)
+    authenticity_class: B       # scanner EXIF + uploader claim; never verified from pixels
+    risks: >-
+      Stock labels are uploader-asserted tags (noisy, sometimes a brand only -> film_stock null, never a negative label);
+      uploader-asserted licences as for commoncatalog_ccby; scanner families and uploaders are confounds (every metric
+      excludes the query's uploader and bootstraps over uploaders).
+    verified_on: 2026-11-07
+
+  - id: artefact_film
+    name: ARTeFACT authentically damaged & manually restored 35mm scans (Ivanova et al., Eurographics 2023)
+    source_url: https://figshare.com/articles/dataset/Authentically_damaged_film_scans/21803304
+    license: CC-BY-4.0          # figshare licence record checked by the adapter at every run (refuses if it changes)
+    commercial_use: true
+    ml_training: false          # project policy: evaluation-only (authenticity and per-emulsion sanity checks)
+    num_images: 88 (44 damaged originals + 44 restored counterparts), 11 emulsions, one photographer
+    labels: [film_stock (owner record in file name and paper), film_format (35mm / half-frame), restored flag, figshare md5]
+    download_method: figshare API file URLs via research.downloader (scripts/ingest_artefact_film.py); original bytes kept, md5 + sha256 verified
+    attribution: required - Daniela Ivanova, doi 10.6084/m9.figshare.21803304 (data/raw/artefact_film/ATTRIBUTION.jsonl)
+    redistribution: not done
+    training_allowed: false
+    authenticity_class: A
+    risks: single photographer and scanner (within-photographer only); scans carry dust/scratch damage by design (restored versions are derived images, kept separate by kind)
+    verified_on: 2026-11-07
+
+  - id: aic_photographs
+    name: Art Institute of Chicago public-domain photographs (curated-photography group, CC0)
+    source_url: https://api.artic.edu/docs/
+    license: CC0-1.0            # AIC Open Access: public-domain works' images are CC0 (is_public_domain = true checked per record)
+    commercial_use: true
+    ml_training: true
+    num_images: pilot target 600 of 3,777 (cap 8 per artist)
+    labels: [artist, date, medium/process (gelatin silver print, albumen print, ...), classification, credit line]
+    download_method: public API (metadata, paged, 1.2 s spacing, descriptive AIC-User-Agent) + IIIF 843 px renditions via research.downloader (scripts/ingest_aic_photographs.py)
+    attribution: not required (CC0); artist, title and page URL kept per image anyway
+    redistribution: permitted (CC0); not done
+    training_allowed: true      # CC0; group curated_photography (never mixed into the real-film pool or synthetic sets without an explicit experiment definition)
+    authenticity_class: A       # museum records of the physical print; digitised prints, not negatives; mostly 1840s-1920s
+    risks: historic processes only (no modern editorial photography); museum digitisation pipeline is a shared nuisance; editorial/curatorial selection is not a quality ground truth
+    verified_on: 2026-11-07

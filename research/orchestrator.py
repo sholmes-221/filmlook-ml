@@ -51,6 +51,15 @@ def seed(auto_research: bool = False) -> list[str]:
     made.append(T.add("data_validate_existing", "data", [PY, "-m", "research.data_pipeline", "validate-all"], max_attempts=2, wall_minutes_max=30)["id"])
     made.append(T.add("eval_commons_film_analysis", "eval", [PY, "-m", "research.eval_pipeline", "run", "--dataset", "commons_film", "--split", "analysis"],
                       depends_on=["dataset:commons_film"], gpu_mb=3000, max_attempts=3, wall_minutes_max=60, retry_backoff_s=600)["id"])
+    # second real-film source (CommonCatalog film scans with uploader stock tags): metadata scan, then resumable acquisition, then evaluation
+    made.append(T.add("data_commoncatalog_film_scan", "data", [PY, "scripts/ingest_commoncatalog_film.py", "--scan", "--shards", "300"], max_attempts=3, wall_minutes_max=120, retry_backoff_s=900)["id"])
+    made.append(T.add("data_commoncatalog_film_acquire", "data", [PY, "-m", "research.data_pipeline", "acquire", "commoncatalog_film"], depends_on=["task:data_commoncatalog_film_scan"],
+                      max_attempts=8, wall_minutes_max=130, retry_backoff_s=600)["id"])
+    made.append(T.add("eval_commoncatalog_film_analysis", "eval", [PY, "-m", "research.eval_pipeline", "run", "--dataset", "commoncatalog_film", "--split", "analysis"],
+                      depends_on=["dataset:commoncatalog_film"], gpu_mb=3000, max_attempts=3, wall_minutes_max=60, retry_backoff_s=600)["id"])
+    # ARTeFACT (figshare, CC BY 4.0, class A) and the curated CC0 museum photographs (Art Institute of Chicago)
+    made.append(T.add("data_artefact_film_acquire", "data", [PY, "-m", "research.data_pipeline", "acquire", "artefact_film"], max_attempts=4, wall_minutes_max=70, retry_backoff_s=900)["id"])
+    made.append(T.add("data_aic_photographs_acquire", "data", [PY, "-m", "research.data_pipeline", "acquire", "aic_photographs"], max_attempts=4, wall_minutes_max=100, retry_backoff_s=900)["id"])
     if auto_research:
         made.append(T.add("research_cycle", "research", [PY, "-m", "research.research_loop", "--once"], gpu_mb=6000, max_attempts=1, wall_minutes_max=120)["id"])
     return made

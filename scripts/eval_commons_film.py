@@ -38,7 +38,13 @@ from style_benchmark import load_cache, unit  # noqa: E402
 from filmlook_ml import paths as P  # noqa: E402
 from filmlook_ml.datasets.preprocess import read_jsonl  # noqa: E402
 
-OUT = P.EMBEDDINGS / "commons_film_features_v1"
+DATASET = "commons_film"; OUT = P.EMBEDDINGS / "commons_film_features_v1"; MANIFEST = P.MANIFESTS / "commons_film_manifest.jsonl"
+
+
+def configure(dataset: str) -> None:
+    """Point the script at another real-film dataset (same manifest fields: path, image_id, uploader, kind, film_stock_claim, film_type, scanner_category)."""
+    global DATASET, OUT, MANIFEST
+    DATASET, OUT, MANIFEST = dataset, P.EMBEDDINGS / f"{dataset}_features_v1", P.MANIFESTS / f"{dataset}_manifest.jsonl"
 N_BOOT = 500
 
 
@@ -52,7 +58,7 @@ def do_features():
     from PIL import Image
     from filmlook_infer.compact import preprocess
     t0 = time.time(); dev = torch.device("cuda")
-    rows = read_jsonl(P.MANIFESTS / "commons_film_manifest.jsonl")
+    rows = read_jsonl(MANIFEST)
     with Pool(16) as pool:
         arrs = pool.map(V3._load, [(r["path"], r["image_id"], True, True) for r in rows], chunksize=8)
     ims = [Image.fromarray(a) for a in arrs]
@@ -70,7 +76,7 @@ def do_features():
             e = np.exp(a - a.max(1, keepdims=True)); a = (e / e.sum(1, keepdims=True))[:, meta["heads"]["capture_type"].index("film_scan")]
         feats[name] = a
     np.savez(OUT.with_suffix(".npz"), **feats)
-    OUT.with_suffix(".json").write_text(json.dumps({"version": "commons-film-features-v1", "n": len(rows), "rows": rows, "seconds": round(time.time() - t0, 1),
+    OUT.with_suffix(".json").write_text(json.dumps({"version": f"{DATASET}-features-v1", "n": len(rows), "rows": rows, "seconds": round(time.time() - t0, 1),
                                                     "student_tags": [t for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]}))
     print(json.dumps({"n": len(rows), "seconds": round(time.time() - t0, 1)}))
 
@@ -143,10 +149,10 @@ def do_eval(split):
     for t in [t for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]:
         if "student_" + t in F:
             cands[f"student_{t}_64"] = F["student_" + t]
-    up = np.array([r["uploader"] for r in rows]); half = np.array([half_of(u) for u in up]); kind = np.array([r["kind"] for r in rows])
+    up = np.array([r["uploader"] for r in rows]); half = np.array([r["split"] if r.get("split") in ("analysis", "test") else half_of(u) for r, u in zip(rows, up)]); kind = np.array([r["kind"] for r in rows])
     stock = np.array([r["film_stock_claim"] or "?" for r in rows]); ftype = np.array([r["film_type"] for r in rows]); scanner = np.array([r["scanner_category"] or "" for r in rows])
     m = half == split; film = m & (kind == "film"); emu = m & (kind == "digital_emulation")
-    out = {"dataset": "commons_film", "split": split, "n_film": int(film.sum()), "n_emulation": int(emu.sum()), "n_uploaders_film": int(len(set(up[film]))),
+    out = {"dataset": DATASET, "split": split, "n_film": int(film.sum()), "n_emulation": int(emu.sum()), "n_uploaders_film": int(len(set(up[film]))),
            "stocks_top": Counter(stock[film]).most_common(15), "film_types": dict(Counter(ftype[film])),
            "stock_uploader_concentration": {s: round(max(Counter(up[film & (stock == s)]).values()) / (film & (stock == s)).sum(), 2) for s, _ in Counter(stock[film]).most_common(10)},
            "candidates": {}}
@@ -168,7 +174,7 @@ def do_eval(split):
         has = film & (scanner != "")
         r["scanner_probe"] = grouped_probe(Z[has], scanner[has], up[has]) if has.sum() >= 30 else {"accuracy": None, "n": int(has.sum())}
         out["candidates"][name] = r
-    P.REPORTS.mkdir(exist_ok=True); (P.REPORTS / f"commons_film_{split}.json").write_text(json.dumps(out, indent=1, default=str))
+    P.REPORTS.mkdir(exist_ok=True); (P.REPORTS / f"{DATASET}_{split}.json").write_text(json.dumps(out, indent=1, default=str))
     print(json.dumps({k: out[k] for k in ("split", "n_film", "n_emulation", "n_uploaders_film", "film_types", "stock_uploader_concentration", "authenticity_film_vs_emulation")}, indent=1, default=str))
     print(f"{'candidate':22s} {'stock p@5':>10s} {'CI':>16s} {'chance':>7s} {'type p@5':>9s} {'chance':>7s} {'upl share':>10s} {'prior':>6s} {'scanner acc':>12s} {'maj':>6s}")
     for name, r in out["candidates"].items():
@@ -178,7 +184,9 @@ def do_eval(split):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("--features", action="store_true"); ap.add_argument("--split", choices=["analysis", "test"], default=None)
+    ap.add_argument("--dataset", default="commons_film")
     a = ap.parse_args()
+    configure(a.dataset)
     if a.features:
         do_features()
     if a.split:
