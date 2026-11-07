@@ -35,12 +35,15 @@ E8 third generator (data generating at session start), E9 layer ablation, E10 SD
 embedding, E12 spatial student, E13 scale to 500 sources (blocked by E8).
 
 ## Completed this session
-(none yet)
+- E9/E9b layer ablation: neutral (depth trade-off documented; L4+L8 kept).
+- E11 parameter-similarity embedding: rejected (real same-stock regressed 0.25 -> 0.21).
 
 ## Rejected approaches (do not repeat without a new hypothesis)
 - Training "treated vs untreated" on both generators with pristine-only controls: real-film regression (E3 `style_both`).
 - Label-tied grain (film-synth-v1) as a transfer signal: generator fingerprint (E2/E4).
 - Resolution/JPEG standardisation or VAE controls as the leakage fix alone: little effect (E4 C1/C2).
+- Fine parameter-similarity contrastive objective (E11): fits synthetic geometry, hurts real-scan retrieval.
+- Searching DINOv2 layers for a single best style layer (E9/E9b): within CI; mid layers = real texture, deep = generator-invariant.
 
 ## Resource usage
 See `research/ledger.json`.

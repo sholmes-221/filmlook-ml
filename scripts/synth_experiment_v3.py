@@ -118,16 +118,22 @@ def treated_retrieval(Fq, src_q, Fb, src_b, treated_b):
     return {"treated_precision@5_other_sources": round(float(np.mean(prec)), 4), "chance": round(float(treated_b.mean()), 4)}
 
 
-def same_stock(F, stock, roll):
+def same_stock(F, stock, roll, n_boot=N_BOOT, seed=0):
+    """Same-stock precision@5 with the query's own roll excluded; 95% CI by bootstrap over ROLLS (the unit of scene
+    overlap), so the interval reflects how few independent film rolls BlueNeg has."""
     Z = F / (np.linalg.norm(F, axis=1, keepdims=True) + 1e-8); S = Z @ Z.T
-    prec, ch = [], []
+    prec, ch, qroll = [], [], []
     for q in range(len(F)):
         ok = roll != roll[q]
         if (stock[ok] == stock[q]).sum() == 0:
             continue
         order = [j for j in np.argsort(-S[q]) if ok[j]][:5]
-        prec.append(np.mean(stock[order] == stock[q])); ch.append((stock[ok] == stock[q]).mean())
-    return {"precision@5": round(float(np.mean(prec)), 4), "chance": round(float(np.mean(ch)), 4), "n": len(prec)}
+        prec.append(np.mean(stock[order] == stock[q])); ch.append((stock[ok] == stock[q]).mean()); qroll.append(roll[q])
+    prec, qroll = np.array(prec), np.array(qroll)
+    rng = np.random.default_rng(seed); ur = np.unique(qroll); gi = {r: np.where(qroll == r)[0] for r in ur}
+    boots = [prec[np.concatenate([gi[r] for r in rng.choice(ur, len(ur))])].mean() for _ in range(n_boot)]
+    return {"precision@5": round(float(prec.mean()), 4), "ci95": [round(float(np.percentile(boots, 2.5)), 3), round(float(np.percentile(boots, 97.5)), 3)],
+            "chance": round(float(np.mean(ch)), 4), "n": int(len(prec)), "n_rolls": int(len(ur))}
 
 
 def main():

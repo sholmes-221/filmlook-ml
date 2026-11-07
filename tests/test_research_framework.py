@@ -66,3 +66,16 @@ def test_planner_prefers_value_per_cost_within_budget(reg, tmp_path):
     assert planner.select_next(bl)["id"] == "b"                   # a exceeds the budget, c is blocked
     md = planner.render_markdown(bl)
     assert "| a |" in md and "pending" in md
+
+
+def test_same_stock_metric_reports_roll_bootstrap_ci():
+    import numpy as np
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+    import synth_experiment_v3 as V3
+    rng = np.random.default_rng(0)
+    stock = np.array(["a"] * 20 + ["b"] * 20); roll = np.array([f"r{i // 4}" for i in range(40)])
+    F = np.vstack([rng.normal(size=(20, 8)) + 3, rng.normal(size=(20, 8)) - 3])      # perfectly separable stocks
+    r = V3.same_stock(F, stock, roll, n_boot=50)
+    assert r["precision@5"] == 1.0 and r["ci95"] == [1.0, 1.0] and r["n_rolls"] == 10 and 0.4 < r["chance"] < 0.6
+    r2 = V3.same_stock(rng.normal(size=(40, 8)), stock, roll, n_boot=50)
+    assert r2["ci95"][0] <= r2["precision@5"] <= r2["ci95"][1]

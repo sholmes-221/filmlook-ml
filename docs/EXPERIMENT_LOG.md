@@ -114,6 +114,55 @@ generators.
 - Learned: Cross-generator transfer rises with depth (SDXL->filmsynth 0.31 at L2 to 0.53 at L12; filmsynth->SDXL best at L9, 0.64 [0.55, 0.77]); real-film signal peaks at mid layers (BlueNeg 0.71 and same-stock 0.25 at L4-L5) and collapses at depth (0.14). Shallow layers carry generator texture signatures, deep layers are generator-invariant but blind to real film texture. No single layer beats L4+L8 beyond the CI width.
 - Next: E9b: mid+deep pairs (L4+L9, L5+L9, L5+L12) to test whether one feature set can hold both signals.
 
+### E9b_layer_combos — a mid+deep layer pair captures both real-film texture (mid) and generator-invariant treatment (deep)
+- Status: done; wall 188.3 s; peak GPU 20734.0 MB (total on card).
+- best_layer_fs_to_sdxl [synthetic]: 0.6281 CI [0.494, 0.778] (baseline 0.6444, neutral)
+- best_layer_same_stock [real]: 0.2318 (baseline 0.2471, neutral)
+- Decision rule: neutral: no credible real-film change
+- Learned: L4+L9: filmsynth->SDXL 0.62 [0.56, 0.73] vs 0.59 for L4+L8, same BlueNeg (0.70) and same-stock (0.23); three-layer mixes add nothing. No static layer mix resolves the mid-vs-deep trade-off beyond CI width. Keep L4+L8; L4+L9 is equivalent.
+- Next: Stop layer search. Test a different objective instead (E11 parameter-similarity embedding).
+
+### E11_parameter_similarity_supcon — continuous parameter-similarity positives (across sources) give a better cross-photo style embedding than family labels
+- Status: done; wall 165.3 s; peak GPU 20734.0 MB (total on card).
+- best_param_same_stock [real]: 0.2059
+- family_same_stock [real]: 0.2482
+- Decision rule: neutral: no credible real-film change
+- Learned: Soft parameter-similarity positives fit the synthetic parameter geometry (embedding-distance vs parameter-distance Spearman 0.76-0.79 vs 0.28 for family SupCon) but real-scan same-stock retrieval fell to 0.21/0.19/0.18 (tau 0.2/0.35/0.7) from 0.25 with family labels; cross-generator retrieval also no better. Coarse family grouping transfers to real film better than the engine's fine parameterisation. Hypothesis falsified by its own criterion (needed > 0.28).
+- Next: Rejected. Do not refine tau; the objective is wrong for the real target. Keep family SupCon as the embedding objective; test spatial supervision (E12) and the third generator (E8).
+
+### E12_spatial_student — a MobileNetV3 student with a 2x2 feature-map grid head learns framing (zoom, signed offsets) from exact crop geometry at least as well as the frozen DINOv2 grid probe
+- Status: done; wall 39.2 s; peak GPU 21326.0 MB (total on card).
+- grid_x_offset_r2 [proxy]: -0.1502
+- grid_y_offset_r2 [proxy]: 0.0351
+- grid_zoom_r2 [proxy]: 0.0678
+- global_x_offset_r2 [proxy]: -0.2463
+- grid_mirror [proxy]: 0.4747
+- Decision rule: neutral: no credible real-film change
+- Learned: End-to-end MobileNetV3 with a 2x2 grid head trained on exact crop geometry (2,744 crops, 343 sources) does not recover framing on 57 held-out sources: x-offset R^2 -0.15, y 0.04, zoom 0.07 (offset MAE ~0.5 on a +/-1 target), below the frozen DINOv2 grid probe (0.24 / 0.23). Grid embedding is mirror-sensitive (0.47 vs 0.13 global), so left/right is encoded but not mapped to offset. Falsified (criterion R^2 < 0.1).
+- Next: Drop direct geometry regression for the student. If composition is revisited, distil the DINOv2 grid features (which do carry offset) rather than regress geometry.
+
+### E8_zimage_third_generator — grain-randomised synthetic training generalises to an unseen diffusion family (Z-Image-Turbo)
+- Status: done; wall 223.4 s; peak GPU 7369.0 MB (total on card).
+- heldout_zimage_auroc [synthetic]: 0.6281 CI [0.521, 0.748]
+- heldout_sdxl_auroc [synthetic]: 0.5807 CI [0.527, 0.678]
+- heldout_filmsynth_auroc [synthetic]: 0.4654 CI [0.358, 0.597]
+- gen_id_4way_acc [proxy]: 0.7667
+- blueneg_auroc_heldout_zimage [real]: 0.6462
+- same_stock_supcon_heldout_zimage [real]: 0.1318 CI [0.082, 0.169]
+- Decision rule: neutral: no credible real-film change
+- Learned: Held-out Z-Image (train filmsynth+SDXL) 0.63 [0.52, 0.75]: CI excludes chance, so the criterion is met, but the gain sits in diffusion<->diffusion pairs (SDXL->Z-Image 0.65 [0.57, 0.73], Z-Image->SDXL 0.65 [0.52, 0.77]) while filmsynth<->diffusion stays at 0.47-0.58 and a probe trained on the two diffusion families scores real film INVERTED (BlueNeg 0.39). Generator identity stays high (4-way 0.77 vs chance 0.44). Content preserved for Z-Image (own-source rank-1 0.96). Real-film transfer did not improve (0.65 vs 0.70 for filmsynth alone).
+- Next: Scaling (E13) not justified: generator identifiability did not fall and real-film did not improve. Test the artifact explanation directly (E14).
+
+### E8b_v4_fine_supcon_labels — E8 retrieval re-run with fine SupCon labels (filmsynth families + diffusion treatments); the E8 collapse to chance was an evaluation bug
+- Status: done; wall 220.2 s; peak GPU 7371.0 MB (total on card).
+- same_stock_supcon_heldout_zimage [real]: 0.2176 CI [0.107, 0.311] (baseline 0.1318, improved?)
+- same_stock_supcon_heldout_sdxl [real]: 0.2576 CI [0.162, 0.337]
+- same_stock_hybrid_raw [real]: 0.1459 CI [0.081, 0.193]
+- heldout_zimage_auroc [synthetic]: 0.6281 CI [0.521, 0.748] (baseline 0.6281, neutral)
+- Decision rule: accept: real improvement
+- Learned: With family/treatment labels the SupCon same-stock retrieval is 0.22 [0.11, 0.31] (filmsynth+SDXL) and 0.26 [0.16, 0.34] (filmsynth+Z-Image) vs raw 0.15 [0.08, 0.19]; the E8 collapse to 0.13 was an evaluation bug (coarse labels). The roll-bootstrap CIs (27 rolls) are wide: embedding variants within 0.03-0.04 of each other are indistinguishable on BlueNeg.
+- Next: Treat same-stock differences below ~0.08 as noise; a second real-film source is needed for a sharper retrieval benchmark.
+
 ## Decisions taken from these runs
 
 1. Grain randomisation (film-synth-v2) is the fix that worked for cross-generator leakage; standardisation and the

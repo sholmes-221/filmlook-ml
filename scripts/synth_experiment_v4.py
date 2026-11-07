@@ -26,6 +26,7 @@ import torch
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
 import synth_experiment as X  # noqa: E402
 import synth_experiment_v3 as V3  # noqa: E402
+import os  # noqa: E402
 
 from filmlook_ml import paths as P  # noqa: E402
 from filmlook_ml.annotation.workflow import discover  # noqa: E402
@@ -116,7 +117,10 @@ def main():
     for held in GENS:
         others = [g for g in GENS if g != held]
         Xtr = np.vstack([F[g]["t"]["hybrid_style"][meta[g]["t"][1] == "train"] for g in others] + [F[g]["c"]["hybrid_style"][meta[g]["c"][1] == "train"] for g in others])
-        lab = np.concatenate([np.full((meta[g]["t"][1] == "train").sum(), f"{g}_treated") for g in others] + [np.full((meta[g]["c"][1] == "train").sum(), "control") for g in others])
+        # fine labels: filmsynth family ids, diffusion treatment ids; controls pooled (E8b fix: coarse labels collapsed families)
+        fam_of = {"filmsynth": lambda a: a["augmentation_family"], "sdxl": lambda a: "sdxl_" + a["treatment"], "zimage": lambda a: "zimage_" + a["treatment"]}
+        lab = np.concatenate([np.array([fam_of[g](a) for a in sets[g][0]])[meta[g]["t"][1] == "train"] for g in others]
+                             + [np.full((meta[g]["c"][1] == "train").sum(), "control") for g in others])
         proj = X.supcon(Xtr, lab, dev)
         st, pt = meta[held]["t"]; sc_, pc = meta[held]["c"]
         bank_F = np.vstack([F[g]["t"]["hybrid_style"] for g in others] + [F[g]["c"]["hybrid_style"] for g in others] + [F[held]["c"]["hybrid_style"]])
@@ -134,7 +138,7 @@ def main():
                       "generator_identity_hybrid": out["generator_identity"]["hybrid_style"],
                       "v3_C3_baseline": {"filmsynth->sdxl": 0.5763, "sdxl->filmsynth": 0.4806, "gen_id_3way": 0.7944, "blueneg": 0.6975, "same_stock_supcon": 0.2482}}
     rep["total_seconds"] = round(time.time() - t0, 1)
-    (P.REPORTS / "synth_experiment_v4.json").write_text(json.dumps(rep, indent=1, default=str))
+    (P.REPORTS / os.environ.get("V4_OUT", "synth_experiment_v4.json")).write_text(json.dumps(rep, indent=1, default=str))
     print(json.dumps({"n": rep["n"], "summary": rep["summary"], "content_leakage": rep["content_leakage"], "retrieval": rep["retrieval"], "seconds": rep["total_seconds"]}, indent=1, default=str))
 
 
