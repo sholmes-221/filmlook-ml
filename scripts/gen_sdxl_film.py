@@ -37,7 +37,7 @@ from filmlook_ml.datasets.quarantine import load_quarantine
 from filmlook_ml.datasets.registry import Registry
 from filmlook_ml.filmsynth import variant_seed
 
-OUT = P.DATA / "synthetic" / "sdxl_i2i_v1"
+OUT = P.DATA / "synthetic" / os.environ.get("SDXL_OUT", "sdxl_i2i_v1")
 CACHE = P.DATA / "hf_cache"
 BASE = "stabilityai/stable-diffusion-xl-base-1.0"
 LORAS = {
@@ -125,7 +125,7 @@ def main():
             cfg = LORAS[t]
             vid = f"{r['family_id']}__sdxl_{t}"
             path = OUT / "images" / f"{vid}.jpg"
-            seed = variant_seed(r["image_id"], f"sdxl_{t}", a.seed, "sdxl-i2i-v1")
+            seed = variant_seed(r["image_id"], f"sdxl_{t}", a.seed, os.environ.get("SDXL_OUT", "sdxl-i2i-v1"))
             if path.exists():
                 continue
             if cfg["repo"]:
@@ -150,7 +150,7 @@ def main():
             out.save(path, quality=92, subsampling=0)
             data = path.read_bytes()
             anns.append({"source_image_id": r["image_id"], "variant_id": vid, "generator": "sdxl_i2i",
-                         "generator_version": "sdxl-i2i-v1", "treatment": t,
+                         "generator_version": os.environ.get("SDXL_OUT", "sdxl-i2i-v1"), "treatment": t,
                          "models": {BASE: {"revision": revisions[BASE], "license": "CreativeML Open RAIL++-M"},
                                     **({cfg["repo"]: {"revision": revisions[cfg["repo"]], "file": cfg["file"],
                                                       "license": cfg["license"], "scale": cfg["scale"]}} if cfg["repo"] else {})},

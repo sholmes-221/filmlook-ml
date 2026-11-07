@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 4162.441406164169,
- "disk_bytes": 258128188,
+ "gpu_seconds": 4182.326052341461,
+ "disk_bytes": 258136165,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -120,6 +120,22 @@
    "disk_bytes": 0,
    "peak_gpu_mb_total": 6257.0,
    "returncode": 1
+  },
+  {
+   "id": "E19_content_invariant_projection",
+   "wall_seconds": 4.4,
+   "gpu": true,
+   "disk_bytes": 7977,
+   "peak_gpu_mb_total": 6353.0,
+   "returncode": 0
+  },
+  {
+   "id": "B1_bench_test_final",
+   "wall_seconds": 15.5,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 20194.0,
+   "returncode": 0
   }
  ],
  "session_started": "2026-11-07T07:03:54Z",

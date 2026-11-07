@@ -36,8 +36,8 @@ experiments:
   status: pending
 - id: E10_sdxl_strength_050
   hypothesis: the weak reverse direction (sdxl->filmsynth 0.48) is because strength-0.35 treatments barely change rendering
-  motivation: generator_signature_diagnostic shows SDXL moves saturation/contrast little
-  value: 3
+  motivation: 'E19 diagnostic: SDXL treatments at 0.35 differ by 0.19x nuisance; labels meaningless'
+  value: 5
   gpu_minutes: 8
   disk_gb: 0.1
   metric: pairwise LOGO both directions at strength 0.5 vs 0.35; content own-source rank-1 (must stay > 0.9)
@@ -119,3 +119,12 @@ experiments:
     p@5 of the chosen set
   falsified_if: no subset of <= 8 statistics reaches the full set's cross-type mean within 0.02
   status: pending
+- id: E19_content_invariant_projection
+  hypothesis: all-generator labels + hard negatives + content decorrelation improve cross-scene retrieval without generator
+    fingerprint
+  value: 4
+  gpu_minutes: 1
+  disk_gb: 0
+  metric: 'benchmark v1 val: B, C share, E'
+  falsified_if: C share or E subject probe rises
+  status: rejected

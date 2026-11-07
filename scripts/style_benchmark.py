@@ -15,7 +15,7 @@ import time
 
 import numpy as np
 
-sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent)); sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[1]))
 import synth_experiment as X  # noqa: E402
 from colour_vs_texture import IDX_C, IDX_T  # noqa: E402
 

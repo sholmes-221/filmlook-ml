@@ -12,7 +12,9 @@ def _val(m):
                 return float(m[k]), m.get("ci95")
     if isinstance(m, (list, tuple)) and m and isinstance(m[0], (int, float)):
         return float(m[0]), (m[1] if len(m) > 1 and isinstance(m[1], (list, tuple)) else None)
-    return float(m), None
+    if isinstance(m, (int, float)):
+        return float(m), None
+    return None, None                                   # nested record without a scalar: skipped by compare()
 
 
 def compare(exp_id: str, baseline_id: str | None = None, min_delta: float = 0.02) -> dict:
@@ -23,9 +25,13 @@ def compare(exp_id: str, baseline_id: str | None = None, min_delta: float = 0.02
         if name not in exp.get("metrics", {}):
             continue
         v, ci = _val(exp["metrics"][name])
+        if v is None:
+            continue
         entry = {"value": v, "ci95": ci, "kind": spec.get("kind", "proxy")}
         if base and name in base.get("metrics", {}):
             bv, bci = _val(base["metrics"][name])
+            if bv is None:
+                out["per_metric"][name] = entry; out[entry["kind"]].append((name, None)); continue
             d = (v - bv) * (1 if spec.get("higher_is_better", True) else -1)
             overlap = bool(ci and bci and not (ci[0] > bci[1] or ci[1] < bci[0]))
             entry.update({"baseline": bv, "delta": round(d, 4),

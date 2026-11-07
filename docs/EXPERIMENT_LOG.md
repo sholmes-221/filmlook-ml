@@ -226,6 +226,22 @@ generators.
 - Learned: raw DINOv2 global is a content embedding (ratio 0.08, rank-1 0.96, subject probe at ceiling). Family SupCon on hybrid features and the v2 student are style-dominated (ratios 1.7 / 5.1, subject probe near majority, neighbour overlap with content 0.06-0.08). Two failures: diffusion treatment ids are not retrievable across scenes by any candidate (B sdxl/zimage = chance 0.33), and learned embeddings cluster by generator (share 0.54-0.60 vs prior 0.40).
 - Next: E19 projection trained on all generators' labels with same-source hard negatives and a content-decorrelation penalty.
 
+### E19_content_invariant_projection — a projection trained on all generators' treatment labels with same-source hard negatives and a content-decorrelation penalty raises cross-scene same-treatment retrieval (incl. diffusion) and lowers generator share and semantic leakage, on the val split
+- Status: done; wall 4.4 s; peak GPU 6353.0 MB (total on card).
+- B_fs_decorr [synthetic]: 0.4533 CI [0.417, 0.49]
+- B_sdxl_decorr [synthetic]: 0.3778 CI [0.333, 0.427]
+- Decision rule: neutral: no credible real-film change
+- Learned: All-generator labels raise diffusion same-treatment retrieval only slightly (0.39-0.43 vs chance 0.33) while the generator fingerprint rises (same-generator share 0.70 vs 0.54, probe 0.64 vs 0.51) and semantic leakage grows (subject probe 0.35 vs 0.24); hard negatives and the content-decorrelation penalty change almost nothing. Diagnostic (reports/diffusion_treatment_distinctness.json): two SDXL treatments of the same source differ by 0.19x the JPEG+rescale nuisance under raw features (Z-Image 0.35x; filmsynth 1.6x; under SupCon 1.0x vs 13.7x). The diffusion treatment ids at strength 0.35 are not distinct beyond nuisance: B(sdxl/zimage) at chance is a label problem.
+- Next: Rejected. Regenerate diffusion treatments at a strength where they are distinct (E10, strength 0.5) and re-measure distinctness, cross-scene retrieval and content preservation before using them as labels again.
+
+### B1_bench_test_final — Final one-time test-split evaluation of the retained candidates on benchmark v1 (A-E plus D BlueNeg same-stock); no selection on this run
+- Status: done; wall 15.5 s; peak GPU 20194.0 MB (total on card).
+- B_fs [proxy]: 0.435
+- D_p5 [real]: 0.2482
+- Decision rule: neutral: no credible real-film change
+- Learned: One-time test run of benchmark v1 (docs/BENCHMARK.md, Results). Val and test agree within 0.05 on every column. hybrid + family SupCon: B filmsynth 0.44 [0.39, 0.48], own-source rank-1 0.33, generator share 0.59, BlueNeg same-stock 0.25 [0.16, 0.31] (only candidate clearly above the 0.17 DINOv2 reference). student_fs_v2: best on synthetic (B 0.55, rank-1 0.16) but 0.18 on real scans; colour/tone 16: least semantic content (subject probe 0.25) but 0.18 on real scans. Abstention (reports/abstention_test.json): top-1 cosine similarity orders the hybrid SupCon errors on real scans (rank-1 0.22 -> 0.37 at 50% coverage, 0.50 at 25%, AURC 0.59 vs 0.78 unordered); the student's confidence is uninformative on real data.
+- Next: Record in MODEL_CARD/FINDINGS; keep hybrid + family SupCon as the research embedding with abstention below the 50%-coverage threshold. Test split is now spent for this candidate set.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18)
 
 4. "Treated vs untreated" is retired as a research target: across generator types it reduces to one statistic

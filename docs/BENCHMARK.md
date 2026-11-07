@@ -35,3 +35,52 @@ raw DINOv2 global (768), raw hybrid (explicit 28 ++ DINOv2 L4+L8, 1564), hybrid 
 trained on train sources), `student_style_fs_v2` 576-d and 64-d (ONNX), colour/tone statistics (16), texture
 statistics (12). Features are cached in `data/embeddings/bench_features_v1.npz` with the image list in
 `data/embeddings/bench_features_v1.json`.
+
+## Results (benchmark v1, 2026-11-07)
+
+Val (selection; `reports/style_benchmark_val.json`, `_val_e19.json`) and the one-time test run
+(`reports/style_benchmark_test.json`, registry `B1_bench_test_final`). B/C/E chance rates: B filmsynth 0.11, B
+sdxl/zimage 0.33, C accuracy 0.44, C share prior 0.40, E subject majority 0.20 (val) / 0.22 (test), E content
+ceiling (DINOv2 global) 0.53 (val) / 0.48 (test). D chance 0.12.
+
+| candidate (test split) | A p | A2 | B fs p@5 [CI] | B sdxl | B zim | C acc | C share | E rank-1 | E subj | E jac | D p@5 [roll CI] |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| raw DINOv2 global (reference) | 0.82 | 0.06 | 0.13 [0.12, 0.14] | 0.36 | 0.37 | 0.47 | 0.44 | 0.99 | 0.48 | 1.00 | 0.17 [0.13, 0.23] |
+| raw hybrid | 0.49 | 0.19 | 0.21 [0.17, 0.25] | 0.34 | 0.34 | 0.74 | 0.40 | 0.37 | 0.49 | 0.09 | 0.15 [0.08, 0.19] |
+| hybrid + family SupCon | 0.93 | 1.51 | 0.44 [0.39, 0.48] | 0.32 | 0.35 | 0.56 | 0.59 | 0.33 | 0.34 | 0.09 | **0.25 [0.16, 0.31]** |
+| student_fs_v2 64-d | 0.90 | 3.33 | **0.55 [0.49, 0.62]** | 0.35 | 0.35 | 0.55 | 0.63 | **0.16** | 0.33 | 0.09 | 0.18 [0.13, 0.23] |
+| colour/tone 16 stats | 1.00 | 1.91 | 0.34 [0.30, 0.38] | 0.35 | 0.35 | 0.48 | 0.51 | 0.52 | **0.25** | 0.08 | 0.18 [0.09, 0.28] |
+
+Val numbers for the same candidates are within ±0.05 of these on every column (hybrid SupCon val: A 0.91, A2 1.71,
+B fs 0.47, C share 0.54, rank-1 0.37, subj 0.24), so nothing was selected on noise. Readings:
+- Raw DINOv2 global is a content embedding (A2 0.06, rank-1 0.99, Jaccard 1.0, subject probe at the ceiling).
+  Every retained candidate is style-dominated on filmsynth (A2 > 1, B fs 3-5× chance, Jaccard < 0.1).
+- The learned candidates still carry content and generator signal: own-source rank-1 0.16-0.37 (student lowest),
+  subject probe 0.33-0.34 against a 0.22 majority, same-generator share 0.59-0.63 against a 0.40 prior. The
+  16 colour/tone statistics carry the least semantic content (0.25) but the most own-source identity (0.52).
+- B for SDXL and Z-Image is at chance for every embedding, including the ones trained on those labels (E19). The
+  diagnostic `reports/diffusion_treatment_distinctness.json` explains why: two SDXL treatments of the same source
+  differ by 0.19× the JPEG+rescale nuisance under raw hybrid features (Z-Image 0.35×; filmsynth 1.6×), so at strength
+  0.35 the diffusion treatment ids are not distinct labels. E10 re-generates SDXL at strength 0.5 to test that.
+- D (real scans): only hybrid + family SupCon is clearly above chance, 0.25 [0.16, 0.31]; the student (0.18) and the
+  colour/tone statistics (0.18) are not separable from the DINOv2 reference (0.17) at 27 rolls.
+
+## Confidence and abstention (`scripts/abstention_analysis.py`, `reports/abstention_test.json`)
+Every retrieval query gets a label-free confidence: `top1_sim` (cosine similarity to the nearest neighbour from
+another source/roll) or `knn_agree` (share of the 5 nearest index items that agree with the top-1's label).
+Rank-1 precision when answering only the most confident fraction of queries (test split; chance 0.125 for B,
+0.10 for D):
+
+| candidate | task | 100 % | 75 % | 50 % | 25 % | AURC (unordered) |
+|---|---|---|---|---|---|---|
+| hybrid + family SupCon | B filmsynth, top1_sim | 0.60 | 0.73 | 0.83 | 1.00 | 0.18 (0.40) |
+| hybrid + family SupCon | D BlueNeg, top1_sim | 0.22 | 0.26 | 0.37 | 0.50 | 0.59 (0.78) |
+| student_fs_v2 64-d | B filmsynth, knn_agree | 0.59 | 0.72 | 0.75 | 0.92 | 0.19 (0.41) |
+| student_fs_v2 64-d | D BlueNeg, top1_sim | 0.15 | 0.16 | 0.20 | 0.27 | 0.81 (0.85) |
+| colour/tone 16 | D BlueNeg, knn_agree | 0.20 | 0.22 | 0.27 | 0.40 | 0.72 (0.80) |
+
+`top1_sim` orders the hybrid SupCon errors well on both synthetic and real data: at 50 % coverage same-stock rank-1
+precision rises from 0.22 to 0.37 (0.50 at 25 %, 48 queries, so ±0.14). The student's confidence is informative on
+synthetic data only; its real-scan ordering is close to random. Deployment rule for the research embedding:
+abstain from "similar film look" suggestions below the top1_sim value that gives 50 % coverage on the benchmark,
+and report the coverage, not a probability. No score here is a calibrated probability of a correct match.
