@@ -107,6 +107,8 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
 
 21. **On CC0 museum prints the hybrid teacher retrieves the physical process above chance without artist leakage; the real-distilled students do not.** aic_photographs analysis half (306 prints, 111 artists; E29): process p@5 artist-excluded 0.532 [0.453, 0.596] vs chance 0.389 for the hybrid teacher with artist share 0.10 (prior 0.017); raw DINOv2-global and colour statistics reach 0.58-0.62 but leak the artist (share 0.21-0.22); student_style_fs_v2_real, l3_real and kdsdxl fall to 0.445-0.468 with lower CIs below chance, while the synthetic-only students keep 0.48-0.51. Real-image distillation did not transfer to this third domain. (medium; historic prints, process correlates with era)
 
+22. **Across photographers, the only film-process signal left on Flickr scans is a weak colour-type cue, and the teacher does not carry it cleanly.** Colour scans only (295, 93 uploaders; E31): negative-vs-reversal p@5 with the uploader excluded is 0.670 [0.597, 0.726] for the hybrid teacher against chance 0.642 (rejected; uploader share 0.063 vs prior 0.025), 0.715 for colour statistics alone and 0.72-0.74 for the synthetic-only students (lower CIs above chance, but with uploader share 0.05-0.07). The real-film retrieval evidence for these embeddings therefore rests on within-photographer structure (BlueNeg), not on cross-photographer stock or process identity. (medium; uploader-claimed types, one source)
+
 ## What is not established
 - That any embedding captures aesthetics as a person would judge them (no human evaluation exists).
 - That same-stock retrieval generalises beyond one photographer's 1990s consumer stocks.

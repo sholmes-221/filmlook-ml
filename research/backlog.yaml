@@ -535,4 +535,5 @@ experiments:
   next_step: 'supported: film-process (not stock) becomes the real-film retrieval target for the next benchmark version; falsified:
     record that these embeddings carry no cross-photographer film-process signal on Flickr scans and move the real-film claim
     to within-photographer / within-roll structure only'
-  status: pending
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
