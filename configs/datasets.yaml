@@ -139,7 +139,7 @@ datasets:
       MediaWiki Action API (descriptive User-Agent, requests in series, 0.6 s spacing, maxlag=5, 429 backoff; API:Etiquette)
       for category listing and per-file metadata; <=1024 px server renditions from upload.wikimedia.org. The site
       robots.txt disallows /w/ for generic crawlers; the Action API is the documented programmatic interface and is used
-      as its etiquette page prescribes. Owner may veto: delete data/raw/commons_film and this entry.
+      as its etiquette page prescribes; files are standard-width renditions (never originals, which are rate-limited per client), fetched by the resumable downloader with Retry-After honoured (docs/PIPELINES.md). Owner may veto: delete data/raw/commons_film and this entry.
     attribution: required - author, licence and file page URL per row (data/raw/commons_film/ATTRIBUTION.jsonl)
     redistribution: not done; images stay local
     training_allowed: false     # EVALUATION ONLY (real-film retrieval, scanner/colour-shift analysis); split by uploader into analysis/test

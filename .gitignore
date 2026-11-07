@@ -57,3 +57,7 @@ js/filmlook-style/test/fixtures/
 *.tmp
 *.swp
 *~
+research/tasks.json
+research/tasks.lock
+research/.gpu.lock
+research/tasks.json.part
