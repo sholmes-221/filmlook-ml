@@ -1,6 +1,6 @@
 {
  "gpu_seconds": 3842.4771737194064,
- "disk_bytes": 220871333,
+ "disk_bytes": 220872534,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -95,6 +95,14 @@
    "gpu": false,
    "disk_bytes": 4285,
    "peak_gpu_mb_total": 6271.0,
+   "returncode": 0
+  },
+  {
+   "id": "E18_minimal_transferable_statistics",
+   "wall_seconds": 23.9,
+   "gpu": false,
+   "disk_bytes": 1201,
+   "peak_gpu_mb_total": 5740.0,
    "returncode": 0
   }
  ],

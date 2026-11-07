@@ -275,3 +275,17 @@ Full numbers: `docs/EXPERIMENT_LOG.md`, `reports/synth_experiment_v2.json`, `rep
   `docs/SHADOW_MODE_INTEGRATION.md`, `docs/BADGE_ATTRIBUTE_MAPPING.md` (deterministic attribute badges only).
 - **Still true:** every number here is a proxy; no human has judged aesthetics; BlueNeg is one photographer's
   1990s consumer film; nothing was deployed.
+
+## 12. Autonomous session 2026-11-07 (E8-E18): what survived
+
+Eleven metered experiments (`docs/EXPERIMENT_LOG.md`, `research/registry.jsonl`). Three results change the plan:
+1. **"Treated vs untreated" is not an aesthetics signal.** Across generator types the only transferable part is
+   saturation clipping (one statistic, E18); within a type it is a generator signature. Retired as a target.
+2. **The axes separate cleanly.** Texture (DINOv2 mid layers) carries real-film authenticity; colour/tone cannot
+   (E15). Deep or rich descriptors re-encode scene identity (E16, E17): coarse global statistics are the explainable
+   attribute layer, DINOv2 texture the authenticity layer, and family-SupCon on hybrid features the retrieval layer.
+3. **The benchmark is the bottleneck.** Same-stock retrieval on BlueNeg (27 rolls) cannot separate variants closer
+   than ~0.08; the third generator (E8) and every embedding variant land inside that band. A second real-film source
+   is worth more than any model change.
+Negative results kept: E11, E12, E16, E17 (see state file). Nothing was deployed; the EXIF authenticity baseline is
+unchanged; composition and photographer badges remain off.

@@ -54,7 +54,7 @@ Identical cards and file lists (5 ZIPs named `Kodak_Aerochrome`, `Kodak_E100`, `
 | [pslabs/35mm_32k](https://huggingface.co/datasets/pslabs/35mm_32k) | two ZIPs, no card, no licence; name suggests 32k scraped "35mm" images | not eligible |
 | [msdkhairi/kodak](https://huggingface.co/datasets/msdkhairi/kodak) and mirrors | the 24-image Kodak PhotoCD test suite (classic compression benchmark; originally film, scanned by Kodak) | licence unclear on HF; 24 images; not used |
 | FilmSet ([arXiv 2301.08880](https://arxiv.org/abs/2301.08880)) | 5,000+ images in three "film" styles produced with **Capture One film recipes**: synthetic, not film | not film; not pursued |
-| Cinestill 800T paired set ([arXiv 2411.15967](https://arxiv.org/abs/2411.15967)) | aligned digital/film pairs for one stock, released by the authors | licence and location not verified in this pass; follow up |
+| Cinestill 800T paired set ([arXiv 2411.15967](https://arxiv.org/abs/2411.15967)) | 41 raw / 38 processed aligned digital-film pairs (Sony A7 + Nikon F3 on one tripod), one stock | **unobtainable**: the code repository named in the paper returns 404 and no dataset licence is published (checked 2026-11-07) |
 | Film-damage scans ([arXiv 2302.10004](https://arxiv.org/abs/2302.10004)) | 44 4K damaged film scans with restorations | restoration data, licence not verified |
 | ur2good/blueneg-release, yangkun2197/blueneg-release | mirrors of BlueNeg | use the original |
 

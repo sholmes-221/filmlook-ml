@@ -16,6 +16,9 @@ transformation parameters), `owner-record` (BlueNeg stock), `none` (self-supervi
 | MobileNetV3 style student, filmsynth only (`style_fs`) | `student_style_fs.json` | synthetic-param + SupCon distil | **0.81 / 0.75** | **0.24** (576-d), 0.20 (64-d) | 0.48 (chance) | **0.28** / 0.13 | 4.4 MB, 1.3 ms |
 | MobileNetV3 style student, filmsynth + SDXL (`style_both`) | `student_style_both.json` | synthetic-param + SupCon distil | 0.67 / 0.64 (**worse**) | 0.22 (576-d), 0.18 (64-d) | 0.73 (seen in training) | 0.30 / 0.11 | 4.4 MB, 1.2 ms |
 | MobileNetV3 style student, filmsynth **v2** (grain randomised, `style_fs_v2`) | `student_style_fs_v2.json` | synthetic-param + SupCon distil | 0.77 / 0.76 | 0.21 (576-d) | 0.54 (chance-ish, no inversion) | 0.34 / 0.13 | 4.4 MB, 1.2 ms |
+| hybrid SupCon, filmsynth v2 + Z-Image families (E8b) | `synth_experiment_v4b.json` | synthetic-param | 0.65 / 0.63 (held-out Z-Image probe) | **0.26 [0.16, 0.34]** | held-out Z-Image 0.63 [0.52, 0.75] | 0.44 (hybrid) | 88 MB backbone |
+| 16 coarse colour/tone statistics, linear (E15) | `colour_vs_texture.json` | synthetic-param | 0.53 (none: aesthetics axis) | 0.19 [0.11, 0.25] | cross-type mean 0.635 (SDXL->fs 0.74) | 0.84 | 16 numbers |
+| `sat_clip` alone (E18) | `minimal_statistics.json` | synthetic-param | — | 0.09 | cross-type mean 0.66 | 0.04 | 1 number |
 | existing supervised student (`student_sup`), P(film_scan) | `student_sup.json`, `film_authenticity_eval.json` | **EXIF capture type (real)** | 0.85 / 0.83 cross-source; **0.78 [0.69, 0.88] within CommonCatalog**, ECE 0.20 | not available (no embedding output) | — | — | 4.3 MB, 1.5 ms |
 | frozen hybrid probe, filmsynth v2 (C3), linear | `synth_experiment_v3.json` | synthetic-param | 0.70 / 0.66 | SupCon 0.25 | **0.58 [0.52, 0.67]** / 0.48 | 0.29 (hybrid) | 88 MB backbone |
 
@@ -201,7 +204,30 @@ generators.
 - Learned: The 80-d colour-rendition descriptor transfers WORSE than the 16 coarse statistics (cross-type mean 0.43 vs 0.635; SDXL->filmsynth 0.34, Z-Image->filmsynth 0.33, inverted), is fully scene-identifying (own-source rank-1 1.00) and does not lift same-stock retrieval (0.18 [0.11, 0.24]). Concatenating it with the 16-d set drags the 16-d set down to 0.46. Per-channel percentiles and histograms are scene fingerprints; probes on them learn content-tied hue shifts. Richer is not more transferable: the generator-agnostic aesthetics signal lives in a few coarse treatment-level statistics.
 - Next: Ablate the 16 statistics to the minimal transferable set (E18, CPU); seek a second real-film source for the retrieval benchmark rather than more descriptors.
 
-## Decisions taken from these runs
+### E18_minimal_transferable_statistics — a subset of the 16 coarse colour/tone statistics carries all cross-type transfer; the rest add scene identity
+- Status: done; wall 23.9 s; peak GPU 5740.0 MB (total on card).
+- chosen_cross_type_mean [synthetic]: 0.6599
+- full16_cross_type_mean [synthetic]: 0.6352
+- chosen_same_stock_raw [real]: 0.0929 CI [0.004, 0.22]
+- Decision rule: neutral: no credible real-film change
+- Learned: Greedy selection stops after ONE statistic: sat_clip alone gives cross-type mean 0.66 (full 16-d 0.635): SDXL->filmsynth and Z-Image->filmsynth 0.76 [0.69, 0.84], filmsynth->SDXL 0.60, filmsynth->Z-Image 0.52. It carries no scene identity (own-source rank-1 0.04) and no stock identity (same-stock 0.09, below chance). The generator-agnostic 'treated vs untreated' signal is one-dimensional: treatments change saturation clipping. Treated-vs-untreated is not an aesthetics representation; it was a proxy that reduced to a single clipping statistic.
+- Next: Retire treated-vs-untreated as a target. Keep cross-photo same-stock retrieval on real scans as the aesthetics benchmark (hybrid SupCon 0.25 [0.15, 0.31]); it needs a second real-film source before further model work is decisive.
+
+## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18)
+
+4. "Treated vs untreated" is retired as a research target: across generator types it reduces to one statistic
+   (saturation clipping, E18); within a generator type it is a generator signature (E2-E4). It is neither aesthetics
+   nor authenticity.
+5. The aesthetics benchmark is cross-photo same-stock retrieval on real scans (BlueNeg, owner labels). Best: hybrid
+   (explicit + DINOv2 L4+L8) with family SupCon, 0.25 [0.15, 0.31] vs chance 0.12. CIs are wide (27 rolls): a second
+   real-film source is worth more than another model variant.
+6. Authenticity = texture axis (DINOv2 mid layers; explicit texture statistics inverted on real film). The EXIF
+   student stays the baseline (0.78 within source).
+7. Deep or rich descriptors re-encode scene identity (E16, E17); coarse global statistics are the explainable
+   attribute layer. Composition: frozen DINOv2 grid probe only (E12 student failed).
+8. Scaling synthesis (E13) is not justified by E8; a third generator improved nothing real.
+
+## Decisions taken from these runs (earlier)
 
 1. Grain randomisation (film-synth-v2) is the fix that worked for cross-generator leakage; standardisation and the
    VAE control helped little but stay on as hygiene. Scale beyond 100 sources only with v2-style presets, and add a
