@@ -44,7 +44,8 @@ experiments:
   confounders:
   - content drift at higher strength
   falsified_if: sdxl->filmsynth AUROC does not rise above 0.55 or rank-1 drops below 0.9
-  status: pending
+  status: rejected
+  result: per-image change up, no shared treatment signature; content preservation 0.97->0.82
 - id: E11_parameter_similarity_supcon
   hypothesis: a style embedding trained with continuous parameter-vector similarity (across sources and generators) retrieves
     same-stock real scans better than family-label SupCon
@@ -79,6 +80,7 @@ experiments:
   blocked_by: E8_zimage_third_generator
   reason: 'E8: held-out Z-Image CI excludes 0.5 but generator identifiability unchanged and real-film unimproved; also ~2.5
     GPU-h of Z-Image generation'
+  motivation: 'E8 + E10: more synthesis of the same kinds improves nothing real'
 - id: E16_texture_neutral_dino
   hypothesis: DINOv2 features of texture-neutralised images (downsampled before encoding) transfer across generator types
     in both directions and keep same-stock retrieval, because the inversion came from texture entanglement
@@ -128,3 +130,24 @@ experiments:
   metric: 'benchmark v1 val: B, C share, E'
   falsified_if: C share or E subject probe rises
   status: rejected
+- id: E20_second_real_film_source
+  hypothesis: a second rights-cleared real-film source with stock records (different photographer, scanner, era) narrows the
+    same-stock CI and tests whether 0.25 holds beyond BlueNeg
+  value: 5
+  gpu_minutes: 10
+  disk_gb: 2
+  metric: same-stock p@5 with roll CI on the new source; cross-source retrieval
+  falsified_if: hybrid SupCon not above DINOv2 reference on the new source
+  status: blocked
+  blocker: no rights-cleared source found yet (docs/FILM_DATASET_RESEARCH.md); needs owner decision on the app's self-reported
+    stock flow
+- id: E21_abstention_threshold_shadow
+  hypothesis: the top1_sim 50%-coverage threshold from benchmark v1 holds its precision on shadow-mode traffic (hash-only
+    logging) once a privacy review allows it
+  value: 3
+  gpu_minutes: 0
+  disk_gb: 0
+  metric: coverage at the fixed threshold on shadow records
+  falsified_if: coverage < 20% or > 80% on real traffic
+  status: blocked
+  blocker: privacy and retention review before any user-photo logging

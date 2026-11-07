@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 4182.326052341461,
- "disk_bytes": 258136165,
+ "gpu_seconds": 4870.745361719131,
+ "disk_bytes": 327925963,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -135,6 +135,14 @@
    "gpu": true,
    "disk_bytes": 0,
    "peak_gpu_mb_total": 20194.0,
+   "returncode": 0
+  },
+  {
+   "id": "E10_sdxl_strength_050",
+   "wall_seconds": 688.4,
+   "gpu": true,
+   "disk_bytes": 69789798,
+   "peak_gpu_mb_total": 20218.0,
    "returncode": 0
   }
  ],

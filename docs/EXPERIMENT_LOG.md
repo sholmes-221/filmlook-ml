@@ -242,7 +242,23 @@ generators.
 - Learned: One-time test run of benchmark v1 (docs/BENCHMARK.md, Results). Val and test agree within 0.05 on every column. hybrid + family SupCon: B filmsynth 0.44 [0.39, 0.48], own-source rank-1 0.33, generator share 0.59, BlueNeg same-stock 0.25 [0.16, 0.31] (only candidate clearly above the 0.17 DINOv2 reference). student_fs_v2: best on synthetic (B 0.55, rank-1 0.16) but 0.18 on real scans; colour/tone 16: least semantic content (subject probe 0.25) but 0.18 on real scans. Abstention (reports/abstention_test.json): top-1 cosine similarity orders the hybrid SupCon errors on real scans (rank-1 0.22 -> 0.37 at 50% coverage, 0.50 at 25%, AURC 0.59 vs 0.78 unordered); the student's confidence is uninformative on real data.
 - Next: Record in MODEL_CARD/FINDINGS; keep hybrid + family SupCon as the research embedding with abstention below the 50%-coverage threshold. Test split is now spent for this candidate set.
 
-## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18)
+### E10_sdxl_strength_050 — SDXL treatments at strength 0.5 are distinct beyond nuisance (ratio > 1 under raw features) while keeping content (own-source rank-1 > 0.9), making diffusion treatment ids usable
+- Status: done; wall 688.4 s; peak GPU 20218.0 MB (total on card).
+- new_variants [proxy]: 500.0
+- seconds_per_image [proxy]: 1.36
+- Decision rule: neutral: no credible real-film change
+- Learned: 500 SDXL variants at strength 0.5 (reports/sdxl_strength_sdxl_i2i_s050.json vs _sdxl_i2i_v1.json, same script). Per-image change grows (treatment-vs-treatment distance / nuisance: raw hybrid 0.60 -> 0.75, family SupCon 0.69 -> 2.15, colour/tone 3.4 -> 12.5) but it is not a consistent treatment: same-treatment retrieval across other sources stays at chance under every feature (0.26-0.31 vs chance 0.25; at 0.35: 0.34-0.36 vs 0.33), the treatment probe falls (raw hybrid 0.55 at 4-way vs 0.67 at 3-way), and content preservation drops (own-source rank-1 under DINOv2 global 0.97 -> 0.82). Higher strength makes diffusion rewrite each image more, differently for each image; it does not create a shared style signature.
+- Next: Falsified. Diffusion img2img treatment ids are retired as style labels at any strength tried; diffusion sets stay as generator-fingerprint and nuisance controls only. Do not scale diffusion generation (E13 stays deferred).
+
+## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
+
+9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
+   research embedding stays hybrid + family SupCon (only candidate above the DINOv2 reference on real scans); the
+   abstention rule is top-1 similarity at 50 % coverage.
+10. Diffusion img2img treatment ids are not style labels at strength 0.35 or 0.5 (E19 diagnostic, E10): they change
+    each image differently without a shared signature. Diffusion sets remain controls for generator fingerprint.
+11. Making the projection content-blind by loss design (E19 hard negatives, decorrelation) does not work on 70
+    sources; the remaining content and generator signal is a data limitation, not an objective choice.
 
 4. "Treated vs untreated" is retired as a research target: across generator types it reduces to one statistic
    (saturation clipping, E18); within a generator type it is a generator signature (E2-E4). It is neither aesthetics
