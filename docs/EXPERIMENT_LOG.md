@@ -381,6 +381,25 @@ generators.
 - Teacher agreement (Spearman of pairwise cosines vs hybrid_supcon_family): fs_v2 0.52, both 0.55, fs_v2_real 0.55, kdsdxl 0.51, sel 0.53, fs 0.45, l3_real 0.41.
 - Decision under the pre-registered rule: raw_dino_global and colour_tone16 falsified (leakage); the three real-distilled students (fs_v2_real, l3_real, kdsdxl) falsified (process p@5 lower CI below chance); the hybrid teacher and the synthetic-only students pass. Overall **inconclusive** for the hypothesis (mixed), and a warning: real-image distillation (E23b) did not buy cross-source robustness on this third domain; the process signal here is largely colour/tone and era, which the treatment-family projection partly discards. No promotion; aic_photographs stays evaluation-only for now.
 
+### E27b, second snapshot (905 scans) — same-stock retrieval from uploader tags stays at chance for every embedding
+- Run: research.eval_pipeline on the analysis half of the 905-row `commoncatalog_film` snapshot (c2b088c3; 445 scans, 124 uploaders, 389 stock-labelled rows, 68 stocks, 34 with >= 2 uploaders; 356 queries), 2026-11-08 02:30.
+- Chance: same-stock 0.044, stock-line 0.066, same-type 0.264 (first snapshot); uploader-share prior 0.03.
+  raw_dino_global              stock 0.071 [0.047, 0.1]  line 0.085 [0.065, 0.109]  type 0.343  uploader share 0.140
+  raw_hybrid                   stock 0.043 [0.031, 0.057]  line 0.065 [0.054, 0.077]  type 0.392  uploader share 0.041
+  hybrid_supcon_family         stock 0.051 [0.036, 0.069]  line 0.078 [0.065, 0.091]  type 0.467  uploader share 0.052
+  student_fs_v2_64             stock 0.049 [0.037, 0.063]  line 0.087 [0.073, 0.105]  type 0.467  uploader share 0.058
+  colour_tone16                stock 0.061 [0.047, 0.079]  line 0.086 [0.069, 0.104]  type 0.458  uploader share 0.095
+  texture12                    stock 0.046 [0.033, 0.063]  line 0.062 [0.051, 0.076]  type 0.349  uploader share 0.028
+  hybrid_l3_supcon_family      stock 0.055 [0.042, 0.071]  line 0.089 [0.074, 0.104]  type 0.441  uploader share 0.061
+  student_style_both_64        stock 0.053 [0.041, 0.07]  line 0.086 [0.069, 0.104]  type 0.458  uploader share 0.058
+  student_style_fs_64          stock 0.064 [0.048, 0.085]  line 0.101 [0.087, 0.118]  type 0.492  uploader share 0.058
+  student_style_fs_v2_kdsdxl_64 stock 0.056 [0.043, 0.071]  line 0.091 [0.078, 0.104]  type 0.470  uploader share 0.069
+  student_style_fs_v2_real_64  stock 0.058 [0.045, 0.073]  line 0.092 [0.077, 0.107]  type 0.461  uploader share 0.053
+  student_style_fs_v2_sel_64   stock 0.054 [0.04, 0.07]  line 0.084 [0.072, 0.099]  type 0.473  uploader share 0.060
+  student_style_l3_real_64     stock 0.045 [0.033, 0.061]  line 0.066 [0.056, 0.081]  type 0.441  uploader share 0.058
+- Decisions: raw_dino_global and colour_tone16 rejected for photographer leakage (0.140 / 0.095 vs prior 0.03); everything else inconclusive; E27b inconclusive again (L3 0.055 vs 0.051). Nothing is promoted. The only readings CI-separated from chance are the stock-line metric for the SupCon hybrid (0.078 vs 0.066, barely) and several students (0.084-0.101), and film-type retrieval (0.44-0.49), which the monochrome cue inflates.
+- Reading: across photographers, uploader-claimed film stock is not recoverable from any of these embeddings on Flickr scans at a useful level; BlueNeg's 0.25 (one photographer, 27 rolls) was within-photographer structure. Either the labels are too noisy (tags, speeds, expired/pushed film, lab scanning dominates) or the embeddings carry no stock signal that survives the photographer/scanner change. The next test (E31) removes the trivial monochrome cue and asks whether colour negative vs colour reversal is separable across uploaders at all.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

@@ -264,8 +264,9 @@ experiments:
     waiting on dataset:commons_film'
   next_step: 'if supported: switch the distillation target and re-run the full benchmark on a fresh test set (v1 test is spent);
     if rejected: keep L4+L8 and move to augmentation-based invariance'
-  status: pending
-  blocked_by: dataset:commons_film ready (acquisition rate-limited, resumable)
+  status: deferred
+  result: 'deferred: Commons remains throttled; E27b answered the same question on commoncatalog_film twice (inconclusive,
+    no gain); L3 target closed without adoption'
 - id: E27a_student_l3_teacher_interim
   hypothesis: a real-distil student (E23b recipe) distilled from a layer-3 mean/std hybrid teacher keeps the synthetic family
     signal and content invariance of the L4+L8 real-distil student (interim, synthetic/proxy only; the real-film decision
@@ -408,7 +409,12 @@ experiments:
     same-stock p@5 is 0.137 [0.105, 0.176] vs L4+L8 0.146 [0.119, 0.184] (chance 0.125): not below the baseline''s lower CI
     and uploader-share excess -0.001, so not falsified, but no gain; every candidate including the baseline is at chance on
     the pre-registered speed-level stock labels, so this snapshot cannot rank teachers. Student l3_real 0.152 vs fs_v2_real
-    0.143: same.'
+    0.143: same. SECOND SNAPSHOT: inconclusive on the second snapshot too (905 scans, 252 uploaders, 88 stocks; analysis half
+    445/124, 356 queries from 112 uploaders): L3 teacher same-stock p@5 0.055 [0.042, 0.071] vs L4+L8 0.051 [0.036, 0.069],
+    chance 0.044; uploader-share excess +0.009. Every candidate is within CI of chance on the pre-registered metric; on the
+    secondary stock-line metric the baseline is 0.078 [0.065, 0.091] vs chance 0.066, student_style_fs 0.101 [0.087, 0.118],
+    student_style_l3_real 0.066 (chance). The L3 target brings no real-film gain on two snapshots and its student is the weakest
+    on the line metric: the L3 line of work is closed without adoption.'
 - id: E29_curated_cross_source_robustness
   hypothesis: on CC0 museum photographs (aic_photographs, analysis half) the style embeddings retrieve the physical print
     process (owner records) above chance with the artist excluded, without photographer leakage; the real-distil student agrees
