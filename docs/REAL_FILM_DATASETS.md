@@ -39,8 +39,8 @@ deep-learning dataset round-ups). The registry prevents re-searching a query wit
 
 | source | class | licence | size | status | use |
 |---|---|---|---|---|---|
-| **CommonCatalog CC-BY film scans with uploader stock tags** (`commoncatalog_film`) — Flickr/YFCC100M rows whose EXIF capture device is a film scanner or minilab and whose uploader tagged a stock | B | CC-BY-2.0 per row (checked) | 80 shards scanned on 11-06 gave 399 qualifying rows (203 with a stock); 300 more shards are being scanned; pilot caps 20/uploader, 6/uploader×stock, 150/stock | acquiring (resumable; 78 rows from the first bounded run: 49 uploaders, 33 stocks) | evaluation-only; uploaders in the training manifest excluded; analysis/test halves by uploader hash |
-| **ARTeFACT** damaged & manually restored 35mm scans, Ivanova et al., Eurographics 2023 (`artefact_film`) | A | CC BY 4.0 (figshare 21803304) | 44 originals + 44 restored, 11 emulsions (Portra 160/400, Ektar 100, Gold 200, Ultramax 400, Ektachrome 100, Provia 100, Velvia 50, Superia 400, CineStill 50D/800T), one photographer | acquiring (37/88 after the first bounded run) | authenticity and per-emulsion sanity checks (within-photographer only) |
+| **CommonCatalog CC-BY film scans with uploader stock tags** (`commoncatalog_film`) — Flickr/YFCC100M rows whose EXIF capture device is a film scanner or minilab and whose uploader tagged a stock | B | CC-BY-2.0 per row (checked) | all 1,076 shards of the 1024-2048 px range scanned (5,130 qualifying rows); caps 20/uploader, 6/uploader×stock, 150/stock | **acquired: 905 scans, 252 uploaders, 88 uploader-claimed stocks** (two snapshots: 487 on 11-08 00:15, 905 on 02:23); evaluated twice (E27b) | evaluation-only; uploaders in the training manifest excluded; analysis/test halves by uploader hash |
+| **ARTeFACT** damaged & manually restored 35mm scans, Ivanova et al., Eurographics 2023 (`artefact_film`) | A | CC BY 4.0 (figshare 21803304) | 44 originals + 44 restored, 11 emulsions (Portra 160/400, Ektar 100, Gold 200, Ultramax 400, Ektachrome 100, Provia 100, Velvia 50, Superia 400, CineStill 50D/800T), one photographer | **acquired 88/88** (md5 + sha256 verified) | authenticity and per-emulsion sanity checks (within-photographer only) |
 | **BlueNeg** (ICCV 2025), 491 colour negatives with roll records | A | CC-BY derivative, credit Tien-Tsin Wong | 491 | acquired (session 1) | benchmark v1 test; blue-corrupted partition retired for selection (E26) |
 | **Wikimedia Commons film-brand categories** (`commons_film`) | B | per file CC0/PD/CC-BY/CC-BY-SA | 5,743 items, 266 stored | acquiring; Wikimedia throttles this client (HTTP 429, Retry-After honoured); deprioritised, retries with doubling backoff | evaluation-only |
 
@@ -78,14 +78,15 @@ excluded from `commoncatalog_film`; scanner family recorded for the leakage guar
 deduplication at ingest (near-duplicates rejected); splits by uploader hash so no photographer spans both halves; the
 test half is evaluated once (`--final`). Film authenticity (film vs digital) and stock retrieval stay separate metrics.
 
-## Evaluation readiness (2026-11-08, start of the scan)
+## Evaluation readiness and results (2026-11-08 02:40)
 
-- `commoncatalog_film`: becomes `ready` at >= 300 rows with a complete acquisition; the orchestrator then runs
-  `eval_commoncatalog_film_analysis` (fixed candidates + eligible students + the pre-registered L3 teacher candidate).
-- `artefact_film`: ready at >= 40 rows; single photographer, so it feeds authenticity checks, not selection.
-- `commons_film`: 266/5,743; stays partial while Wikimedia throttles.
-- E27 (pre-registered) is decided on the first real-film set that reaches readiness with >= 2 uploaders per stock for
-  the main stocks; the rules are unchanged (`research/backlog.yaml`, `docs/BENCHMARK.md`).
+- `commoncatalog_film`: ready (905 rows); evaluated on the analysis half twice (`reports/eval_pipeline/history.jsonl`).
+  Same-stock p@5 is at chance for every candidate on both snapshots (teacher 0.051 [0.036, 0.069] vs chance 0.044 on
+  the second); E27b inconclusive twice, no student promoted, the L3 target closed (`docs/EXPERIMENT_LOG.md`).
+- `artefact_film`: ready (88 rows); single photographer, so it feeds authenticity checks, not selection.
+- `aic_photographs` (curated group): ready (593 rows); E29 run (`docs/CURATED_PHOTOGRAPHY_SOURCES.md`).
+- `commons_film`: 266/5,743; stays partial while Wikimedia throttles (four attempts, all HTTP 429).
+- Test halves of all new sets untouched.
 
 ## Limitations
 

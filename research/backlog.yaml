@@ -492,3 +492,47 @@ experiments:
     film); rejected: keep the single-generator projection and record that cross-pipeline families do not merge linearly'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E31_colour_type_retrieval
+  hypothesis: 'on real Flickr film scans a film-process signal survives the change of photographer once the monochrome cue
+    is removed: with only colour scans (uploader-claimed colour negative vs colour reversal), the hybrid teacher retrieves
+    the colour type above its class prior with the query''s uploader excluded and without photographer leakage'
+  motivation: 'E27b: same-stock retrieval is at chance for every embedding on 905 scans; film-type retrieval looks strong
+    (0.44-0.49) but B&W-vs-colour is trivial. If negative-vs-reversal is not separable across uploaders either, no cross-photographer
+    film-process signal exists in these embeddings on this source.'
+  value: 4
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 2
+  disk_gb: 0.01
+  datasets:
+  - commoncatalog_film
+  metric: 'scripts/colour_type_retrieval.py: colour-type p@5 uploader-excluded with uploader-bootstrap CI vs class prior;
+    uploader share vs prior; summary.supported'
+  confounders:
+  - reversal film is rarer and often slide-scanned (scanner confound)
+  - uploader claims
+  - era/subject correlates with type
+  falsified_if: 'summary.supported == 0: the hybrid teacher''s colour-type p@5 lower CI is not above chance, or its uploader-share
+    excess exceeds 0.02'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/colour_type_retrieval.py
+  result_json: reports/colour_type_retrieval.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    baseline_p5:
+      path: summary.baseline_p5
+      kind: real
+    chance:
+      path: summary.chance
+      kind: real
+  next_step: 'supported: film-process (not stock) becomes the real-film retrieval target for the next benchmark version; falsified:
+    record that these embeddings carry no cross-photographer film-process signal on Flickr scans and move the real-film claim
+    to within-photographer / within-roll structure only'
+  status: pending
