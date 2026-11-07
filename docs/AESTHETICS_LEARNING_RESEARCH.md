@@ -231,3 +231,26 @@ Production on E2: see `deployment/E2_MICRO_PLAN.md` (student in the app process;
 4. Build the 150-photo human set.
 5. Fetch manufacturer data sheets for the 10–20 stocks with descriptions, and record curve shape and granularity
    with sources, before any stock-specific preset.
+
+## 10. Update 2026-11-07 (later): second generator, real film with verified stock labels, style student
+
+Full numbers: `docs/EXPERIMENT_LOG.md`, `reports/synth_experiment_v2.json`, `reports/student_style_*.json`.
+
+- **Second generator built:** SDXL base 1.0 image-to-image with OpenRAIL/Civitai film LoRAs (licence review in
+  `docs/HF_FILM_MODEL_RESEARCH.md`). Composition preserved (own-source rank-1 0.98). FLUX-based models (FilmPortrait)
+  rejected: non-commercial licence.
+- **Real film with verified labels obtained:** BlueNeg (ICCV 2025), 491 real 35 mm negatives with the owner's stock
+  records, commercial use permitted with credit (`docs/FILM_DATASET_RESEARCH.md`). Used only as an external
+  evaluation set.
+- **Leave-one-generator-out failed, and the failure is diagnosed.** Probes trained on filmsynth score SDXL outputs
+  below chance (AUROC 0.35) because the two pipelines move measured noise in opposite directions (filmsynth adds
+  grain, SDXL's VAE removes it). The E1 "treated" signal is largely a generator signature. Section 3.6's suspicion
+  is confirmed.
+- **The signal still transfers to real film along one axis:** BlueNeg vs digital AUROC 0.80 with the frozen probe
+  and 0.81 with the 4.4 MB student, with no real labels used. The EXIF-supervised student remains better (0.86).
+- **Same-stock retrieval above chance on real scans** (0.23-0.24 vs 0.12) with SupCon-trained embeddings; the
+  student's embedding is content-invariant (own-source rank-1 0.28 vs 1.00 for raw DINOv2).
+- **Not achieved:** cross-generator generalisation; composition (unchanged from section 3.7); Z-Image-Turbo as a
+  third generator (deferred until nuisance parity is fixed).
+- **Next:** nuisance parity (pass untreated images through the same VAE/JPEG path; randomise the grain and sharpening
+  models per generator), then re-run leave-one-generator-out; only then scale sources.

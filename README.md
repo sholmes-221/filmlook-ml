@@ -69,6 +69,12 @@ Use `--status` for discovery, progress and distributions; it is a dry run unless
   no Claude labels) writes `reports/dinov2_baseline.json` and `checkpoints/dinov2_baseline_v0/`.
 - Reports: `reports/evaluation_database_inventory.md`, `reports/taxonomy_comparison.md`,
   `reports/dinov2_training_strategy.md`.
+- Knowledge bases with sources: `knowledge/film_kb.v1.yaml` (manufacturer-measured grain metrics kept apart from
+  claims and editorial text), `knowledge/photographer_kb.v1.yaml`.
+- Generators and datasets: `docs/HF_FILM_MODEL_RESEARCH.md`, `docs/FILM_DATASET_RESEARCH.md`,
+  `data_registry/film_datasets.json`; `scripts/gen_sdxl_film.py` (SDXL img2img), `scripts/ingest_blueneg.py`.
+- Experiments: `scripts/synth_experiment_v2.py` (cross-generator + real film), `scripts/train_style_student.py`;
+  leaderboard and decisions in `docs/EXPERIMENT_LOG.md`.
 
 ## Two Python packages
 

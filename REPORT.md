@@ -267,3 +267,15 @@ four PD12M items are archival prints, which is consistent with their PD/CC0 reco
   - pairwise ranking trained on synthetic pairs gets 0.77–0.84 on real independent-edit pairs;
   - real film scans are mostly predicted `identity` (weak film transfer);
   - composition is not decodable from pooled features.
+
+## Cross-generator study and real-film evaluation (2026-11-07, later)
+
+- Second generator (SDXL img2img, permissive licences) and a real-film set with owner-verified stock labels (BlueNeg,
+  491 negatives) added; FilmPortrait and other FLUX-based models rejected on licence.
+- Leave-one-generator-out failed: probes trained on the programmatic generator score SDXL outputs below chance
+  (AUROC 0.35) because the two pipelines move measured noise in opposite directions. The earlier synthetic signal is
+  largely a generator signature.
+- Real-film transfer still works along the grain axis: BlueNeg film-vs-digital AUROC 0.80-0.81 with no real labels;
+  the EXIF-supervised student remains better (0.86). Same-stock retrieval on real scans reaches 0.24 vs 0.12 chance.
+- Training on both generators improved synthetic scores and hurt real transfer (0.67): rejected.
+- Details and decisions: `docs/EXPERIMENT_LOG.md`, `docs/AESTHETICS_LEARNING_RESEARCH.md` section 10.
