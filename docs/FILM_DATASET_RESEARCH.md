@@ -80,3 +80,38 @@ collection of real film scans on the Hub.
 
 Splits: a generated or simulated image always inherits its source photo's uploader-grouped split. BlueNeg is a
 single-photographer set, so it is used whole as an **external** evaluation set, never split into train/test.
+
+## Session 3 (2026-11-07): a second real-film source found — Wikimedia Commons film-stock categories
+
+Searched again for real-film datasets with stock, scanner or processing metadata. Nothing new on the Hub, Zenodo or
+GitHub (only metadata databases: film-photography-db, Every Film Ever; HISTORIAN is cine footage). The Library of
+Congress FSA/OWI Kodachrome collection (1,600 public-domain transparencies, one stock) is behind an anti-bot gate for
+automated clients and was not fetched. Flickr groups would need an API key and per-photo licence checks.
+
+**Wikimedia Commons** has a curated tree, `Category:Photographs by film brand` → "Photographs taken on <stock> film" /
+"Taken on <stock>" (167 categories, 3 levels), where uploaders state the stock they shot. Enumerated with the
+MediaWiki Action API as its etiquette page prescribes (descriptive User-Agent, serial requests, maxlag, 429 backoff;
+`scripts/ingest_commons_film.py`):
+
+| | |
+|---|---|
+| film files with a usable licence | **5,632** (CC0 1,118; PD 188; CC BY 2.0/2.5/3.0/4.0 1,866; CC BY-SA 2.0-4.0 2,463); 114 skipped ("No restrictions", "Attribution", GFDL) |
+| uploaders | **401** (vs one photographer in BlueNeg) |
+| stocks | 112 categories; largest: Vision3 250D 544, Kodachrome 480, FP4 plus 427, Tri-X 405, Ektar 100 338, Velvia 333, Ektachrome 325, Portra 276, Superia X-TRA 400 184, Vision3 50D 182, HP5 plus 136, Gold 200 124 |
+| film type (from the category tree) | colour negative 2,300; b&w negative 1,547; colour reversal 1,512; unknown 273 |
+| scanner | hidden categories "Scanned with <scanner>" (Nikon Coolscan 4000/5000/V ED, Fujifilm SP-2000/3000, Plustek 7600i, ...) backfilled per file |
+| roll | per-uploader roll categories ("Photographs by <user>/<date> <stock>") where present |
+| digital-emulation controls | 111 files in "DxO PhotoLab FilmPack ... film emulation" categories (digital photographs with software film looks), indexed separately |
+
+Rights and use: every file keeps its own licence, author and page URL (`ATTRIBUTION.jsonl`). The set is registered as
+`commons_film` with `training_allowed: false` — **evaluation only** (ShareAlike scope for trained models is
+unresolved, and the project does not need to train on it). Renditions ≤ 1024 px are fetched from
+upload.wikimedia.org (about 1.7 GB), never originals. The site robots.txt disallows `/w/` for generic crawlers; the
+Action API is the documented programmatic interface and was used as its etiquette page prescribes. The owner can
+veto this source by deleting `data/raw/commons_film/` and the registry entry.
+
+Limitations: stock labels are uploader-asserted (not owner records); most stocks are dominated by one or two
+uploaders, so every metric excludes the query's uploader and bootstraps over uploaders; eras, scanners and scan
+workflows are mixed (also an asset for scanner analysis); Vision3 is motion-picture stock processed in various ways.
+Protocol: uploaders are hashed into an **analysis** half and a **test** half (`scripts/eval_commons_film.py`); the
+test half is run once per retained candidate. BlueNeg blue-intact stays a separate final-only check.
