@@ -157,6 +157,7 @@ def do_eval(split):
         if "student_" + t in F:
             cands[f"student_{t}_64"] = F["student_" + t]
     up = np.array([r["uploader"] for r in rows]); half = np.array([r["split"] if r.get("split") in ("analysis", "test") else half_of(u) for r, u in zip(rows, up)]); kind = np.array([r["kind"] for r in rows])
+    line = np.array([r.get("film_stock_line") or r["film_stock_claim"] or "?" for r in rows])
     stock = np.array([r["film_stock_claim"] or "?" for r in rows]); ftype = np.array([r["film_type"] for r in rows]); scanner = np.array([r["scanner_category"] or "" for r in rows])
     m = half == split; film = m & (kind == "film"); emu = m & (kind == "digital_emulation")
     out = {"dataset": DATASET, "split": split, "n_film": int(film.sum()), "n_emulation": int(emu.sum()), "n_uploaders_film": int(len(set(up[film]))),
@@ -173,6 +174,7 @@ def do_eval(split):
     for name, Z in cands.items():
         E = unit(Z[film].astype(np.float32)); r = {}
         r["same_stock"] = retrieval(E, stock[film], up[film]); r["same_type"] = retrieval(E, ftype[film], up[film])
+        r["same_stock_line"] = retrieval(E, line[film], up[film])                 # secondary reading (brand + line, speed dropped); never the decision metric
         r["same_stock_uploader_not_excluded"] = retrieval(E, stock[film], up[film], exclude_group=False)
         own = []; S = E @ E.T
         for i in range(len(E)):

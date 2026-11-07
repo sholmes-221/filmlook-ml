@@ -103,3 +103,6 @@ dataset (Commons analysis half; the test half once, with `--final`):
   probe accuracy (where scanner categories exist) may not exceed the baseline's by more than 0.05; a guard failure is
   `reject: leakage` whatever the primary metric;
 - a candidate is never promoted on synthetic metrics alone, and test-half results are never used for selection.
+
+### Note added 2026-11-08 (after the first commoncatalog_film evaluation)
+The decision metric stays same-stock p@5 on the uploader-claimed label as recorded (speed-level when the uploader gave one). On the first snapshot every candidate, baseline included, was at chance on it (54 stocks, 20 with >= 2 uploaders). `same_stock_line` (brand + line, speed dropped) is now reported as a *secondary* reading and `same_type` as a sanity check; neither replaces the decision rule, and no threshold was changed. Larger snapshots are acquired to raise uploaders per stock, not to change the rule.
