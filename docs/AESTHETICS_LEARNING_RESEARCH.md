@@ -254,3 +254,24 @@ Full numbers: `docs/EXPERIMENT_LOG.md`, `reports/synth_experiment_v2.json`, `rep
   third generator (deferred until nuisance parity is fixed).
 - **Next:** nuisance parity (pass untreated images through the same VAE/JPEG path; randomise the grain and sharpening
   models per generator), then re-run leave-one-generator-out; only then scale sources.
+
+## 11. Update 2026-11-07 (later still): leakage fixed by grain randomisation; authenticity audited; spatial grid
+
+- **Cause of the inverted cross-generator AUROC found and fixed.** Cell by cell (`docs/EXPERIMENT_LOG.md` E4):
+  size/JPEG standardisation and an SDXL VAE round-trip control changed little; drawing the grain model and strength
+  independently of the treated/untreated label raised filmsynth→SDXL from 0.35 to 0.58 [0.52, 0.67] and cut
+  generator-identity accuracy from 0.86 to 0.79.
+- **The real-film signal was mostly label-tied texture structure.** With grain randomised, BlueNeg film-vs-digital
+  fell from 0.80 to 0.70 while same-stock retrieval stayed at 0.25 (chance 0.12). Grain/texture ≈ authenticity,
+  colour/tone ≈ aesthetics; they are now separate outputs (`filmlook_infer.shadow`).
+- **The EXIF authenticity baseline is weaker than claimed:** within-source AUROC 0.78 [0.69, 0.88], ECE 0.20; the
+  cross-source 0.85 includes source identity (it ranks BlueNeg above CommonCatalog film at 0.63). Robust to JPEG,
+  rescale and crop. Still the production baseline.
+- **Composition:** a 2×2 patch grid recovers signed framing offsets (R² ≈ 0.23) and mirror sensitivity (0.18-0.29)
+  where pooled features recover nothing; still weak. Section 3.7's conclusion stands, with a known remedy.
+- **Students:** the grain-randomised student (4.4 MB, 1.2 ms) is no longer inverted on an unseen generator (0.54)
+  and matches the earlier student on real film within noise. The EXIF student remains the authenticity baseline.
+- **Shipped research interfaces:** `filmlook_infer.shadow.ShadowAnalyzer` (separate fields, uncertainty stated),
+  `docs/SHADOW_MODE_INTEGRATION.md`, `docs/BADGE_ATTRIBUTE_MAPPING.md` (deterministic attribute badges only).
+- **Still true:** every number here is a proxy; no human has judged aesthetics; BlueNeg is one photographer's
+  1990s consumer film; nothing was deployed.

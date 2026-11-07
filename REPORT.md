@@ -279,3 +279,7 @@ four PD12M items are archival prints, which is consistent with their PD/CC0 reco
   the EXIF-supervised student remains better (0.86). Same-stock retrieval on real scans reaches 0.24 vs 0.12 chance.
 - Training on both generators improved synthetic scores and hurt real transfer (0.67): rejected.
 - Details and decisions: `docs/EXPERIMENT_LOG.md`, `docs/AESTHETICS_LEARNING_RESEARCH.md` section 10.
+- **Leakage fixed (later):** grain randomised independently of the label lifts cross-generator AUROC from 0.35 to
+  0.58 and lowers generator identifiability; real film-vs-digital drops to 0.70 because that signal was label-tied
+  texture. The EXIF authenticity student audits at 0.78 [0.69, 0.88] within source (ECE 0.20), not 0.86. A 2×2
+  spatial grid makes framing partly decodable (R² ≈ 0.23). Shadow-mode interface and badge mapping documented.
