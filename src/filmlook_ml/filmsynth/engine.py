@@ -56,6 +56,27 @@ def _hue_rgb(deg):
     return v / (np.abs(v).max() + 1e-6)
 
 
+GRAIN_MODELS = ("correlated", "gaussian", "poisson", "multiscale")
+
+
+def grain_field(L: np.ndarray, sig: float, model: str, rng) -> np.ndarray:
+    """Unit-variance noise field of L's shape. Models (v2) share no fixed spatial signature:
+    correlated: Gaussian blurred with sigma `sig` (the v1 model); gaussian: white;
+    poisson: signal-dependent, variance grows with luminance, lightly correlated;
+    multiscale: a fine and a coarse correlated field mixed."""
+    if model == "gaussian":
+        n = rng.standard_normal(L.shape).astype(np.float32)
+    elif model == "poisson":
+        n = rng.standard_normal(L.shape).astype(np.float32) * np.sqrt(np.clip(L, 0, 1) + 0.03).astype(np.float32)
+        n = _blur(n, 0.5 * sig) if sig > 0.4 else n
+    elif model == "multiscale":
+        n = 0.65 * _blur(rng.standard_normal(L.shape).astype(np.float32), sig) \
+            + 0.35 * _blur(rng.standard_normal(L.shape).astype(np.float32), 2.5 * sig)
+    else:
+        n = _blur(rng.standard_normal(L.shape).astype(np.float32), sig)
+    return n / (n.std() + 1e-8)
+
+
 def render(img_u8: np.ndarray, p: dict, seed: int, exposure_ev: float = 0.0) -> np.ndarray:
     """Apply parameters ``p`` (missing = neutral) to an RGB uint8 image. Returns RGB uint8."""
     g = lambda k, d=0.0: float(p.get(k, d))  # noqa: E731
@@ -129,13 +150,16 @@ def render(img_u8: np.ndarray, p: dict, seed: int, exposure_ev: float = 0.0) -> 
         wmid = g("grain_midtone_weight")
         amp = 0.045 * gs * ((1 - wmid) + 4 * wmid * L * (1 - L))
         sig = 0.35 + 1.4 * g("grain_size")
-        n = _blur(rng.standard_normal(L.shape).astype(np.float32), sig)
-        n /= n.std() + 1e-8
+        model = p.get("grain_model", "correlated")       # v1 default; v2 randomises this independently of the family
+        n = grain_field(L, sig, model, rng)
         x = x + (amp * n)[..., None]
         cg = g("chroma_grain")
         if cg and not p.get("monochrome"):
-            nc = _blur(rng.standard_normal(x.shape).astype(np.float32), sig)
-            nc /= nc.std() + 1e-8
+            if model == "correlated":                       # exact v1 path (one 3-channel draw, joint normalisation)
+                nc = _blur(rng.standard_normal(x.shape).astype(np.float32), sig)
+                nc /= nc.std() + 1e-8
+            else:
+                nc = np.stack([grain_field(L, sig, model, rng) for _ in range(3)], axis=2)
             x = x + 0.5 * cg * amp[..., None] * nc
     return (np.clip(x, 0, 1) * 255 + 0.5).astype(np.uint8)
 

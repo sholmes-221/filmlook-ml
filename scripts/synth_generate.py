@@ -31,11 +31,10 @@ from filmlook_ml.datasets.registry import Registry
 from filmlook_ml.filmsynth import SyntheticAnnotation, load_presets, sample_nuisance, sample_params, variant_seed
 from filmlook_ml.filmsynth.engine import encode_jpeg, prepare, render
 
-OUT = P.DATA / "synthetic" / "film_synth_v1"
 
 
 def _make(job):
-    r, fam, k, cfg = job
+    r, fam, k, cfg, OUT = job
     version = cfg["version"]
     seed = variant_seed(r["image_id"], fam, k, version)
     rng = np.random.default_rng(seed)
@@ -61,8 +60,11 @@ def main():
     ap.add_argument("--sources", type=int, default=100)
     ap.add_argument("--variants", type=int, default=8)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--config", default=None, help="preset file (default configs/film_synth_v1.yaml)")
+    ap.add_argument("--out", default="film_synth_v1", help="output folder under data/synthetic/")
     a = ap.parse_args()
-    cfg = load_presets()
+    cfg = load_presets(a.config)
+    OUT = P.DATA / "synthetic" / a.out
     lcfg = P.load_yaml("labeling.yaml")
     man = read_jsonl(P.MANIFESTS / "manifest.jsonl")
     eligible, _ = discover(man, Registry.load(), set(lcfg["claude"]["consented_datasets"]), load_quarantine())
@@ -76,12 +78,13 @@ def main():
         pool = [r for r in colour if r["split"] == s]
         idx = rng.choice(len(pool), size=k, replace=False)
         chosen += [pool[i] for i in sorted(idx)]
-    fams = [f for f in cfg["families"] if f != "identity_v1"]
+    identity = next(f for f in cfg["families"] if f.startswith("identity"))
+    fams = [f for f in cfg["families"] if f != identity]
     jobs = []
     for r in chosen:
         srng = np.random.default_rng(variant_seed(r["image_id"], "choose", 0, cfg["version"]))
-        pick = ["identity_v1", *srng.choice(fams, size=a.variants - 1, replace=False).tolist()]
-        jobs += [(r, f, k, cfg) for k, f in enumerate(pick)]
+        pick = [identity, *srng.choice(fams, size=a.variants - 1, replace=False).tolist()]
+        jobs += [(r, f, k, cfg, OUT) for k, f in enumerate(pick)]
     (OUT / "images").mkdir(parents=True, exist_ok=True)
     with Pool(16) as pool:
         anns = pool.map(_make, jobs, chunksize=4)

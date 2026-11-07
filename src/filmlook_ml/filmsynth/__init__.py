@@ -19,7 +19,7 @@ class SyntheticAnnotation(BaseModel):
     variant_id: str
     augmentation_family: str
     augmentation_version: str
-    parameters: dict[str, float | bool]           # every engine parameter as applied (0 / False = off)
+    parameters: dict[str, float | bool | str]     # every engine parameter as applied (0 / False = off)
     nuisance: dict[str, float | int | str]        # jpeg_quality, exposure_ev, crop_fraction, resample
     seed: int
     label_source: str = "deterministic_synthetic_augmentation"
@@ -47,7 +47,9 @@ def sample_params(family_cfg: dict, rng: np.random.Generator) -> dict:
     out: dict = {k: 0.0 for k in PARAM_NAMES}
     out["monochrome"] = False
     for k, v in (family_cfg.get("params") or {}).items():
-        if isinstance(v, list):
+        if isinstance(v, list) and all(isinstance(x, str) for x in v):
+            out[k] = str(rng.choice(v))                       # categorical (e.g. grain_model), label-independent
+        elif isinstance(v, list):
             out[k] = round(float(rng.uniform(v[0], v[1])), 4)
         else:
             out[k] = v

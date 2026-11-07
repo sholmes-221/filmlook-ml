@@ -53,6 +53,8 @@ LORAS = {
     "base_slide_prompt": {"repo": None, "file": None, "scale": 0.0,
                           "prompt": "slide film photograph, saturated colour reversal film, high contrast, fine grain",
                           "license": None},
+    "vae_identity": {"repo": None, "file": None, "scale": 0.0, "prompt": None, "license": None,
+                     "note": "nuisance-parity control: SDXL VAE encode/decode only, no diffusion"},
     "base_bw_prompt": {"repo": None, "file": None, "scale": 0.0,
                        "prompt": "black and white 35mm film photograph, visible grain, rich tonality",
                        "license": None},
@@ -131,9 +133,20 @@ def main():
             else:
                 pipe.set_adapters([x for x in treatments if LORAS[x]["repo"]], adapter_weights=[0.0] * sum(bool(LORAS[x]["repo"]) for x in treatments)) \
                     if any(LORAS[x]["repo"] for x in treatments) else None
-            g = torch.Generator(device=dev).manual_seed(seed)
-            out = pipe(prompt=cfg["prompt"], negative_prompt=NEGATIVE, image=img, strength=a.strength,
-                       num_inference_steps=a.steps, guidance_scale=5.0, generator=g).images[0]
+            if t == "vae_identity":
+                with torch.no_grad():
+                    xin = pipe.image_processor.preprocess(img).to(dev, dtype=torch.float32)
+                    vae = pipe.vae
+                    was = vae.dtype
+                    vae.to(torch.float32)                     # SDXL's VAE is unstable in fp16; the pipeline upcasts too
+                    lat = vae.encode(xin).latent_dist.mode()
+                    dec = vae.decode(lat).sample
+                    vae.to(was)
+                out = pipe.image_processor.postprocess(dec.to(torch.float32), output_type="pil")[0]
+            else:
+                g = torch.Generator(device=dev).manual_seed(seed)
+                out = pipe(prompt=cfg["prompt"], negative_prompt=NEGATIVE, image=img, strength=a.strength,
+                           num_inference_steps=a.steps, guidance_scale=5.0, generator=g).images[0]
             out.save(path, quality=92, subsampling=0)
             data = path.read_bytes()
             anns.append({"source_image_id": r["image_id"], "variant_id": vid, "generator": "sdxl_i2i",
@@ -141,8 +154,10 @@ def main():
                          "models": {BASE: {"revision": revisions[BASE], "license": "CreativeML Open RAIL++-M"},
                                     **({cfg["repo"]: {"revision": revisions[cfg["repo"]], "file": cfg["file"],
                                                       "license": cfg["license"], "scale": cfg["scale"]}} if cfg["repo"] else {})},
-                         "prompt": cfg["prompt"], "negative_prompt": NEGATIVE, "seed": seed, "strength": a.strength,
-                         "steps": a.steps, "guidance_scale": 5.0, "input_size": list(img.size),
+                         "prompt": cfg["prompt"], "negative_prompt": NEGATIVE if t != "vae_identity" else None, "seed": seed,
+                         "strength": a.strength if t != "vae_identity" else 0.0, "steps": a.steps if t != "vae_identity" else 0,
+                         "guidance_scale": 5.0 if t != "vae_identity" else None, "input_size": list(img.size),
+                         "treated": t != "vae_identity",
                          "label_source": "diffusion_image_to_image", "is_real_film_scan": False,
                          "film_stock_claim": None, "split": r["split"], "group_id": r["group_id"],
                          "source_license": r.get("license"), "source_dataset": r["dataset_id"],

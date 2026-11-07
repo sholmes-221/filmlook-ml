@@ -43,7 +43,6 @@ from filmlook_ml.datasets.preprocess import read_jsonl  # noqa: E402
 from filmlook_ml.datasets.quarantine import load_quarantine  # noqa: E402
 from filmlook_ml.datasets.registry import Registry  # noqa: E402
 
-SYN = P.DATA / "synthetic" / "film_synth_v1"
 SDX = P.DATA / "synthetic" / "sdxl_i2i_v1"
 TARGETS = X.TARGETS
 
@@ -84,7 +83,9 @@ def main():
     ap.add_argument("--epochs", type=int, default=25)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--kd", type=float, default=1.0)
+    ap.add_argument("--synth", default="film_synth_v1", help="filmsynth folder under data/synthetic/")
     a = ap.parse_args()
+    SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
     rng = np.random.default_rng(a.seed)
     dev = torch.device("cuda")
@@ -107,7 +108,7 @@ def main():
     for x in syn:
         rows.append((str(P.ROOT / x["path"]), "filmsynth", split_of[x["source_image_id"]], x["source_image_id"],
                      fams.index(x["augmentation_family"]), [float(x["parameters"][t]) for t in TARGETS],
-                     bool(x["parameters"].get("monochrome")), x["augmentation_family"] != "identity_v1"))
+                     bool(x["parameters"].get("monochrome")), not x["augmentation_family"].startswith("identity")))
     for x in sdx:
         rows.append((str(P.ROOT / x["path"]), "sdxl", split_of[x["source_image_id"]], x["source_image_id"], -1, None, False, True))
     for s in srcs:
@@ -119,7 +120,7 @@ def main():
     mono = np.array([r[6] for r in rows])
     M[mono, 0] = M[mono, 1] = False
     train_mask = (split == "train") & np.isin(gen, [*gens, "source"])
-    rep = {"tag": a.tag, "train_generators": gens, "n_train": int(train_mask.sum()),
+    rep = {"tag": a.tag, "train_generators": gens, "synth": a.synth, "n_train": int(train_mask.sum()),
            "train_by_generator": dict(Counter(gen[train_mask].tolist())), "families": fams}
 
     # teacher: hybrid_style -> SupCon projection (filmsynth train sources only)
