@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 3341.069721374512,
- "disk_bytes": 220852225,
+ "gpu_seconds": 3842.4771737194064,
+ "disk_bytes": 220867048,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -72,6 +72,22 @@
    "gpu": true,
    "disk_bytes": 214748364,
    "note": "manual entry: 400 img2img images at 5.3 s, started before the ledger existed; Z-Image download (33 GB) preceded the session budget"
+  },
+  {
+   "id": "E15_colour_vs_texture",
+   "wall_seconds": 210.7,
+   "gpu": true,
+   "disk_bytes": 5192,
+   "peak_gpu_mb_total": 7369.0,
+   "returncode": 0
+  },
+  {
+   "id": "E16_texture_neutral_dino",
+   "wall_seconds": 290.7,
+   "gpu": true,
+   "disk_bytes": 9631,
+   "peak_gpu_mb_total": 7383.0,
+   "returncode": 0
   }
  ],
  "session_started": "2026-11-07T07:03:54Z",

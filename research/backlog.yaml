@@ -79,3 +79,32 @@ experiments:
   blocked_by: E8_zimage_third_generator
   reason: 'E8: held-out Z-Image CI excludes 0.5 but generator identifiability unchanged and real-film unimproved; also ~2.5
     GPU-h of Z-Image generation'
+- id: E16_texture_neutral_dino
+  hypothesis: DINOv2 features of texture-neutralised images (downsampled before encoding) transfer across generator types
+    in both directions and keep same-stock retrieval, because the inversion came from texture entanglement
+  motivation: 'E15: colour/tone alone transfers (0.74/0.71) but is 16-d; DINOv2 carries layout and colour relations but also
+    generator texture'
+  value: 5
+  gpu_minutes: 6
+  disk_gb: 0
+  metric: 6 pairwise LOGO AUROCs with CIs; BlueNeg same-stock SupCon p@5 with CI; BlueNeg-vs-digital (expected near chance)
+  confounders:
+  - downsampling also removes fine composition cues
+  - colour shifts from resampling
+  falsified_if: either cross-type direction stays below 0.6 or same-stock p@5 falls below the colour/tone-only 0.19
+  status: pending
+- id: E17_colour_rendition_descriptor
+  hypothesis: a richer global, explainable colour-rendition descriptor (per-channel tone percentiles, chroma and cast by luminance
+    band, hue histogram, channel correlations) transfers across generator types at least as well as the 16-d set and lifts
+    real-scan same-stock retrieval above 0.19
+  motivation: 'E15/E16: global low-dimensional colour/tone statistics transfer; deep features do not'
+  value: 5
+  gpu_minutes: 0
+  cpu_minutes: 5
+  disk_gb: 0
+  metric: 6 pairwise LOGO with CIs (cross-type mean), BlueNeg same-stock raw/SupCon with roll CI, BlueNeg-vs-digital (expected
+    near chance)
+  confounders:
+  - more dimensions with 700 training rows can overfit generator-specific hues
+  falsified_if: cross-type mean < 0.635 or same-stock SupCon <= 0.19
+  status: pending

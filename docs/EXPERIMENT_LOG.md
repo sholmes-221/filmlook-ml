@@ -163,6 +163,35 @@ generators.
 - Learned: With family/treatment labels the SupCon same-stock retrieval is 0.22 [0.11, 0.31] (filmsynth+SDXL) and 0.26 [0.16, 0.34] (filmsynth+Z-Image) vs raw 0.15 [0.08, 0.19]; the E8 collapse to 0.13 was an evaluation bug (coarse labels). The roll-bootstrap CIs (27 rolls) are wide: embedding variants within 0.03-0.04 of each other are indistinguishable on BlueNeg.
 - Next: Treat same-stock differences below ~0.08 as noise; a second real-film source is needed for a sharper retrieval benchmark.
 
+### E14_diffusion_artifact_probe — diffusion<->diffusion 'treated' transfer is a shared VAE/diffusion artifact: an SDXL-trained probe will call Z-Image's VAE control 'treated'
+- Status: done; wall 152.3 s; peak GPU 7359.0 MB (total on card).
+- A_treatment_transfer [synthetic]: 0.6474 CI [0.567, 0.734]
+- B_artifact_on_vae_control [proxy]: 0.5244 CI [0.447, 0.629]
+- E_vae_vs_raw [proxy]: 0.5289 CI [0.471, 0.596]
+- Decision rule: neutral: no credible real-film change
+- Learned: Not a VAE artifact: the SDXL-trained treated probe scores Z-Image's untreated VAE control vs raw at 0.52 [0.45, 0.63] (B), VAE controls vs raw are barely separable in hybrid features (0.53 [0.47, 0.60]), while true treatment transfer SDXL->Z-Image is 0.65 [0.57, 0.73] (A). The diffusion<->diffusion direction is a shared treatment signal, not a VAE round-trip signature; a shared denoising signature remains possible and real-film transfer is still unimproved.
+- Next: Characterise the two signal types (programmatic vs diffusion) by which measured statistics they move; test whether colour/tone alone carries stock identity on real scans (E15).
+
+### E15_colour_vs_texture — film-stock identity on real scans is carried by colour/tone statistics (aesthetics), not by texture (authenticity)
+- Status: done; wall 210.7 s; peak GPU 7369.0 MB (total on card).
+- colour_tone_same_stock_supcon [real]: 0.1906 CI [0.11, 0.253]
+- texture_same_stock_supcon [real]: 0.1624 CI [0.124, 0.201]
+- hybrid_same_stock_supcon [real]: 0.2471 CI [0.153, 0.314]
+- colour_tone_blueneg_auroc [real]: 0.5295
+- texture_blueneg_auroc [real]: 0.2886
+- Decision rule: neutral: no credible real-film change
+- Learned: Colour/tone statistics alone (16-d) transfer across generator TYPES in the previously failing direction: SDXL->filmsynth 0.74, Z-Image->filmsynth 0.71 (texture-only 0.47/0.55; DINOv2 L4+L8 0.44/0.44). Colour/tone alone does not separate real film from digital (BlueNeg 0.53) while texture does (DINOv2 0.70; explicit texture inverted 0.29). Same-stock retrieval: colour/tone 0.19 [0.11, 0.25], texture 0.16 [0.12, 0.20], hybrid SupCon 0.25 [0.15, 0.31]; CIs overlap, so stock identity is not shown to be colour-only. Authenticity = texture axis; generator-agnostic aesthetics transfer = colour/tone axis.
+- Next: E16: texture-neutralised DINOv2 features (downsample before encoding) to get a colour/tone/layout representation that transfers across generator types without texture signatures.
+
+### E16_texture_neutral_dino — DINOv2 features of texture-neutralised images transfer across generator types in both directions and keep same-stock retrieval
+- Status: done; wall 290.7 s; peak GPU 7383.0 MB (total on card).
+- best_cross_type_mean [synthetic]: 0.5048
+- best_same_stock_supcon [real]: 0.2247 CI [0.12, 0.292]
+- control_hybrid_same_stock [real]: 0.2471 CI [0.153, 0.314]
+- Decision rule: neutral: no credible real-film change
+- Learned: Texture-neutralised DINOv2 (downsample to 64/96/128 px before encoding) transfers WORSE across generator types (cross-type mean 0.45-0.51 vs 0.635 for the 16 colour/tone statistics; Z-Image->filmsynth inverts to 0.32-0.38), is fully content-dominated (own-source rank-1 1.00) and does not improve same-stock retrieval (0.20-0.24 vs 0.25 hybrid, CIs overlap). Deep features encode content-tied colour shifts; global low-dimensional statistics are what transfers.
+- Next: Rejected. Build the aesthetics representation from richer GLOBAL colour-rendition statistics instead (E17); keep DINOv2 texture for authenticity.
+
 ## Decisions taken from these runs
 
 1. Grain randomisation (film-synth-v2) is the fix that worked for cross-generator leakage; standardisation and the

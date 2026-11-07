@@ -3,7 +3,7 @@
 Resume from this file, `docs/RESEARCH_BACKLOG.md` (rendered from `research/backlog.yaml`), `research/registry.jsonl`
 and `research/ledger.json`. Conversation context is not the record.
 
-Last updated: 2026-11-07 (session start of the autonomous loop).
+Last updated: 2026-11-07 (autonomous loop, after E14).
 
 ## Current objective
 A lightweight (MobileNetV3-class) photographic-aesthetics representation that transfers to real photographs:
@@ -37,6 +37,9 @@ embedding, E12 spatial student, E13 scale to 500 sources (blocked by E8).
 ## Completed this session
 - E9/E9b layer ablation: neutral (depth trade-off documented; L4+L8 kept).
 - E11 parameter-similarity embedding: rejected (real same-stock regressed 0.25 -> 0.21).
+- E12 spatial student: rejected (framing R^2 < 0.1; frozen DINOv2 grid probe stays the reference).
+- E8/E8b third generator: held-out Z-Image 0.63 [0.52, 0.75]; gains are diffusion<->diffusion; real film unimproved; E13 scaling deferred.
+- E14 artifact probe: diffusion transfer is not a VAE signature (B 0.52).
 
 ## Rejected approaches (do not repeat without a new hypothesis)
 - Training "treated vs untreated" on both generators with pristine-only controls: real-film regression (E3 `style_both`).
