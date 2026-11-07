@@ -1,0 +1,237 @@
+# FilmLook-ML film knowledge base, v1 (compiled 2026-11-07).
+#
+# Evidence layers are kept apart. Do not mix them:
+#   measured:            numbers published by the manufacturer, with the metric, its scale and its conditions.
+#                        Metrics are NOT interchangeable: Kodak's Print Grain Index (PGI) and diffuse RMS granularity
+#                        use different scales and cannot be compared with each other; Kodak says so explicitly.
+#   manufacturer_claims: the manufacturer's own descriptive statements, paraphrased (marketing language, not measurements).
+#   database_subjective: FilmLook database entries: the i50mm 1-5 ratings and the app's "character" text. These are
+#                        subjective opinions or editorial text.
+#   simulation:          OUR approximate parameter ranges for film-synth (engine scale 0-1). They are derived from the
+#                        layers above by the rules in `simulation_rules`. They are not physical measurements, and no
+#                        preset reproduces a proprietary emulsion.
+# Appearance also depends on exposure, development, scanning, printing and post-processing. Every entry is a
+# tendency, not a fixed look.
+version: film-kb-v1
+sources:
+  kodak_e4050: {title: "KODAK PROFESSIONAL PORTRA 400 Film, E-4050", dates: ["2016-02", "2025-01"], url: "https://kodakprofessional.com/sites/default/files/wysiwyg/pro/resources/e4050_portra_400.pdf", kind: manufacturer_datasheet}
+  kodak_e4051: {title: "KODAK PROFESSIONAL PORTRA 160 Film, E-4051", dates: ["2016-02"], url: "https://125px.com/docs/film/kodak/e4051_Portra_160-2016.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  kodak_e4040: {title: "KODAK PROFESSIONAL PORTRA 800 Film, E-4040", dates: ["2016-02"], url: "https://125px.com/docs/film/kodak/e4040_portra_800-2016.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  kodak_e4046: {title: "KODAK PROFESSIONAL EKTAR 100 Film, E-4046", dates: ["2016-02"], url: "https://125px.com/docs/film/kodak/e4046_ektar_100-2016.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  kodak_e7022: {title: "KODAK GOLD 200 Film, E-7022", dates: ["2016-02"], url: "https://125px.com/docs/film/kodak/E7022_Gold_200-2016.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  kodak_f4017: {title: "KODAK PROFESSIONAL TRI-X 320 and 400 Films, F-4017", dates: ["2002-09", "2016-12", "2021-10"], url: "https://kodakprofessional.com/sites/default/files/wysiwyg/film/f4017_trix_320400.pdf", kind: manufacturer_datasheet}
+  kodak_f4016: {title: "KODAK PROFESSIONAL T-MAX 100 Film, F-4016", dates: ["2002-01", "2018-06"], url: "https://125px.com/docs/film/kodak/f4016_tmax_100-2018.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  kodak_f4043: {title: "KODAK PROFESSIONAL T-MAX 400 Film, F-4043", dates: ["2016-02"], url: "https://125px.com/docs/film/kodak/f4043_TMax_400-2016.pdf", kind: manufacturer_datasheet (unofficial mirror)}
+  fuji_af3_207u: {title: "FUJIFILM Professional Data Guide AF3-207U", dates: ["2005"], url: "https://asset.fujifilm.com/www/ca/files/2020-04/9cdee030ab7fc76bbcfddbcd38650038/ProfessionalFilmDataGuide.pdf", kind: manufacturer_guide}
+  fuji_rvp100f: {title: "FUJICHROME Velvia 100F Professional data sheet", url: "https://www.freestylephoto.com/static/pdf/product_pdfs/fujifilm/Velvia100F_Data.pdf", kind: manufacturer_datasheet (retailer-hosted)}
+  ilford_hp5_fp4: {title: "ILFORD HP5 PLUS / FP4 PLUS technical information", url: "https://www.ilfordphoto.com/film-technical-downloads/", kind: manufacturer_datasheet, status: "NOT READ: HTTP 403 for automated access on 2026-11-07"}
+  filmlook_db: {title: "FilmLook evaluation database (taxonomy-db-v1, i50mm ratings, app character text)", kind: subjective_editorial}
+
+simulation_rules:
+  grain: >-
+    Within one metric family only. Colour negatives are ranked by 35 mm PGI at 8x10 in. Slide and B&W films are ranked
+    by diffuse RMS. Engine grain_strength = 0.05 + 0.45 * (value - family_min) / (family_max - family_min), +/- 0.05.
+    Families are not compared across metrics.
+  colour_and_tone: >-
+    Manufacturer claims of "high"/"ultra-high saturation" or "high contrast" map to the upper third of the engine's
+    saturation/contrast range, "medium" to the middle third, and "natural/neutral skin tones" to the lower-middle
+    third of saturation. These are qualitative mappings with confidence: low.
+  latitude: "Stated exposure latitude sets the exposure_ev nuisance range for that preset. Recorded, not simulated physically."
+
+films:
+  - id: kodak_ektar_100
+    name: Kodak Ektar 100
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 100
+    type: color_negative
+    process: C-41
+    measured:
+      print_grain_index_35mm: {"4x6": "<25", "8x10": 38, "16x20": 66, source: kodak_e4046, note: "PGI 25 = approximate visual threshold of graininess"}
+    manufacturer_claims: ["world's finest-grain colour negative (manufacturer claim)", "high saturation and ultra-vivid colour", "optimised sharpness"]
+    database_subjective: {aesthetic_id: ektar_like, character: "vivid, fine-grained colour negative; saturated reds and blues"}
+    simulation: {family_hint: vivid_negative, grain_strength: [0.0, 0.1], saturation_adjustment: [0.3, 0.6], contrast_adjustment: [0.1, 0.35], confidence: low}
+    evidence_quality: "high (measured grain), medium (claims)"
+    uncertainties: ["no published colour-response or characteristic-curve numbers extracted", "scan and print change the saturation strongly"]
+  - id: kodak_portra_160
+    name: Kodak Portra 160
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 160
+    type: color_negative
+    process: C-41
+    measured:
+      print_grain_index_35mm: {"4x6": 28, "8x10": 50, "16x20": 79, source: kodak_e4051}
+    manufacturer_claims: ["neutral, natural skin tones", "finer grain than its predecessor, optimised for scanning"]
+    database_subjective: {aesthetic_id: kodak_portra_160_like, i50mm_ratings: {grain: 1, sharpness: 2, saturation: 3, contrast: 2}}
+    simulation: {grain_strength: [0.169, 0.269], saturation_adjustment: [-0.2, 0.05], contrast_adjustment: [-0.3, -0.05], confidence: low}
+    evidence_quality: "high (measured grain), medium (claims)"
+    uncertainties: ["the 160NC/160VC predecessors differed; older scans may not match"]
+  - id: kodak_portra_400
+    name: Kodak Portra 400
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 400
+    type: color_negative
+    process: C-41
+    measured:
+      print_grain_index_35mm: {"4x6": 37, "8x10": 59, "16x20": 89, source: kodak_e4050}
+      print_grain_index_120_6x6: {"4x6": 25, "8x10": 37, "16x20": 59, source: kodak_e4050}
+    manufacturer_claims: ["finest-grain high-speed colour negative (manufacturer claim)", "very natural skin tones", "exceptional colour saturation over a wide range of lighting"]
+    database_subjective: {aesthetic_id: portra_like, character: "restrained warm negative: natural skin, gentle contrast, long highlight roll-off, understated saturation"}
+    simulation: {grain_strength: [0.295, 0.395], saturation_adjustment: [-0.15, 0.1], contrast_adjustment: [-0.25, 0.0], highlight_compression: [0.35, 0.65], confidence: low}
+    evidence_quality: "high (measured grain), medium (claims), low (warmth/roll-off: database editorial only)"
+    uncertainties: ["'warm' rendering is editorial, not stated by Kodak", "the manufacturer's 'exceptional saturation' conflicts with the editorial 'understated saturation'; both are recorded"]
+  - id: kodak_portra_800
+    name: Kodak Portra 800
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 800
+    type: color_negative
+    process: C-41
+    measured:
+      print_grain_index_35mm: {"4x6": 48, "8x10": 70, "16x20": 99, source: kodak_e4040}
+      print_grain_index_120_6x6: {"4x6": 36, "8x10": 48, "16x20": 70, source: kodak_e4040}
+    manufacturer_claims: ["balanced colour saturation", "very fine grain for the speed", "best-in-class underexposure latitude (manufacturer claim)", "natural skin tones"]
+    database_subjective: {aesthetic_id: kodak_portra_800_like, i50mm_ratings: {grain: 3, sharpness: 2, saturation: 3, contrast: 3}}
+    simulation: {grain_strength: [0.45, 0.55], saturation_adjustment: [-0.05, 0.2], contrast_adjustment: [-0.1, 0.15], confidence: low}
+    evidence_quality: "high (measured grain), medium (claims)"
+    uncertainties: []
+  - id: kodak_gold_200
+    name: Kodak Gold 200
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 200
+    type: color_negative
+    process: C-41
+    measured:
+      print_grain_index_35mm: {"4x6": 44, source: kodak_e7022}
+      exposure_latitude: {under_stops: 2, over_stops: 3, source: kodak_e7022}
+    manufacturer_claims: ["saturated colours, bright colourful prints", "fine grain and high sharpness"]
+    database_subjective: {aesthetic_id: gold_like, character: "warm consumer colour negative: golden yellows, nostalgic daylight"}
+    simulation: {grain_rule_note: 'PGI only at 4x6 (44, between Portra 400 at 37 and Portra 800 at 48); interpolated', grain_strength: [0.3, 0.42], saturation_adjustment: [0.1, 0.35], temperature_shift: [0.2, 0.5], exposure_ev: [-2, 3], confidence: low}
+    evidence_quality: "medium (grain is reported only at 4x6, so it is not on the same print size as the others), medium (claims)"
+    uncertainties: ["the warm/golden cast is editorial, not a Kodak statement"]
+  - id: kodak_tri_x_400
+    name: Kodak Tri-X 400
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 400
+    type: bw_negative
+    process: B&W
+    measured:
+      diffuse_rms_granularity: {value: 17, rating: fine, conditions: "net diffuse density 1.0, 48 um aperture, 12x", source: kodak_f4017}
+      contrast_index_reference: {value: 0.56, note: "development starting points target this contrast index", source: kodak_f4017}
+    manufacturer_claims: ["fine grain", "wide exposure latitude", "high sharpness and resolving power", "rich tonality kept with push processing"]
+    database_subjective: {aesthetic_id: tri_x_like, character: "gritty black-and-white: strong contrast, bold grain, deep blacks"}
+    simulation: {grain_strength: [0.45, 0.55], contrast_adjustment: [0.15, 0.6], confidence: low}
+    evidence_quality: "high (measured granularity)"
+    uncertainties: ["the 'gritty, strong contrast' look depends heavily on developer and push processing; Kodak describes the film as fine-grained"]
+  - id: kodak_t_max_100
+    name: Kodak T-Max 100
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 100
+    type: bw_negative
+    process: B&W
+    measured:
+      resolving_power_lines_per_mm: {"TOC 1.6:1": 63, source: kodak_f4016}
+    manufacturer_claims: ["extremely high sharpness and extremely fine grain", "very high resolving power, very high degree of enlargement"]
+    database_subjective: {aesthetic_id: kodak_t_max_100_like, i50mm_ratings: {grain: 1, sharpness: 1, contrast: 3}}
+    simulation: {grain_rule_note: 'no manufacturer granularity extracted; editorial placement', grain_strength: [0.05, 0.12], contrast_adjustment: [-0.1, 0.25], confidence: low}
+    evidence_quality: "medium (RMS value not extracted reliably)"
+    uncertainties: ["diffuse RMS figure not extracted"]
+  - id: kodak_t_max_400
+    name: Kodak T-Max 400
+    manufacturer: Kodak (Kodak Alaris)
+    iso: 400
+    type: bw_negative
+    process: B&W
+    measured:
+      diffuse_rms_granularity: {value: 10, source: kodak_f4043}
+      resolving_power_lines_per_mm: {"TOC 1.6:1": 50, "TOC 1000:1": 200, source: kodak_f4043}
+    manufacturer_claims: ["finest-grained 400-speed film (manufacturer claim)", "very high sharpness, great exposure latitude"]
+    database_subjective: {aesthetic_id: kodak_t_max_400_like, i50mm_ratings: {grain: 2, sharpness: 1, contrast: 3}}
+    simulation: {grain_strength: [0.1, 0.2], confidence: low}
+    evidence_quality: "high (measured)"
+    uncertainties: []
+  - id: fuji_velvia_50
+    name: Fujifilm Velvia 50 (RVP)
+    manufacturer: Fujifilm
+    iso: 50
+    type: color_reversal
+    process: E-6
+    measured:
+      diffuse_rms_granularity: {value: 9, source: fuji_af3_207u, note: "2005 guide (original RVP). Later reformulation is reported as RMS 8 by secondary sources, not verified here"}
+    manufacturer_claims: ["high sharpness, highly saturated colours, fine grain", "unique image colour with a sense of three-dimensional depth"]
+    database_subjective: {aesthetic_id: velvia_like, character: "intense slide landscape character: very saturated greens and blues, deep shadows, high contrast"}
+    simulation: {grain_strength: [0.05, 0.15], saturation_adjustment: [0.45, 0.75], contrast_adjustment: [0.35, 0.7], black_point: [0.3, 0.7], confidence: low}
+    evidence_quality: "high (measured granularity), medium (claims)"
+    uncertainties: ["slide film is viewed or scanned directly; projection and scan settings change contrast"]
+  - id: fuji_velvia_100f
+    name: Fujifilm Velvia 100F (RVP100F)
+    manufacturer: Fujifilm
+    iso: 100
+    type: color_reversal
+    process: E-6
+    in_filmlook_database: false
+    measured:
+      diffuse_rms_granularity: {value: 8, source: fuji_rvp100f}
+    manufacturer_claims: ["highest colour saturation in the 100F series, high contrast", "good hue fidelity for purples and greens", "push to +1 stop"]
+    simulation: {grain_strength: [0.0, 0.1], saturation_adjustment: [0.4, 0.7], contrast_adjustment: [0.3, 0.6], confidence: low}
+    evidence_quality: "high"
+    uncertainties: ["not in the FilmLook database; kept as reference evidence for the slide family"]
+  - id: fuji_provia_100f
+    name: Fujifilm Provia 100F (RDP III)
+    manufacturer: Fujifilm
+    iso: 100
+    type: color_reversal
+    process: E-6
+    measured:
+      diffuse_rms_granularity: {value: 8, source: fuji_af3_207u}
+    manufacturer_claims: ["medium colour saturation and contrast relative to the other 100F films", "push to +2 stops"]
+    database_subjective: {aesthetic_id: fuji_provia_100f_like, i50mm_ratings: {grain: 1, sharpness: 1, saturation: 3, contrast: 3}}
+    simulation: {grain_strength: [0.0, 0.1], saturation_adjustment: [0.1, 0.35], contrast_adjustment: [0.15, 0.4], confidence: low}
+    evidence_quality: "high"
+    uncertainties: []
+  - id: fuji_pro_400h
+    name: Fujifilm Pro 400H
+    manufacturer: Fujifilm
+    iso: 400
+    type: color_negative
+    process: C-41
+    measured: {}
+    manufacturer_claims: ["fourth colour layer", "wide exposure latitude under and over", "superb skin tones with smooth gradation from highlights to shadows", "highly faithful colour reproduction"]
+    database_subjective: {aesthetic_id: pro_400h_like, character: "airy pastel negative: soft cool-leaning greens and blues, luminous overexposed highlights"}
+    simulation: {grain_rule_note: 'no manufacturer granularity extracted; editorial placement', grain_strength: [0.2, 0.35], saturation_adjustment: [-0.35, -0.1], contrast_adjustment: [-0.4, -0.1], temperature_shift: [-0.4, -0.05], confidence: low}
+    evidence_quality: "medium (claims only; no granularity in the guide's product table), low (pastel and cool: editorial)"
+    uncertainties: ["discontinued (2021); the 'pastel' look is strongly tied to overexposure practice, not stated by Fujifilm"]
+  - id: fuji_superia_x_tra_400
+    name: Fujifilm Superia X-TRA 400
+    manufacturer: Fujifilm
+    iso: 400
+    type: color_negative
+    process: C-41
+    measured: {}
+    manufacturer_claims: ["fourth colour layer", "great vividness, smooth skin tones, extremely high sharpness", "wide exposure latitude, neutral grey balance"]
+    database_subjective: {aesthetic_id: superia_like, character: "everyday consumer negative: punchy greens, slightly magenta-leaning shadows"}
+    simulation: {grain_rule_note: 'no manufacturer granularity extracted; editorial placement', grain_strength: [0.3, 0.45], saturation_adjustment: [0.1, 0.35], shadow_tint_hue: [280, 330], shadow_tint_strength: [0.0, 0.3], confidence: low}
+    evidence_quality: "medium (claims), low (shadow tint: editorial)"
+    uncertainties: ["the manufacturer states neutral grey balance; the magenta shadows are an editorial observation"]
+  - id: ilford_hp5
+    name: Ilford HP5 Plus 400
+    manufacturer: Ilford (HARMAN technology)
+    iso: 400
+    type: bw_negative
+    process: B&W
+    measured: {}
+    manufacturer_claims: []
+    database_subjective: {aesthetic_id: hp5_like, character: "flexible black-and-white: moderate contrast, soft midtones, visible but gentle grain, wide latitude"}
+    simulation: {grain_rule_note: 'no manufacturer granularity extracted; editorial placement', grain_strength: [0.4, 0.55], contrast_adjustment: [-0.1, 0.25], confidence: very_low}
+    evidence_quality: "low (data sheet not readable: HTTP 403)"
+    uncertainties: ["no manufacturer data obtained in this pass"]
+  - id: ilford_fp4_plus
+    name: Ilford FP4 Plus 125
+    manufacturer: Ilford (HARMAN technology)
+    iso: 125
+    type: bw_negative
+    process: B&W
+    measured: {}
+    manufacturer_claims: []
+    database_subjective: {aesthetic_id: ilford_fp4_plus_like, i50mm_ratings: {grain: 2, sharpness: 2, contrast: 3}}
+    simulation: {grain_rule_note: 'no manufacturer granularity extracted; editorial placement', grain_strength: [0.12, 0.25], confidence: very_low}
+    evidence_quality: "low (data sheet not readable: HTTP 403)"
+    uncertainties: ["no manufacturer data obtained in this pass"]

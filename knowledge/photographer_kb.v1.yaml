@@ -1,0 +1,147 @@
+# FilmLook-ML photographer style knowledge base, v1 (compiled 2026-11-07).
+#
+# Layers:
+#   documented:       own-words summaries of what the cited public pages actually say (foundations, Magnum, encyclopedic).
+#                     null = the sources read say nothing on that dimension. Nothing here is inferred.
+#   database_profile: the FilmLook database's editorial style vector (25 axes, 0-1) and traits, referenced by id. Load it
+#                     with filmlook_ml.taxonomy_db; it is not duplicated here. Editorial estimates, not measurements.
+#   film_or_camera:   only what a source explicitly states. No film stock is attributed without such a statement.
+# No photographs were downloaded or used. Pages were read on 2026-11-07; some failed (listed).
+version: photographer-kb-v1
+axis_observability:              # which database axes can in principle be measured from pixels (see docs)
+  measurable_colour: [color.saturation, color.warmth, color.contrast, color.palette_breadth]
+  measurable_light: [light.key, light.contrast, light.shadow_depth, light.highlight_softness, light.directionality]
+  measurable_texture: [tex.grain, tex.sharpness, tex.motion]
+  measurable_composition_needs_spatial_features: [comp.complexity, comp.layering, comp.negative_space, comp.geometry, comp.centrality]
+  not_measurable_from_pixels_alone: [story.human_presence, story.documentary, story.abstraction, story.humor, story.melancholy, story.intimacy, story.urban, story.stillness]
+photographers:
+  - id: saul_leiter
+    sources_read: ["https://www.saulleiterfoundation.org/", "https://en.wikipedia.org/wiki/Saul_Leiter"]
+    evidence_quality: "high (foundation) / medium (encyclopedic)"
+    documented:
+      color: "colour work from the late 1940s on slide film; described as masterful, innovative colour"
+      light: "black-and-white work plays with shadow and reflection"
+      composition: "bold, innovative compositions; often shifts focus between foreground and background"
+      visual_language: "everyday, overlooked Manhattan street settings; reflective rather than confrontational; also fashion work"
+      texture: null
+    palette: both
+    film_or_camera: "slide film such as Kodachrome (foundation); 35 mm Leica for early black-and-white (Wikipedia)"
+  - id: william_eggleston
+    sources_read: ["https://egglestonartfoundation.org/", "https://en.wikipedia.org/wiki/William_Eggleston"]
+    evidence_quality: "medium (foundation gives little style text; Wikipedia partly summarised)"
+    documented:
+      color: "credited with establishing colour photography as an art medium; colour transparency film and dye-transfer printing (saturated colour)"
+      light: null
+      composition: null
+      visual_language: "ordinary, mundane suburban scenes and objects of the American South; a 'democratic' way of looking; critics note a latent sense of unease"
+      texture: null
+    palette: both (predominantly colour)
+    film_or_camera: "Leica (model not stated); dye-transfer printing"
+  - id: alex_webb
+    sources_read: ["https://www.magnumphotos.com/photographer/alex-webb/"]
+    sources_failed: ["https://www.webbnorriswebb.co/ (no content)"]
+    evidence_quality: "high (Magnum), thin on technique"
+    documented:
+      color: "black and white in the mid-1970s American South; colour since work in the Caribbean and Mexico"
+      light: "a monograph is described as a study of light, community and culture"
+      composition: null
+      visual_language: "street photography seeking the unexpected; community; Caribbean, Mexico and US cities"
+      texture: null
+    palette: both
+    film_or_camera: null
+  - id: daido_moriyama
+    sources_read: ["https://en.wikipedia.org/wiki/Daid%C5%8D_Moriyama", "https://www.moriyamadaido.com/ (no style text)"]
+    evidence_quality: "medium (encyclopedic; partly summarised)"
+    documented:
+      color: "best known for black and white; colour since the 1970s; later mostly digital colour"
+      light: "harsh contrast, shadowy streets"
+      composition: "tilted, skewed framing; often shoots without the viewfinder; prefers a vertical 4:5 crop"
+      visual_language: "Tokyo/Shinjuku street and night life, fragmentary reality, blurred moving figures, the photographer's wandering gaze"
+      texture: "grainy, rough textures; blur and out-of-focus images (are, bure, boke); light leaks and dust in some work"
+    palette: both (predominantly monochrome)
+    film_or_camera: "Canon IV Sb early; compact cameras; Polaroids; later compact digital"
+  - id: shomei_tomatsu
+    sources_read: ["https://en.wikipedia.org/wiki/Sh%C5%8Dmei_T%C5%8Dmatsu"]
+    evidence_quality: "medium (encyclopedic; largely biographical)"
+    documented:
+      color: "adopted colour in the 1970s, drawn by Okinawa's brilliantly coloured landscapes"
+      light: null
+      composition: "moved from photojournalism to a highly expressionistic, subjective image-making in the 1960s"
+      visual_language: "post-war Japan, US bases, Nagasaki, Okinawa, Shinjuku; increasingly allusive treatment of mortality"
+      texture: null
+    palette: both
+    film_or_camera: null
+  - id: rinko_kawauchi
+    sources_read: ["https://en.wikipedia.org/wiki/Rinko_Kawauchi", "https://rinkokawauchi.com/ (no style text)"]
+    evidence_quality: "medium (encyclopedic 'Style' section)"
+    documented:
+      color: "soft colours"
+      light: "radiant light that gives a dream-like quality"
+      composition: "mostly square 6x6; images conceived as parts of series"
+      visual_language: "intimate, poetic everyday moments; family; Shinto rituals; no subject too small"
+      texture: null
+    palette: both (early black and white; later colour)
+    film_or_camera: "Rolleiflex 6x6; digital after 2010"
+  - id: stephen_shore
+    sources_read: ["https://en.wikipedia.org/wiki/Stephen_Shore"]
+    sources_failed: ["https://stephenshore.net/ (certificate expired)"]
+    evidence_quality: "medium (encyclopedic)"
+    documented:
+      color: "pioneering use of colour in art photography from 1972"
+      light: null
+      composition: null
+      visual_language: "banal scenes and objects of everyday life; road-trip American landscapes; New Topographics"
+      texture: "format progression 35 mm -> 4x5 -> 8x10 view camera"
+    palette: both
+    film_or_camera: "35 mm, 4x5 and 8x10 view cameras; Stereo Realist"
+  - id: martin_parr
+    sources_read: ["https://www.magnumphotos.com/photographer/martin-parr/", "https://www.martinparr.com/ (no style text)"]
+    evidence_quality: "high source, thin on style"
+    documented:
+      color: null
+      light: null
+      composition: null
+      visual_language: "creates fiction out of reality by giving society's prejudices a twist; tourism and social themes (project titles)"
+      texture: null
+    palette: "not stated by the sources read"
+    film_or_camera: null
+  - id: fan_ho
+    sources_read: ["https://en.wikipedia.org/wiki/Fan_Ho", "https://fanho-forgetmenot.com/"]
+    evidence_quality: "medium"
+    documented:
+      color: "estate tags the work as black-and-white film"
+      light: "a diagonal shadow added in the darkroom in a 1954 image (documented case)"
+      composition: "posed and darkroom-composited images are documented; leaves rendered as intersecting arcs in one work"
+      visual_language: "Hong Kong street life of the 1950s-60s; described as abstract and humanistic at once"
+      texture: null
+    palette: monochrome (per estate tags)
+    film_or_camera: "Rolleiflex (K4A cited) throughout his career; Brownie early"
+  - id: vivian_maier
+    sources_read: ["https://www.vivianmaier.com/ (gallery titles only)", "https://en.wikipedia.org/wiki/Vivian_Maier"]
+    evidence_quality: "medium (critic quotes on Wikipedia)"
+    documented:
+      color: "mostly black and white; 1980s-90s colour transparencies on Ektachrome"
+      light: null
+      composition: "clarity of composition and a calm gentleness (critic quote); medium-format detail"
+      visual_language: "street scenes in Chicago, New York, Los Angeles; people at the margins; recurrent self-portraits including her shadow"
+      texture: null
+    palette: both (predominantly monochrome)
+    film_or_camera: "Rolleiflex (several models), Leica IIIc, Exakta, Contarex; Ektachrome for later colour"
+  - id: ernst_haas
+    sources_read: []
+    sources_failed: ["https://www.magnumphotos.com/photographer/ernst-haas/ (404)", "https://ernsthaas.com/ (TLS error)"]
+    evidence_quality: "none (no source read in this pass)"
+    documented: {color: null, light: null, composition: null, visual_language: null, texture: null}
+    palette: null
+    film_or_camera: null
+  - id: harry_gruyaert
+    sources_read: ["https://www.magnumphotos.com/photographer/harry-gruyaert/", "https://en.wikipedia.org/wiki/Harry_Gruyaert"]
+    evidence_quality: "high (Magnum) / medium"
+    documented:
+      color: "known for extraordinary colour work; entirely colour from the late 1970s; early Kodachrome"
+      light: "light, colour and contrast are his main concerns (critic); colour, form, light and movement (Magnum)"
+      composition: "cinematographic conception; mirroring surfaces, windows and coloured planes (critic)"
+      visual_language: "everyday urban and travel scenes; contradictions of reality rather than politics; TV-screen series"
+      texture: null
+    palette: colour
+    film_or_camera: "Kodachrome (late 1960s)"
