@@ -368,6 +368,13 @@ generators.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: add hybrid_joint_supcon as a fixed candidate in the real-film evaluation (E27/E27b decide on real film); rejected: keep the single-generator projection and record that cross-pipeline families do not merge linearly
 
+### E27b_early_layer_teacher_commoncatalog — the L3 teacher judged on real film (CommonCatalog film scans with uploader stock tags)
+- Run: research.eval_pipeline on the analysis half of `commoncatalog_film` (487 scans, 175 uploaders, 71 uploader-claimed stocks; analysis half 247 scans / 87 uploaders; snapshot 28d45d1d; 2026-11-08 00:12). Candidates: fixed benchmark set, six eligible students, and the pre-registered `hybrid_l3_supcon_family`.
+- Primary metric (pre-registered: same-stock p@5, uploader excluded, speed-level labels, 185 queries from 77 uploaders): baseline 0.146 [0.119, 0.184], L3 teacher 0.137 [0.105, 0.176], chance 0.125; students 0.124-0.160; raw DINOv2-global 0.157 but rejected for photographer leakage (uploader share 0.134 vs prior 0.030); colour_tone16 and student_style_both also rejected for leakage. No candidate is CI-separated from chance.
+- Decision: **inconclusive** for E27b and for every student (no promotion). The instrument is the problem on this snapshot, not a specific candidate: with 54 stocks on the analysis half and only 20 of them held by two or more uploaders, uploader-excluded same-stock retrieval has too few positives.
+- Post-hoc diagnostics (recorded as observations, not decisions): with stock *line* labels (brand + line, speed dropped; 217 queries) the baseline reaches 0.166 [0.139, 0.193] vs chance 0.129 and the students 0.166-0.195 (student_style_fs_v2_kdsdxl 0.195 [0.165, 0.231]); film-type retrieval (colour negative / B&W / reversal) is clearly above chance for every learned embedding (0.34-0.41 vs 0.264) and at chance for raw DINOv2-global and texture12, though B&W-vs-colour is a trivial part of that signal. Scanner probes sit at the majority rate (0.38-0.51 vs 0.518).
+- Next: a larger snapshot (700 more shards queued: `data_commoncatalog_film_scan2` -> acquire -> re-evaluation) to raise uploaders-per-stock; the pre-registered rule is unchanged; the line-level metric is pre-registered now as a *secondary* reading for the next snapshot, never as a replacement.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

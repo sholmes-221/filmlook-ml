@@ -103,6 +103,8 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
     under its pre-registered rule. Generator invariance has to come from the features or the training signal, not from
     pooling pipelines. (medium; synthetic val only)
 
+20. **On an independent real-film set, same-stock retrieval from uploader tags is at chance for every candidate, while film-type retrieval is not.** CommonCatalog film scans with uploader stock tags (`commoncatalog_film`, 487 scans, 175 uploaders, class B; analysis half 247/87): uploader-excluded same-stock p@5 is 0.10-0.16 for all candidates against chance 0.125 (baseline 0.146 [0.119, 0.184]); with stock-line labels the baseline is 0.166 [0.139, 0.193] vs 0.129 (post-hoc); film-type p@5 is 0.34-0.41 vs 0.264 for every learned embedding and at chance for raw DINOv2-global. Raw DINOv2-global and colour statistics leak the photographer (uploader share 0.13 and 0.10 vs prior 0.03); the SupCon hybrid and the students do not (0.06-0.08). E27b inconclusive; no student promoted. (medium; one snapshot, 20 stocks with >= 2 uploaders)
+
 ## What is not established
 - That any embedding captures aesthetics as a person would judge them (no human evaluation exists).
 - That same-stock retrieval generalises beyond one photographer's 1990s consumer stocks.

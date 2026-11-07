@@ -403,8 +403,12 @@ experiments:
   needs: dataset:commoncatalog_film ready (>= 300 rows); the evaluation task eval_commoncatalog_film_analysis runs automatically
   next_step: 'if supported on this set AND not rejected on any other real-film set: switch the distillation target and re-run
     the full benchmark on a fresh test set; if rejected: keep L4+L8'
-  status: pending
-  blocked_by: dataset:commoncatalog_film ready (acquisition in progress)
+  status: inconclusive
+  result: 'inconclusive: on the commoncatalog_film analysis half (247 scans, 87 uploaders, snapshot 28d45d1d) the L3 teacher''s
+    same-stock p@5 is 0.137 [0.105, 0.176] vs L4+L8 0.146 [0.119, 0.184] (chance 0.125): not below the baseline''s lower CI
+    and uploader-share excess -0.001, so not falsified, but no gain; every candidate including the baseline is at chance on
+    the pre-registered speed-level stock labels, so this snapshot cannot rank teachers. Student l3_real 0.152 vs fs_v2_real
+    0.143: same.'
 - id: E29_curated_cross_source_robustness
   hypothesis: on CC0 museum photographs (aic_photographs, analysis half) the style embeddings retrieve the physical print
     process (owner records) above chance with the artist excluded, without photographer leakage; the real-distil student agrees
