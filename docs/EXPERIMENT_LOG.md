@@ -347,6 +347,17 @@ generators.
   E27 decides on the Commons analysis half.
 - Next: checkpoint student_style_l3_real becomes an eligible candidate of research.eval_pipeline; E27 decides on the Commons analysis half
 
+### E28_l3_shortcut_audit — the layer-3 teacher's cross-scene treatment gain (E26/E27) is not a filmsynth-pipeline shortcut and the L3 features do not recover scanner family or uploader on real film scans more than L4+L8: under a generator-swapped SupCon projection (trained on sdxl families) the L3 advantage on held-out filmsynth persists, and on CommonCatalog film-scan originals (train+val) the L3 teacher's scanner-probe accuracy is within +0.05 and its same-uploader top-5 share within +0.02 of the L4+L8 teacher
+- Status: done; wall 5.8 s; peak GPU 6284.0 MB (total on card).
+- passes [proxy]: 0.0
+- swap_gain [synthetic]: 0.0116
+- scanner_excess [proxy]: -0.034
+- uploader_excess [proxy]: -0.0046
+- Decision rule: neutral: no credible real-film change
+- Readings (reports/l3_shortcut_audit.json, analysis data only). C1 generator swap: with the family SupCon projection trained on the 4 sdxl families (280 rows) instead of filmsynth, both teachers collapse on held-out filmsynth val (L3 0.203 [0.183, 0.221] vs L4+L8 0.192 [0.166, 0.223]; chance 0.11) and are equal on zimage (0.413 both): `swap_status = vanishes`. The L3 advantage seen with filmsynth-trained projections (0.572 vs 0.467) is therefore tied to training the projection on the filmsynth pipeline, and the projection itself is generator-specific for every layer choice. C2/C3 on 265 CommonCatalog film-scan originals (138 uploaders): L3 scanner-probe accuracy 0.423 [0.345, 0.501] vs 0.457 (majority 0.506) and same-uploader share 0.014 vs 0.019, so L3 is not a scanner or photographer shortcut; explicit28 alone recovers the scanner best (0.581), consistent with E24. Students: style_l3_real scanner 0.426 / uploader 0.017 vs style_fs_v2_real 0.468 / 0.024. Decision: rejected under the pre-registered rule (passes = 0 because the swap gain vanished); the teacher target stays L4+L8; L3 remains only an E27 candidate on real film. No promotion. Cost 5.8 s GPU.
+- Learned: decision rejected: falsified: passes=0.0000 < 1
+- Next: not falsified: L3 stays a candidate for E27 on Commons (no promotion from this run); falsified: drop the L3 teacher target, keep L4+L8, record which shortcut
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

@@ -324,3 +324,56 @@ experiments:
   result: 'inconclusive (interim): student fam F1 0.616 vs 0.650, rank-1 0.21 vs 0.18 (within thresholds); teacher val B 0.572
     vs 0.467, rank-1 0.262 vs 0.369, generator share 0.594 vs 0.541. Checkpoint student_style_l3_real awaits the Commons evaluation
     (E27).'
+- id: E28_l3_shortcut_audit
+  hypothesis: 'the layer-3 teacher''s cross-scene treatment gain (E26/E27) is not a filmsynth-pipeline shortcut and the L3
+    features do not recover scanner family or uploader on real film scans more than L4+L8: under a generator-swapped SupCon
+    projection (trained on sdxl families) the L3 advantage on held-out filmsynth persists, and on CommonCatalog film-scan
+    originals (train+val) the L3 teacher''s scanner-probe accuracy is within +0.05 and its same-uploader top-5 share within
+    +0.02 of the L4+L8 teacher'
+  motivation: E27 (real film, Commons) is blocked by rate limiting; E27 val showed the L3 gain only on filmsynth (not sdxl/zimage)
+    and a higher generator share, which is the signature of a pipeline fingerprint; early layers may encode scanner/JPEG texture.
+    All three checks run on cached features and analysis data only.
+  value: 4
+  gpu_minutes: 1
+  gpu_mb: 2500
+  cpu_minutes: 5
+  disk_gb: 0.01
+  datasets:
+  - bench_features_v1
+  - commoncatalog_ccby
+  metric: 'scripts/l3_shortcut_audit.py: swap_status (persists|inconclusive|vanishes), scanner probe accuracy and same-uploader
+    share on 265 real scans (138 uploaders), summary.passes'
+  confounders:
+  - sdxl TRAIN has only 4 families / 280 rows, so swapped projections are weaker for both candidates (CI-based rule)
+  - scanner family from EXIF camera is a proxy
+  - students compared as observations only
+  falsified_if: 'summary.passes == 0: the L3 advantage vanishes under the generator swap (L3 point estimate <= baseline upper
+    CI on filmsynth val), or scanner probe accuracy exceeds the baseline''s by > 0.05, or same-uploader share exceeds the
+    baseline''s by > 0.02'
+  falsify:
+    metric: passes
+    below: 1
+  falsify_sufficient: false
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/l3_shortcut_audit.py
+  result_json: reports/l3_shortcut_audit.json
+  metrics_of_interest:
+    passes:
+      path: summary.passes
+      kind: proxy
+    swap_gain:
+      path: summary.swap_L3_minus_baseline_filmsynth_val
+      kind: synthetic
+    scanner_excess:
+      path: summary.scanner_acc_L3_minus_baseline
+      kind: proxy
+      higher_is_better: false
+    uploader_excess:
+      path: summary.uploader_share_L3_minus_baseline
+      kind: proxy
+      higher_is_better: false
+  next_step: 'not falsified: L3 stays a candidate for E27 on Commons (no promotion from this run); falsified: drop the L3
+    teacher target, keep L4+L8, record which shortcut'
+  status: rejected
+  result: 'falsified: passes=0.0000 < 1'

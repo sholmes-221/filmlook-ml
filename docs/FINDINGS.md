@@ -87,6 +87,15 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
     check used (BlueNeg blue-corrupted) cannot separate candidates (chance 0.565, CI +-0.13), so the choice of target
     stays open until the Commons evaluation (E27). (medium on synthetic; none on real film yet)
 
+18. **The layer-3 gain is bound to the filmsynth-trained projection, not to a scanner or photographer shortcut.** Under a
+    generator-swapped family SupCon projection (trained on the 4 sdxl families), both teachers collapse on held-out
+    filmsynth val (L3 0.203 [0.183, 0.221] vs L4+L8 0.192 [0.166, 0.223]; chance 0.11) and tie on zimage (0.413), so the
+    E26/E27 advantage (0.572 vs 0.467) exists only when the projection is trained on the filmsynth pipeline: the
+    projection is generator-specific whichever layer feeds it. On 265 CommonCatalog film-scan originals (138 uploaders)
+    L3 recovers the scanner family less than L4+L8 (probe 0.423 vs 0.457, majority 0.506) and its same-uploader share is
+    lower (0.014 vs 0.019); explicit28 alone recovers the scanner best (0.581). E28, rejected under its pre-registered
+    rule; the teacher target stays L4+L8. (medium; analysis data only)
+
 ## What is not established
 - That any embedding captures aesthetics as a person would judge them (no human evaluation exists).
 - That same-stock retrieval generalises beyond one photographer's 1990s consumer stocks.
