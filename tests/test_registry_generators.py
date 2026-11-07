@@ -13,7 +13,7 @@ def test_registry_entries_carry_license_evidence_and_status():
     assert reg["datasets"], "registry is empty"
     for d in reg["datasets"]:
         assert d["id"] and d["source_url"].startswith("http"), d["id"]
-        assert d["status"] in {"eligible", "not_eligible", "not_pursued", "follow_up"}, d["id"]
+        assert d["status"] in {"eligible", "not_eligible", "not_pursued", "follow_up", "unavailable"}, d["id"]
         if d["status"] == "eligible":
             assert d["license"]["name"] and d.get("commercial_ml_training"), d["id"]
             assert d.get("provenance"), d["id"]
