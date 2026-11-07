@@ -103,7 +103,9 @@
       "content": "320 originals with film-scanner EXIF (Frontier, Noritsu, Pakon, Coolscan, ...) plus 439 digital/phone originals; 28 with uploader-asserted stock tags",
       "real_film": true,
       "film_stock_labels": "28 uploader-asserted tags (not verified)",
-      "license": {"name": "CC-BY 2.0 per record"},
+      "license": {"name": "CC-BY 2.0 per record", "evidence": "per-row licenseurl in the CommonCatalog metadata; uploader-asserted on Flickr (see DATASET_SOURCES.md risks)"},
+      "provenance": "YFCC100M Flickr uploads with per-record CC-BY 2.0; author, page URL and licence URL kept per image in data/raw/commoncatalog/ATTRIBUTION.jsonl",
+      "commercial_ml_training": "permitted (CC-BY 2.0 allows commercial use; attribution shipped)",
       "status": "eligible",
       "downloaded": true,
       "registry": "configs/datasets.yaml"
