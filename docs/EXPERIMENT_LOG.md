@@ -213,6 +213,19 @@ generators.
 - Learned: Greedy selection stops after ONE statistic: sat_clip alone gives cross-type mean 0.66 (full 16-d 0.635): SDXL->filmsynth and Z-Image->filmsynth 0.76 [0.69, 0.84], filmsynth->SDXL 0.60, filmsynth->Z-Image 0.52. It carries no scene identity (own-source rank-1 0.04) and no stock identity (same-stock 0.09, below chance). The generator-agnostic 'treated vs untreated' signal is one-dimensional: treatments change saturation clipping. Treated-vs-untreated is not an aesthetics representation; it was a proxy that reduced to a single clipping statistic.
 - Next: Retire treated-vs-untreated as a target. Keep cross-photo same-stock retrieval on real scans as the aesthetics benchmark (hybrid SupCon 0.25 [0.15, 0.31]); it needs a second real-film source before further model work is decisive.
 
+### B0 content-invariance benchmark v1, val split (2026-11-07) — `docs/BENCHMARK.md`, `reports/style_benchmark_val.json`
+- Infrastructure: 3,716 standardised images featurised once (`data/embeddings/bench_features_v1.*`, 317 s GPU, 37 MB). Selection on val (15 sources); test split + BlueNeg reserved for one final run per candidate.
+- Baselines (A p / A2 ratio / B filmsynth p@5 (chance 0.11) / C same-generator share (prior 0.40) / E rank-1 / E subject probe (majority 0.20, content ceiling 0.53)):
+  - raw_dino_global: 0.81 / 0.08 / 0.16 / 0.45 / 0.96 / 0.53
+  - raw_hybrid: 0.53 / 0.24 / 0.17 / 0.42 / 0.39 / 0.56
+  - hybrid_supcon_family: 0.91 / 1.71 / 0.47 / 0.54 / 0.37 / 0.24
+  - student_fs_v2_64: 0.88 / 5.09 / 0.53 / 0.60 / 0.10 / 0.26
+  - colour_tone16: 0.99 / 3.62 / 0.31 / 0.51 / 0.52 / 0.23
+  - texture12: 0.44 / 0.18 / 0.13 / 0.41 / 0.29 / 0.19
+  - raw_dino_style_L4L8: 0.83 / 0.12 / 0.19 / 0.52 / 0.98 / 0.57
+- Learned: raw DINOv2 global is a content embedding (ratio 0.08, rank-1 0.96, subject probe at ceiling). Family SupCon on hybrid features and the v2 student are style-dominated (ratios 1.7 / 5.1, subject probe near majority, neighbour overlap with content 0.06-0.08). Two failures: diffusion treatment ids are not retrievable across scenes by any candidate (B sdxl/zimage = chance 0.33), and learned embeddings cluster by generator (share 0.54-0.60 vs prior 0.40).
+- Next: E19 projection trained on all generators' labels with same-source hard negatives and a content-decorrelation penalty.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18)
 
 4. "Treated vs untreated" is retired as a research target: across generator types it reduces to one statistic
