@@ -27,6 +27,14 @@ python -m research.data_pipeline status
 python -m research.data_pipeline validate-all              # existing datasets from their manifests (CPU, seconds)
 python -m research.data_pipeline acquire commons_film      # one resumable download run (exit 0 ready, 3 resumable, 2 permanent)
 python scripts/ingest_commons_film.py --download --max-minutes 230 --stall-minutes 20 --spacing 2.0   # what acquire runs
+python scripts/ingest_commoncatalog_film.py --scan --shards 300     # metadata-only shard scan for stock-tagged film scans (resumable)
+python -m research.data_pipeline acquire commoncatalog_film         # resumable page-range fetch of the selected scans (exit 3 = resume later)
+python -m research.data_pipeline acquire artefact_film              # ARTeFACT figshare scans (CC BY 4.0)
+python -m research.data_pipeline acquire aic_photographs            # Art Institute of Chicago CC0 photographs (curated group)
+# discovery (API-based, multilingual, remembered in data/manifests/discovery_registry.json)
+python -m research.dataset_discovery discover [--platforms hf,zenodo,figshare,github] [--ttl-days 7]
+python -m research.dataset_discovery report                         # tables for docs/REAL_FILM_DATASETS.md
+python -m research.dataset_discovery set <key> --status rejected --auth-class C --reason "..."
 # research
 python -m research.research_loop --once --dry-run          # what would run next, with its cost estimate
 python -m research.research_loop --once [--id E26_layer_statistic_ablation]

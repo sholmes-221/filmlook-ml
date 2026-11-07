@@ -377,3 +377,57 @@ experiments:
     teacher target, keep L4+L8, record which shortcut'
   status: rejected
   result: 'falsified: passes=0.0000 < 1'
+- id: E27b_early_layer_teacher_commoncatalog
+  hypothesis: a hybrid teacher built on early-layer mean/std (L3, or L2-L4 concatenated) instead of L4+L8 retrieves same-stock
+    real film at least as well as the current teacher on an informative real source, with lower photographer leakage, and
+    a student distilled from it with the E23b recipe inherits the gain (same hypothesis, judged on the CommonCatalog film-scan
+    set with uploader stock tags instead of Commons)
+  motivation: Commons acquisition is throttled; commoncatalog_film is an independent real-film source (class B, uploaders
+    disjoint from training). Rules copied verbatim from E27 before any commoncatalog_film result is read (2026-11-07 23:40).
+  value: 5
+  gpu_minutes: 4
+  gpu_mb: 5000
+  cpu_minutes: 10
+  disk_gb: 0.05
+  datasets:
+  - commoncatalog_film
+  metric: 'commoncatalog_film analysis half (research.eval_pipeline rules): same-stock p@5 uploader-excluded with CI, uploader
+    share excess, scanner probe; candidate hybrid_l3_supcon_family vs hybrid_supcon_family, plus student_style_l3_real vs
+    student_style_fs_v2_real'
+  confounders:
+  - stock labels are uploader tags (noisy)
+  - several stocks are held by few uploaders
+  - scanner EXIF families are coarse
+  falsified_if: on the commoncatalog_film analysis half the L3 teacher's same-stock p@5 is not >= the L4+L8 teacher's lower
+    CI, or its uploader-share excess exceeds the baseline's by > 0.02
+  needs: dataset:commoncatalog_film ready (>= 300 rows); the evaluation task eval_commoncatalog_film_analysis runs automatically
+  next_step: 'if supported on this set AND not rejected on any other real-film set: switch the distillation target and re-run
+    the full benchmark on a fresh test set; if rejected: keep L4+L8'
+  status: pending
+  blocked_by: dataset:commoncatalog_film ready (acquisition in progress)
+- id: E29_curated_cross_source_robustness
+  hypothesis: on CC0 museum photographs (aic_photographs, analysis half) the style embeddings retrieve the physical print
+    process (owner records) above chance with the artist excluded, without photographer leakage; the real-distil student agrees
+    with its teacher on this third real domain
+  motivation: cross-source robustness check on a domain that is neither Flickr scans nor synthetic renders; CC0 permits later
+    use as distillation inputs if useful
+  value: 3
+  gpu_minutes: 3
+  gpu_mb: 3000
+  cpu_minutes: 5
+  disk_gb: 0.02
+  datasets:
+  - aic_photographs
+  metric: process p@5 artist-excluded (chance = class prior) with artist bootstrap CI; artist-share top-5 vs prior; student-teacher
+    Spearman
+  confounders:
+  - process correlates with decade and subject
+  - museum digitisation is a shared nuisance
+  - historic prints only
+  falsified_if: a candidate's artist-share excess over hybrid_supcon_family exceeds 0.02, or its process p@5 lower CI is below
+    chance
+  needs: 'dataset:aic_photographs ready; an evaluation script for process retrieval (to write: scripts/eval_curated_photos.py)'
+  next_step: 'if supported: register aic_photographs as a distillation-input domain for an E23-style student run; if rejected:
+    record the leakage and keep the group evaluation-only'
+  status: pending
+  blocked_by: dataset:aic_photographs ready; script not written

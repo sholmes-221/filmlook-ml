@@ -29,6 +29,10 @@ It is metadata, not a judgement of aesthetics, but it is independent of every te
 - Licenses are as of the YFCC100M snapshot. CC licenses are irrevocable for copies obtained under them.
 - BLIP-captioned non-photos (screens, drawings, posters) are filtered by caption, but not perfectly.
 
+## Session 4 additions (2026-11-07/08)
+
+Real-film discovery and acquisition are recorded in `docs/REAL_FILM_DATASETS.md` (registry: `data/manifests/discovery_registry.json`); curated-photography platforms and their terms in `docs/CURATED_PHOTOGRAPHY_SOURCES.md`. New registry entries: `commoncatalog_film` (CC-BY film scans with uploader stock tags, evaluation-only), `artefact_film` (CC BY 4.0, evaluation-only), `aic_photographs` (CC0, curated group). PhotoVogue, DEHAZED and Iconic Artist: metadata only, never crawled (terms prohibit automated access / ML use).
+
 ## Rejected or not used
 
 | Source | Reason |

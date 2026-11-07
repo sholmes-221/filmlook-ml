@@ -60,6 +60,8 @@ def seed(auto_research: bool = False) -> list[str]:
     # ARTeFACT (figshare, CC BY 4.0, class A) and the curated CC0 museum photographs (Art Institute of Chicago)
     made.append(T.add("data_artefact_film_acquire", "data", [PY, "-m", "research.data_pipeline", "acquire", "artefact_film"], max_attempts=4, wall_minutes_max=70, retry_backoff_s=900)["id"])
     made.append(T.add("data_aic_photographs_acquire", "data", [PY, "-m", "research.data_pipeline", "acquire", "aic_photographs"], max_attempts=4, wall_minutes_max=100, retry_backoff_s=900)["id"])
+    made.append(T.add("eval_aic_photographs_analysis", "eval", [PY, "scripts/eval_curated_photos.py", "--features", "--split", "analysis"],
+                      depends_on=["dataset:aic_photographs"], gpu_mb=3000, max_attempts=3, wall_minutes_max=45, retry_backoff_s=600)["id"])
     if auto_research:
         made.append(T.add("research_cycle", "research", [PY, "-m", "research.research_loop", "--once"], gpu_mb=6000, max_attempts=1, wall_minutes_max=120)["id"])
     return made

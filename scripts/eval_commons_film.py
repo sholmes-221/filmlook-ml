@@ -64,7 +64,8 @@ def do_features():
     ims = [Image.fromarray(a) for a in arrs]
     explicit = np.stack([X.explicit_of(im) for im in ims]).astype(np.float32)
     dg, ds = X.Dino(dev)(ims)
-    feats = {"explicit": explicit, "dino_global": dg.astype(np.float32), "dino_style": ds.astype(np.float32)}
+    _, ds3 = X.Dino(dev, layers=(3,))(ims)                                   # E27: layer-3 mean++std teacher candidate
+    feats = {"explicit": explicit, "dino_global": dg.astype(np.float32), "dino_style": ds.astype(np.float32), "dino_style_l3": ds3.astype(np.float32)}
     extra = [("student_" + t, "student_" + t, ["style_embedding"]) for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]
     for name, ck, outs in (("student64", "student_style_fs_v2", ["style_embedding"]), ("student_sup", "student_sup", ["capture_type"]), *extra):
         sess = ort.InferenceSession(str(P.CHECKPOINTS / ck / "model.onnx"), providers=["CPUExecutionProvider"])
@@ -146,6 +147,12 @@ def do_eval(split):
     hyb = np.hstack([F["explicit"], F["dino_style"]])
     cands = {"raw_dino_global": F["dino_global"], "raw_hybrid": hyb, "hybrid_supcon_family": proj(hyb), "student_fs_v2_64": F["student64"],
              "colour_tone16": F["explicit"][:, IDX_C], "texture12": F["explicit"][:, IDX_T]}
+    layers = P.EMBEDDINGS / "bench_layers_v1.npz"                              # E27 teacher candidate: explicit28 ++ L3 mean/std -> family SupCon
+    if "dino_style_l3" in F and layers.exists():
+        z = np.load(layers)
+        if (z["ids"] == np.array([r["id"] for r in rows_c])).all():
+            H3 = np.hstack([Fc["explicit"], z["ms_L3"].astype(np.float32)]); proj3 = X.supcon(H3[tr], fam_c[tr], dev)
+            cands["hybrid_l3_supcon_family"] = proj3(np.hstack([F["explicit"], F["dino_style_l3"]]))
     for t in [t for t in os.environ.get("STUDENT_TAGS", "").split(",") if t]:
         if "student_" + t in F:
             cands[f"student_{t}_64"] = F["student_" + t]
