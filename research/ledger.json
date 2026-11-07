@@ -1,5 +1,5 @@
 {
- "gpu_seconds": 5102.859602603912,
+ "gpu_seconds": 5113.265970144272,
  "disk_bytes": 461962768,
  "runs": [
   {
@@ -223,6 +223,30 @@
    "gpu": true,
    "disk_bytes": 4399342,
    "peak_gpu_mb_total": 7649.0,
+   "returncode": 0
+  },
+  {
+   "id": "E28_l3_shortcut_audit",
+   "wall_seconds": 5.8,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6284.0,
+   "returncode": 0
+  },
+  {
+   "id": "E30_joint_generator_supcon",
+   "wall_seconds": 4.6,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6287.0,
+   "returncode": 0
+  },
+  {
+   "id": "E31_colour_type_retrieval",
+   "wall_seconds": 3.1,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6261.0,
    "returncode": 0
   }
  ],
