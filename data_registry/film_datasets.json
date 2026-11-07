@@ -1,0 +1,112 @@
+{
+  "version": "film-datasets-registry-v1",
+  "compiled": "2026-11-07",
+  "note": "Eligibility is an engineering reading of the licence evidence, not legal advice. 'eligible' means the image rights are documented and permit commercial ML training for FilmLook; nothing else is downloaded.",
+  "datasets": [
+    {
+      "id": "blueneg_release",
+      "name": "BlueNeg: A 35mm Negative Film Dataset (ICCV 2025)",
+      "source_url": "https://huggingface.co/datasets/ttgroup/blueneg-release",
+      "paper": "https://openaccess.thecvf.com/content/ICCV2025/html/Liu_BlueNeg_A_35mm_Negative_Film_Dataset_for_Restoring_Channel-Heterogeneous_Deterioration_ICCV_2025_paper.html",
+      "content": "491 real 35 mm colour-negative scans (16-bit DNG) with 8-bit positive previews, 398 scanned prints, 247 pseudo-ground-truth images; 30 test items withheld",
+      "images": 491,
+      "resolution": {"negative_dng": "10128x6840", "preview_png": "1322x892", "print_tif": "2994x1920"},
+      "real_film": true,
+      "film_stock_labels": "verified by the owner's own records (meta.json film_type): Kodak Gold 100-5 (226), Fuji NPH400 (53), Fuji 400 (45), Kodak Gold 400-5 (38), Konica Super XG 100 (30), Kodak Gold 100 (25), Fuji 100 (23), Kodak Gold 400 (19), Kodak GA 100 5095 (16), others (16)",
+      "paired": "negative + print for 398 items; not digital/film pairs",
+      "size": "about 60 GB full; about 1 GB for previews + pseudo-GT + metadata",
+      "license": {"name": "BlueNeg Data Set License v1.0 (custom, CC-BY-like, not CC-BY)", "url": "https://huggingface.co/datasets/ttgroup/blueneg-release/blob/main/LICENSE", "date": "2024-06-12", "terms": "academic and commercial use permitted; credit 'Copyrighted by Tien-Tsin Wong' required in any publication, reproduction, redistribution or derivative; citation requested"},
+      "provenance": "shot and scanned by the copyright holder (Tien-Tsin Wong), 1988-2002, one photographer; family and travel scenes",
+      "commercial_ml_training": "permitted with credit (licence text)",
+      "intended_usage": "external real-film evaluation set with verified stock labels; blue-intact previews as clean references; blue-corrupted as a real deterioration family; never split, never mixed into synthetic training labels",
+      "caveats": ["297/491 negatives have blue-layer deterioration", "1990s consumer stocks only", "single photographer"],
+      "status": "eligible",
+      "downloaded": "previews, pseudo-GT, metadata (data/hf_cache)",
+      "attribution_required": "Copyrighted by Tien-Tsin Wong"
+    },
+    {
+      "id": "digitalfilm_dataset_yangkun2197",
+      "name": "DigitalFilm_dataset (mirror)",
+      "source_url": "https://huggingface.co/datasets/yangkun2197/DigitalFilm_dataset",
+      "upstream": "https://github.com/SongZihui-sudo/digitalFilm",
+      "content": "5 ZIPs named by film stock (Kodak Aerochrome, E100, Gold 200, ...); CycleGAN training data; ~7K images",
+      "real_film": "film-side images are 'collected from the Internet' (card); digital side from a Xiaomi 13 Ultra and an HDR dataset",
+      "film_stock_labels": "folder names; unverified",
+      "paired": false,
+      "license": {"name": "MIT (HF tag)", "evidence": "tag only; the card states film samples were collected from the Internet, so the image rights are unknown"},
+      "provenance": "third-party internet photographs, uncredited",
+      "commercial_ml_training": "not permitted (no rights to the film images)",
+      "status": "not_eligible",
+      "downloaded": false
+    },
+    {
+      "id": "digitalfilm_dataset_richards_sheehy",
+      "name": "DigitalFilm_dataset (original upload)",
+      "source_url": "https://huggingface.co/datasets/Richards-Sheehy-sudo/DigitalFilm_dataset",
+      "same_as": "digitalfilm_dataset_yangkun2197",
+      "status": "not_eligible",
+      "downloaded": false
+    },
+    {
+      "id": "openphoto_restore",
+      "name": "OpenPhoto Restore Dataset",
+      "source_url": "https://huggingface.co/datasets/joshuachin/openphoto-restore-dataset",
+      "content": "4,500 train + 500 test pairs: pristine 1024x1024 digital photo vs procedurally damaged copy (cracks, scratches, sepia, Gaussian 'grain')",
+      "real_film": false,
+      "film_stock_labels": false,
+      "paired": true,
+      "size": "4.4 GB",
+      "license": {"name": "CC-BY-4.0 (HF tag)", "evidence": "source images come from the Unsplash Lite dataset; Unsplash terms govern the images (internal use only per configs/datasets.yaml)"},
+      "provenance": "Unsplash Lite + synthetic damage pipeline",
+      "commercial_ml_training": "not permitted for FilmLook (Unsplash terms); also not film",
+      "status": "not_eligible",
+      "downloaded": false
+    },
+    {
+      "id": "nbardy_film_stock",
+      "source_url": "https://huggingface.co/datasets/Nbardy/film_stock",
+      "content": "60 image+text rows; no card, no licence",
+      "status": "not_eligible",
+      "reason": "no licence, no provenance",
+      "downloaded": false
+    },
+    {
+      "id": "pslabs_35mm_32k",
+      "source_url": "https://huggingface.co/datasets/pslabs/35mm_32k",
+      "content": "two ZIP files; no card, no licence",
+      "status": "not_eligible",
+      "reason": "no licence, no provenance",
+      "downloaded": false
+    },
+    {
+      "id": "filmset_2301_08880",
+      "name": "FilmSet (FilmNet paper)",
+      "source_url": "https://arxiv.org/abs/2301.08880",
+      "content": "5,000+ images in three film styles produced with Capture One film recipes",
+      "real_film": false,
+      "status": "not_pursued",
+      "reason": "synthetic LUT styles, not film; licence not checked"
+    },
+    {
+      "id": "cinestill800t_pairs_2411_15967",
+      "name": "Aligned digital/film pairs, Cinestill 800T",
+      "source_url": "https://arxiv.org/abs/2411.15967",
+      "content": "aligned pairs from a digital camera and a film camera, one stock",
+      "real_film": true,
+      "status": "follow_up",
+      "reason": "release location and licence not verified in this pass"
+    },
+    {
+      "id": "commoncatalog_ccby_film_scans",
+      "name": "FilmLook-ML CommonCatalog film scans (already held)",
+      "source_url": "https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by",
+      "content": "320 originals with film-scanner EXIF (Frontier, Noritsu, Pakon, Coolscan, ...) plus 439 digital/phone originals; 28 with uploader-asserted stock tags",
+      "real_film": true,
+      "film_stock_labels": "28 uploader-asserted tags (not verified)",
+      "license": {"name": "CC-BY 2.0 per record"},
+      "status": "eligible",
+      "downloaded": true,
+      "registry": "configs/datasets.yaml"
+    }
+  ]
+}
