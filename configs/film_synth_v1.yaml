@@ -1,0 +1,85 @@
+# Film-inspired synthetic augmentation presets, version 1 (augmentation engine: filmlook_ml.filmsynth).
+#
+# Internal family ids are NEUTRAL. A preset is a hand-designed rendering direction. It is NOT a reproduction of any
+# commercial film, and a synthetic image is never a scan of one. `approximate_references` links each family to the
+# FilmLook database's aesthetic directions (taxonomy/film_aesthetics.v1.json) for orientation only, with the database
+# evidence that motivated the ranges.
+#
+# Parameter scales (all dimensionless, documented in filmlook_ml/filmsynth/engine.py):
+#   temperature_shift, tint, saturation_adjustment, contrast_adjustment, local_contrast   [-1, 1]  (0 = unchanged)
+#   shadow_lift, black_point, highlight_compression, grain_strength, grain_size, chroma_grain,
+#   grain_midtone_weight, softness, halation, bloom, vignette, shadow_tint_strength,
+#   highlight_tint_strength                                                             [0, 1]   (0 = off)
+#   shadow_tint_hue, highlight_tint_hue                                                  degrees  [0, 360)
+#   monochrome                                                                           bool
+# A range [a, b] is sampled uniformly per variant; a scalar is fixed.
+version: film-synth-v1
+working_short_side: 384          # every variant AND the identity copy are rendered at this size through one pipeline
+nuisance:                        # sampled independently of the family, for every output including identity
+  jpeg_quality: [80, 95]
+  exposure_ev: [-0.25, 0.25]
+  crop_fraction: [0.0, 0.03]
+  resample: [bilinear, bicubic, lanczos]
+database_evidence:               # summary of taxonomy-db-v1 (i50mm subjective 1-5 ratings; higher grain = coarser)
+  color_negative: {n: 20, grain: 2.8, saturation: 3.55, contrast: 3.25}
+  color_slide: {n: 4, grain: 1.0, saturation: 4.0, contrast: 3.5}
+  black_and_white: {n: 27, grain: 2.33, contrast: 3.07, grain_by_iso: {"<=125": 1.64, "160-800": 2.73, ">=1600": 4.0}}
+families:
+  identity_v1:
+    description: no rendering change (same pipeline and nuisance only)
+    params: {}
+    approximate_references: []
+  warm_negative_v1:
+    description: warm, gently muted colour negative with soft highlight roll-off and moderate grain
+    params: {temperature_shift: [0.25, 0.6], tint: [-0.1, 0.1], saturation_adjustment: [-0.3, -0.05],
+             contrast_adjustment: [-0.35, -0.05], shadow_lift: [0.15, 0.45], highlight_compression: [0.35, 0.7],
+             grain_strength: [0.2, 0.45], grain_size: [0.3, 0.6], chroma_grain: [0.1, 0.3], grain_midtone_weight: [0.4, 0.8]}
+    approximate_references: [portra_like, gold_like, kodak_ultramax_400_like, kodak_colorplus_200_like]
+    evidence: "database character: 'restrained warm negative ... long highlight roll-off' (portra_like); 'warm consumer colour negative: golden yellows' (gold_like)"
+  neutral_finegrain_negative_v1:
+    description: near-neutral colour negative, fine grain, slightly lifted shadows, mild roll-off
+    params: {temperature_shift: [-0.1, 0.15], saturation_adjustment: [-0.15, 0.1], contrast_adjustment: [-0.2, 0.05],
+             shadow_lift: [0.1, 0.3], highlight_compression: [0.25, 0.5], grain_strength: [0.08, 0.2],
+             grain_size: [0.1, 0.3], chroma_grain: [0.05, 0.15], grain_midtone_weight: [0.3, 0.7]}
+    approximate_references: [kodak_portra_160_like, ektar_like]
+    evidence: "colour negative ratings: grain 2.8 average; Portra 160 is among the finest-rated negatives"
+  vivid_reversal_v1:
+    description: slide-like rendering, high saturation and contrast, deep shadows, very fine grain
+    params: {temperature_shift: [-0.15, 0.15], saturation_adjustment: [0.3, 0.7], contrast_adjustment: [0.3, 0.7],
+             black_point: [0.3, 0.7], highlight_compression: [0.0, 0.15], grain_strength: [0.03, 0.1], grain_size: [0.05, 0.2],
+             local_contrast: [0.1, 0.35]}
+    approximate_references: [velvia_like, fuji_velvia_100_like, kodachrome_like, kodak_ektachrome_e100_like]
+    evidence: "slide ratings: saturation 4.0, contrast 3.5, grain 1.0 (finest)"
+  cool_pastel_v1:
+    description: cool-leaning, airy pastel negative, low contrast, bright lifted highlights
+    params: {temperature_shift: [-0.5, -0.15], tint: [-0.25, 0.0], saturation_adjustment: [-0.4, -0.15],
+             contrast_adjustment: [-0.5, -0.2], shadow_lift: [0.3, 0.6], highlight_compression: [0.3, 0.6],
+             grain_strength: [0.1, 0.3], grain_size: [0.2, 0.5], chroma_grain: [0.05, 0.2], shadow_tint_hue: [150, 200],
+             shadow_tint_strength: [0.2, 0.5]}
+    approximate_references: [pro_400h_like, superia_like]
+    evidence: "database character: 'airy pastel negative: soft cool-leaning greens and blues, luminous overexposed highlights' (pro_400h_like)"
+  tungsten_cinematic_v1:
+    description: tungsten-balanced look in mixed or daylight scenes, cool cast, warm glow around highlights
+    params: {temperature_shift: [-0.7, -0.35], tint: [-0.05, 0.15], saturation_adjustment: [-0.1, 0.2],
+             contrast_adjustment: [0.0, 0.3], highlight_compression: [0.2, 0.5], halation: [0.3, 0.8], bloom: [0.0, 0.3],
+             grain_strength: [0.2, 0.4], grain_size: [0.3, 0.6], chroma_grain: [0.1, 0.3]}
+    approximate_references: [cinestill_like, cinestill_50d_like]
+    evidence: "database character: 'tungsten-balanced ... cool shadows, glowing warm practical lights, visible halation' (cinestill_like)"
+  high_contrast_bw_v1:
+    description: monochrome, strong contrast, deep blacks, bold grain
+    params: {monochrome: true, contrast_adjustment: [0.35, 0.75], black_point: [0.3, 0.7], highlight_compression: [0.0, 0.25],
+             grain_strength: [0.4, 0.7], grain_size: [0.4, 0.7], grain_midtone_weight: [0.5, 0.9], local_contrast: [0.1, 0.4]}
+    approximate_references: [tri_x_like, ilford_delta_400_like, kodak_t_max_400_like]
+    evidence: "database character: 'gritty black-and-white: strong contrast, bold grain, deep blacks' (tri_x_like)"
+  finegrain_bw_v1:
+    description: monochrome, smooth tonality, fine grain, moderate contrast
+    params: {monochrome: true, contrast_adjustment: [-0.15, 0.2], shadow_lift: [0.0, 0.25], highlight_compression: [0.2, 0.5],
+             grain_strength: [0.05, 0.18], grain_size: [0.05, 0.25], grain_midtone_weight: [0.3, 0.7]}
+    approximate_references: [ilford_delta_100_like, kodak_t_max_100_like, ilford_pan_f_plus_50_like, ilford_fp4_plus_like]
+    evidence: "B&W grain rating 1.64 at ISO <=125 vs 2.73 at 160-800"
+  grainy_highspeed_mono_v1:
+    description: monochrome, very coarse grain, compressed tones, slightly soft
+    params: {monochrome: true, contrast_adjustment: [-0.1, 0.35], shadow_lift: [0.1, 0.35], highlight_compression: [0.3, 0.6],
+             grain_strength: [0.7, 1.0], grain_size: [0.6, 1.0], grain_midtone_weight: [0.2, 0.6], softness: [0.2, 0.5]}
+    approximate_references: [ilford_delta_3200_like, kodak_t_max_3200_like]
+    evidence: "B&W grain rating 4.0 at ISO >=1600"

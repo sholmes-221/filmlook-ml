@@ -1,0 +1,146 @@
+# Machine-readable dataset registry. `training_allowed` is the ONLY switch the pipeline
+# honours; it is true only when license + commercial + ML-training rights were verified.
+license_allowlist:            # licenses acceptable for commercial ML training
+  - CC0-1.0
+  - PDM-1.0
+  - CDLA-Permissive-2.0
+  - Apache-2.0
+  - CC-BY-4.0
+  - CC-BY-2.0
+  - Unsplash-Lite-Dataset-Terms   # internal business ML training only, no redistribution
+  - user-consent                  # user-owned photos with explicit training consent
+  - synthetic                     # procedurally generated in this repo
+license_denylist: [CC-BY-SA-2.0, CC-BY-SA-4.0, CC-BY-NC-4.0, CC-BY-NC-2.0, CC-BY-NC-SA-2.0, CC-BY-NC-ND-2.0, CC-BY-NC-SA-4.0, CC-BY-NC-ND-4.0, Unsplash-Full-Dataset-Terms, unknown]
+
+datasets:
+  - id: synthetic_fixture
+    name: FilmLook synthetic edit-family fixture
+    source_url: local (src/filmlook_ml/datasets/synthetic.py)
+    license: synthetic
+    commercial_use: true
+    ml_training: true
+    num_images: configurable
+    labels: [edit_family, edit_type, known attribute orderings]
+    download_method: generated
+    attribution: none
+    redistribution: unrestricted
+    training_allowed: true
+    verified_on: 2026-11-06
+
+  - id: pd12m_pilot
+    name: PD12M (Spawning) - photographic pilot subset
+    source_url: https://huggingface.co/datasets/Spawning/PD12M
+    license: CC0-1.0            # per-row license field; dataset card tag CDLA-Permissive-2.0
+    commercial_use: true
+    ml_training: true           # CC0/PDM waive rights; card states intended for model training
+    num_images: 12400094
+    labels: [caption (synthetic recaption), width, height, source, license per row]
+    download_method: metadata parquet via huggingface_hub; images via per-row URL (rate limited)
+    attribution: not required (CC0); we keep source + id in the manifest anyway
+    redistribution: permitted (CC0); we do not redistribute
+    training_allowed: true
+    row_license_filter: [creativecommons.org/publicdomain/zero, creativecommons.org/publicdomain/mark]
+    notes: Mostly museum/archive content - filter captions for photographs. Few modern colour photos; few film-stock labels.
+    verified_on: 2026-11-06
+
+  - id: unsplash_lite
+    name: Unsplash Lite Dataset 1.4.0
+    source_url: https://github.com/unsplash/datasets
+    license: Unsplash-Lite-Dataset-Terms
+    commercial_use: true
+    ml_training: true           # TERMS 2.A: internal use to train ML models for internal business purposes
+    num_images: 25000
+    labels: [keywords, EXIF camera make/model, searches, colors]
+    download_method: https://unsplash.com/data/lite/latest (~700MB zip of TSVs) then image URLs
+    attribution: requested for research citation ("Unsplash Lite Dataset 1.4.0")
+    redistribution: PROHIBITED (TERMS s.3) - never ship images or derived dataset; models stay internal-use
+    training_allowed: false     # v1: the target is a PUBLIC Xiaohongshu-facing product; TERMS 2.A only covers
+                                #     internal business purposes. Re-enable only after legal review.
+    requires_approval_to_download: true   # >500MB
+    notes: Not used for v1 (internal-use-only terms vs public product).
+    verified_on: 2026-11-06
+
+  - id: unsplash_full
+    name: Unsplash Full Dataset
+    source_url: https://github.com/unsplash/datasets
+    license: Unsplash-Full-Dataset-Terms
+    commercial_use: false
+    ml_training: false          # models trained on it must not be used commercially
+    training_allowed: false
+    verified_on: 2026-11-06
+
+  - id: ava
+    name: AVA (Aesthetic Visual Analysis)
+    source_url: https://github.com/imfing/ava_downloader
+    license: unknown
+    commercial_use: unknown
+    ml_training: unknown
+    num_images: 255500
+    labels: [aesthetic vote histograms 1-10, semantic tags, challenge ids]
+    download_method: Kaggle / HF mirror / MEGA / torrent (third-party mirrors)
+    attribution: cite Murray et al. CVPR 2012
+    redistribution: unclear - images are dpchallenge.com user uploads
+    training_allowed: false     # QUARANTINED: no license grant found; images are third-party copyrighted
+    verified_on: 2026-11-06
+
+  - id: flickr_cc_commercial
+    name: Flickr Creative Commons (commercial-compatible licenses only)
+    source_url: https://www.flickr.com/creativecommons/
+    license: per-image (CC-BY-2.0/4.0, CC0-1.0, PDM-1.0 accepted; ND/SA need review; NC rejected)
+    commercial_use: per-image
+    ml_training: per-image (not addressed by Flickr)
+    download_method: Flickr API (requires key, API ToS) - not implemented by default
+    attribution: required for CC-BY
+    training_allowed: false     # enable per-image after license filtering + attribution tracking
+    verified_on: 2026-11-06
+
+  - id: commoncatalog_ccby
+    name: CommonCatalog CC-BY (YFCC100M / Flickr photos, re-hosted by common-canvas on Hugging Face)
+    source_url: https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by
+    license: CC-BY-2.0          # PER-ROW licenseurl is checked; only creativecommons.org/licenses/by/<v>/ accepted
+    commercial_use: true
+    ml_training: true           # CC-BY permits any use incl. commercial, subject to attribution on redistribution
+    num_images: ~15M (we use a few hundred originals)
+    labels: [EXIF camera make/model, capture device, user tags, BLIP-2 caption, Flickr page URL, uploader]
+    download_method: metadata columns + per-image parquet page range reads via huggingface_hub (no Flickr scraping)
+    attribution: required - author (Flickr nickname), page URL and license URL kept per image (ATTRIBUTION.jsonl)
+    redistribution: allowed with attribution; we do not redistribute images
+    training_allowed: true
+    row_license_filter: [creativecommons.org/licenses/by/]
+    risks: >-
+      Uploader-asserted licenses (some Flickr uploads may not be the uploader's own work); license is as of the
+      YFCC100M snapshot (CC licenses are irrevocable for copies obtained under them). BLIP-captioned non-photos
+      (screens, drawings, posters) are excluded by caption filter. The HF dataset tag (cc-by-4.0) is NOT relied on.
+    verified_on: 2026-11-06
+
+  - id: commoncatalog_ccbysa
+    name: CommonCatalog CC-BY-SA
+    source_url: https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by-sa
+    license: CC-BY-SA-4.0
+    training_allowed: false     # share-alike scope for trained models unresolved; not needed
+    verified_on: 2026-11-06
+
+  - id: wikimedia_commons_api
+    name: Wikimedia Commons via MediaWiki API
+    source_url: https://commons.wikimedia.org/w/api.php
+    license: per-file
+    training_allowed: false     # robots.txt disallows /w/ and /api/ for generic agents; not used
+    verified_on: 2026-11-06
+
+  - id: openverse_api
+    name: Openverse API
+    source_url: https://api.openverse.org/v1/images/
+    license: per-file
+    training_allowed: false     # robots.txt disallows /v1/images/ and explicitly blocks AI crawlers; not used
+    verified_on: 2026-11-06
+
+  - id: user_consented
+    name: FilmLook user uploads with explicit training consent
+    source_url: FilmLook application (export pending)
+    license: user-consent
+    commercial_use: true
+    ml_training: true
+    labels: [optional user-declared film stock / camera / edit]
+    download_method: manual export into data/raw/user_consented/ with consent.jsonl
+    training_allowed: true
+    verified_on: null

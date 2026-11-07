@@ -1,0 +1,23 @@
+{
+ "taxonomy_version": "taxonomy-db-v1",
+ "source_path": "~/misc/film-evaluation",
+ "source_git_commit": "9200816f8c991f54c5f1261e47a4845a71357648",
+ "source_dirty": false,
+ "files": {
+  "filmlook/data/film_color_notes.json": "847c87ebdba7e83be6e38ce65a906ed5ff123950b30d95e40ad76f0123b2a7b6",
+  "filmlook/data/film_look_notes.json": "672ebca1d85aea7d0ca23b035cb22c01e046c80fbc09d780f60c98bf3187eefc",
+  "filmlook/data/film_stocks.json": "82560c9bbe3990ef59c40e2b621860aa8fb749282b84941cf401dbc3a11e3a00",
+  "filmlook/data/reference_knowledge.json": "b4664cd2f2df60e5d9e825bbf596eabafc59329d70a8398769ab77e5af1374e2",
+  "filmlook/film_catalog.py": "c0c85a4e3147add5b425462f1d15acfdb674ffc8f74a718a98d42ae043bf0ef4",
+  "filmlook/photographer_dna/seed_data/american.json": "86f606c69a9ad18eee0378397895a08e54a81f69cf8cecf07751eb64b6862ad4",
+  "filmlook/photographer_dna/seed_data/axes.json": "bba793f7069be52c3e901504684bbbc937fa8386f8ec1ee78ea382aaee58cdfd",
+  "filmlook/photographer_dna/seed_data/chinese.json": "f1824aeabfcb0b975def4936f4801b3335e56214a174ef552ea874ffc282afe4",
+  "filmlook/photographer_dna/seed_data/contemporary.json": "1be2e7d6bb909f6a387765ba6e67c43d7bd0c436c8e5a17f140fa0fbb34cd56d",
+  "filmlook/photographer_dna/seed_data/european.json": "618ecce3b9d0b480e7351d2613686440b1e8e62abd07ddd4ab89aac35ccc6463",
+  "filmlook/photographer_dna/seed_data/japanese.json": "cceb2a2fe69ceb57d1c128e450404645e1b460602e74e94c5470803dfa592416",
+  "filmlook/photographer_dna/seed_data/japanese_photobooks_1930_1974.json": "21bf596a917cb4dc3239dbbf4fbb26a94467ac7ffe958b31214b0efbadd2b279",
+  "filmlook/photographer_dna/seed_data/japanese_photobooks_1974_2020.json": "a9de4a87eb0ad043d1b71a859d33ea1eb84b4a0da36d91f6e2ed7c929b62efb0",
+  "filmlook/photographer_dna/seed_data/magnum.json": "524febc3978ac17b393479a8928b809f985e78b586f897a30d0a716258a3175c"
+ },
+ "note": "Read-only extraction. Descriptions are the FilmLook app's own words; style vectors are editorial estimates; film ratings are third-party subjective opinions. No images were copied."
+}

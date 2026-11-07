@@ -1,0 +1,69 @@
+{
+  "schema_version": "style-1.0",
+  "model_version": "filmlook-style-v1.0.0",
+  "language": "zh",
+  "status": "uncertain",
+  "message": "未找到可靠的风格匹配：这张照片在可测量的特征上没有足够鲜明的组合。",
+  "monochrome": true,
+  "matches": [
+    {
+      "id": "alex_webb",
+      "name": "亚历克斯·韦伯",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "较弱",
+      "evidence": [],
+      "counter_evidence": [
+        "该风格通常具有清晰锐利的细节，本图则不同"
+      ],
+      "basis": "强烈暖色与深重硬朗阴影并置的多层次画面"
+    },
+    {
+      "id": "daido_moriyama",
+      "name": "森山大道",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "较弱",
+      "evidence": [
+        "柔和朦胧的细节"
+      ],
+      "counter_evidence": [
+        "该风格通常具有大面积深重阴影，本图则不同"
+      ],
+      "basis": "高反差黑白、粗颗粒与晃动模糊（粗・晃・暈）"
+    },
+    {
+      "id": "ernst_haas",
+      "name": "恩斯特·哈斯",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "较弱",
+      "evidence": [
+        "强烈的明暗反差"
+      ],
+      "counter_evidence": [
+        "该风格通常具有简洁不杂乱的画面，本图则不同"
+      ],
+      "basis": "被动态模糊和柔焦晕开的饱和色彩"
+    }
+  ],
+  "dims": {
+    "monochrome": 1,
+    "saturation": 0.0884,
+    "accent": 0.0052,
+    "contrast": 0.4797,
+    "darkness": 0.4554,
+    "shadow_mass": 0.4023,
+    "softness": 0.5732,
+    "grain": 0.3895,
+    "warmth": 0.3823,
+    "red_yellow": 0.1192,
+    "high_key": 0.4531,
+    "complexity": 0.5336,
+    "spotlight": 0.8715
+  },
+  "disclaimer": "风格相似度基于可测量的特征（色彩、影调、质感、构图）计算，不代表识别摄影师或鉴定作品归属。"
+}

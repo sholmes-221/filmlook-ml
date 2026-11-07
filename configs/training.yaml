@@ -1,0 +1,30 @@
+seed: 1337
+min_free_gpu_gb: 2          # refuse to start if other jobs leave less than this
+confidence: {std_scale: 6.0, ood_scale: 1.5}
+backbone: facebook/dinov2-small
+image_size: 224
+texture_crop: 512             # native-resolution crop for the texture branch
+max_side: 1280                # images are downscaled to this before features (train AND inference)
+splits: {train: 0.7, val: 0.15, test: 0.15}
+medium_pairs: {enabled: true, per_film: 8, weight: 2.0, seed: 0}   # film-scan > digital originals on film_score (train split); see REPORT.md
+stage_a:
+  epochs: 60
+  batch_size: 64
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  hidden: 256
+  dropout: 0.2
+  rank_margin: 0.05
+  loss_weights: {score: 1.0, attributes: 1.0, ranking: 1.0, medium: 0.5}
+  early_stopping_patience: 10
+stage_b:
+  enabled: false
+  unfreeze_last_blocks: 2
+  epochs: 10
+  batch_size: 16
+  grad_accum: 2
+  lr_backbone: 1.0e-5
+  lr_heads: 3.0e-4
+  amp: true
+  early_stopping_patience: 3
+  max_gpu_mem_gb: 8

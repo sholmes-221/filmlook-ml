@@ -1,0 +1,49 @@
+prompt_version: v2
+teacher: heuristic            # heuristic | mock | claude
+claude:
+  model: claude-opus-5-5      # vision-capable; never switched silently (change here + record in REPORT)
+  max_tokens: 4000
+  effort: low                 # Opus 5.5 cannot disable thinking; effort is the only control
+  max_budget_usd: 5.00        # HARD cap, cumulative across runs (read from data/labels/claude_usage.jsonl)
+  price_input_per_mtok: 4.00  # Opus 5.5 list price (checked 2026-11-06)
+  price_output_per_mtok: 20.00
+  dry_run: true               # paid calls need --no-dry-run AND --confirm-paid
+  max_images_per_run: 100     # preflight bound (docs/AI_DATA_POLICY.md s.6): no unbounded batches
+  max_pairs_per_run: 50
+  max_concurrency: 1          # one labeling job at a time (data/labels/claude_labeling.lock)
+  max_image_side: 1024        # full view sent to the API
+  texture_crop: 384           # + native-resolution centre crop for grain/texture
+  est_prompt_tokens: 1300
+  est_output_tokens: 700
+  allow_training_use: true    # training on Claude outputs is PERMITTED with a written reference (status
+                              # written_reference + reference, or env FILMLOOK_ANTHROPIC_TRAINING_AUTHORIZATION_REF)
+                              # or the owner's recorded confirmation (status user_confirmed). docs/AI_DATA_POLICY.md
+  training_authorization:
+    status: user_confirmed    # owner decision 2026-11-07 -> classified PERMITTED (unverified; see AI_DATA_POLICY s.2)
+    recorded: 2026-11-07
+    statement: >-
+      2026-11-06: the project owner stated they have confirmed with Anthropic that Claude API outputs may be used
+      to train this specialized FilmLook model. 2026-11-07: the project owner stated they have confirmed with
+      Anthropic that the intended use (content categorization, structured information extraction, photography
+      aesthetics classification for the DINOv2-small classifier) is permitted, and instructed that this
+      confirmation be used.
+    reference: null           # no written reference was supplied or verified; do not invent one
+    previous_status: confirmed_by_project_owner (2026-11-06; classified uncertain until 2026-11-07)
+    scope: >-
+      categorization / information-extraction labels (photographer-inspired style, film-stock-inspired aesthetic,
+      visual attributes) used to develop and evaluate the specialized DINOv2-small photography classifier only
+  evaluation_use:             # evaluation-only runs (outputs never become training targets) while training
+    approved: false           # permission is uncertain need an explicit recorded decision by the owner
+    approved_by: null
+    recorded: null
+  exploratory_use:            # categorization runs (scripts/annotate_categories.py)
+    approved: true            # owner requested a 20-image pilot on 2026-11-07; the full 968-image run needs a
+    approved_by: project owner (Claude Code session request)   # separate explicit approval
+    recorded: 2026-11-07
+  consented_datasets: [synthetic_fixture, pd12m_pilot, commoncatalog_ccby, user_consented]
+source_weights:               # loss weight per label source; human labels dominate
+  human: 1.0
+  claude: 0.8
+  synthetic_ordering: 0.7
+  heuristic: 0.3
+  mock: 0.0

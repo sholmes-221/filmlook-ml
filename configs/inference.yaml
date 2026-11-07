@@ -1,0 +1,5 @@
+model_version: 0.1.0
+top_k: 3
+onnx_threads: 1
+min_confidence_to_show: 0.0
+languages: [en, zh]

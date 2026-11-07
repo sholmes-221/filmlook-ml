@@ -1,0 +1,59 @@
+# --- secrets and credentials (never commit) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+*.secret
+
+# --- Python / tooling ---
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+
+# --- data, datasets, generated images (anchored: src/filmlook_ml/datasets/ is SOURCE CODE) ---
+/data/**
+!/data/**/
+!/data/**/.gitkeep
+/datasets/
+/outputs/
+
+# --- models, checkpoints, experiment tracking ---
+/checkpoints/**
+!/checkpoints/.gitkeep
+/weights/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.safetensors
+*.npz
+wandb/
+mlruns/
+
+# --- databases ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- generated reports and build outputs ---
+/reports/**
+!/reports/.gitkeep
+/dist/
+js/filmlook-style/test/fixtures/
+
+# --- OS / temporary ---
+.DS_Store
+*.tmp
+*.swp
+*~

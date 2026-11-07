@@ -1,0 +1,13 @@
+# Images excluded from annotation, training and evaluation. Original files are kept unchanged on disk;
+# only their use is blocked. Every entry needs a reason and a date. Removing an entry needs a recorded decision.
+version: 1
+images:
+  - image_id: f993c25b62208870_original
+    source_id: "9733492355"
+    dataset_id: commoncatalog_ccby
+    quarantined: 2026-11-07
+    reason: >-
+      Photo of a printed 1967 school-yearbook page (halftone reproduction). The uploader's CC-BY-2.0 licence may
+      not cover the underlying photograph, whose rights holder is unknown. Found in categorization pilot 1.
+    status: excluded_pending_rights_review
+    family_excluded: true      # its edited derivatives are excluded too

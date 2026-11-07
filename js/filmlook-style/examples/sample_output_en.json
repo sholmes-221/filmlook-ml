@@ -1,0 +1,69 @@
+{
+  "schema_version": "style-1.0",
+  "model_version": "filmlook-style-v1.0.0",
+  "language": "en",
+  "status": "uncertain",
+  "message": "No reliable style match: this photo does not show a distinctive enough combination of the measured characteristics.",
+  "monochrome": true,
+  "matches": [
+    {
+      "id": "alex_webb",
+      "name": "Alex Webb",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "weak",
+      "evidence": [],
+      "counter_evidence": [
+        "this style typically shows crisp, precise detail; this photo does not"
+      ],
+      "basis": "intense warm colour against deep, hard-edged shadows in layered frames"
+    },
+    {
+      "id": "daido_moriyama",
+      "name": "Daido Moriyama",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "weak",
+      "evidence": [
+        "soft, diffused detail"
+      ],
+      "counter_evidence": [
+        "this style typically shows large areas of deep shadow; this photo does not"
+      ],
+      "basis": "high-contrast black and white, heavy grain, blur (are-bure-boke)"
+    },
+    {
+      "id": "ernst_haas",
+      "name": "Ernst Haas",
+      "similarity": 0,
+      "percentile": 0,
+      "reliable": false,
+      "strength": "weak",
+      "evidence": [
+        "strong tonal contrast"
+      ],
+      "counter_evidence": [
+        "this style typically shows simple, uncluttered frame; this photo does not"
+      ],
+      "basis": "saturated colour dissolved by motion blur and soft focus"
+    }
+  ],
+  "dims": {
+    "monochrome": 1,
+    "saturation": 0.0884,
+    "accent": 0.0052,
+    "contrast": 0.4797,
+    "darkness": 0.4554,
+    "shadow_mass": 0.4023,
+    "softness": 0.5732,
+    "grain": 0.3895,
+    "warmth": 0.3823,
+    "red_yellow": 0.1192,
+    "high_key": 0.4531,
+    "complexity": 0.5336,
+    "spotlight": 0.8715
+  },
+  "disclaimer": "Style resemblance is computed from measurable characteristics (colour, tone, texture, composition). It does not identify the photographer or authenticate authorship."
+}

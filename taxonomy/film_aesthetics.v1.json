@@ -1,0 +1,1104 @@
+{
+ "taxonomy_version": "taxonomy-db-v1",
+ "aesthetics": [
+  {
+   "id": "cinestill_like",
+   "label": "CineStill-like",
+   "display_name": "CineStill 800T",
+   "reference_stock": "CineStill 800T",
+   "reference_stock_id": "cinestill_800t",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Tungsten-balanced motion-picture character: cool shadows, glowing warm practical lights, visible halation around point sources.",
+   "suits": "Night streets, neon, tungsten interiors, mixed artificial light.",
+   "poor_fit": "Flat midday daylight and scenes with no bright practical lights.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "ektar_like",
+   "label": "Ektar-like",
+   "display_name": "Ektar 100",
+   "reference_stock": "Kodak Ektar 100",
+   "reference_stock_id": "kodak_ektar_100",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Vivid, fine-grained colour negative: saturated reds and blues, clean structure, relatively high colour contrast.",
+   "suits": "Landscapes, travel and architecture with strong colour in good daylight.",
+   "poor_fit": "Close portraits, where it pushes skin toward red.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "gold_like",
+   "label": "Gold-like",
+   "display_name": "Gold 200",
+   "reference_stock": "Kodak Gold 200",
+   "reference_stock_id": "kodak_gold_200",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Warm consumer colour negative: golden yellows, nostalgic daylight, slightly rough and casual.",
+   "suits": "Sunny snapshots, golden hour, family and travel memories.",
+   "poor_fit": "Cool or moody scenes, night, and images relying on clean neutrals.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "hp5_like",
+   "label": "HP5-like",
+   "display_name": "HP5 Plus",
+   "reference_stock": "Ilford HP5 Plus 400",
+   "reference_stock_id": "ilford_hp5",
+   "category": "black_and_white",
+   "monochrome": true,
+   "character": "Flexible black-and-white: moderate contrast, soft midtones, visible but gentle grain, wide latitude.",
+   "suits": "Documentary, available-light portraits, quiet or overcast scenes.",
+   "poor_fit": "Images whose meaning depends on colour relationships.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "kodachrome_like",
+   "label": "Kodachrome-like",
+   "display_name": "Kodachrome",
+   "reference_stock": "Kodachrome 64",
+   "reference_stock_id": "kodachrome_64",
+   "category": "color_slide",
+   "monochrome": false,
+   "character": "Classic slide character: dense saturated reds and yellows, deep shadows, strong contrast, a mid-century documentary feel.",
+   "suits": "Hard or bright daylight, street and travel with primary colours.",
+   "poor_fit": "Low-key, low-contrast or pastel scenes, and deep shade.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "portra_like",
+   "label": "Portra-like",
+   "display_name": "Portra",
+   "reference_stock": "Kodak Portra 400",
+   "reference_stock_id": "kodak_portra_400",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Restrained warm negative: natural skin, gentle contrast, long highlight roll-off, understated saturation.",
+   "suits": "Portraits and people in soft ambient light where skin is central.",
+   "poor_fit": "Images without people that need punch, night or neon scenes, monochrome intent, and vivid landscapes.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "pro_400h_like",
+   "label": "Pro 400H-like",
+   "display_name": "Pro 400H",
+   "reference_stock": "Fujifilm Pro 400H",
+   "reference_stock_id": "fuji_pro_400h",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Airy pastel negative: soft cool-leaning greens and blues, luminous overexposed highlights, gentle contrast.",
+   "suits": "Foliage, overcast or open-shade light, airy lifestyle scenes.",
+   "poor_fit": "Warm low-sun scenes, hard contrast and dark low-key images.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "superia_like",
+   "label": "Superia-like",
+   "display_name": "Superia 400",
+   "reference_stock": "Fujifilm Superia 400",
+   "reference_stock_id": "fuji_superia_x_tra_400",
+   "category": "color_negative",
+   "monochrome": false,
+   "character": "Everyday consumer negative: punchy greens, slightly magenta-leaning shadows, candid and imperfect.",
+   "suits": "Casual city, nature and daily-life scenes, overcast streets and greenery.",
+   "poor_fit": "Polished studio portraits and images needing refined skin rendering.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "tri_x_like",
+   "label": "Tri-X-like",
+   "display_name": "Tri-X 400",
+   "reference_stock": "Kodak Tri-X 400",
+   "reference_stock_id": "kodak_tri_x_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "character": "Gritty black-and-white: strong contrast, bold grain, deep blacks and graphic tonal structure.",
+   "suits": "Street, reportage, hard light, strong shapes and expressive faces.",
+   "poor_fit": "Delicate tonal scenes and images whose meaning depends on colour.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "velvia_like",
+   "label": "Velvia-like",
+   "display_name": "Velvia 50",
+   "reference_stock": "Fujifilm Velvia 50",
+   "reference_stock_id": "fuji_velvia_50",
+   "category": "color_slide",
+   "monochrome": false,
+   "character": "Intense slide landscape character: very saturated greens and blues, deep shadows, high contrast and little tolerance for error.",
+   "suits": "Wide landscapes and nature in soft directional light.",
+   "poor_fit": "People, where skin turns unnatural, and contrasty harsh-light scenes.",
+   "source": "film_catalog.py (literal entries)"
+  },
+  {
+   "id": "kodak_portra_160_like",
+   "label": "Kodak Portra 160-like",
+   "display_name": "Kodak Portra 160",
+   "reference_stock": "Kodak Portra 160",
+   "reference_stock_id": "kodak_portra_160",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 2,
+    "saturation": 3,
+    "contrast": 2
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_portra_800_like",
+   "label": "Kodak Portra 800-like",
+   "display_name": "Kodak Portra 800",
+   "reference_stock": "Kodak Portra 800",
+   "reference_stock_id": "kodak_portra_800",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_colorplus_200_like",
+   "label": "Kodak ColorPlus 200-like",
+   "display_name": "Kodak ColorPlus 200",
+   "reference_stock": "Kodak ColorPlus 200",
+   "reference_stock_id": "kodak_colorplus_200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_ultramax_400_like",
+   "label": "Kodak UltraMax 400-like",
+   "display_name": "Kodak UltraMax 400",
+   "reference_stock": "Kodak UltraMax 400",
+   "reference_stock_id": "kodak_ultramax_400",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_c200_like",
+   "label": "Fuji C200-like",
+   "display_name": "Fuji C200",
+   "reference_stock": "Fuji C200",
+   "reference_stock_id": "fuji_c200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_industrial_100_like",
+   "label": "Fuji Industrial 100-like",
+   "display_name": "Fuji Industrial 100",
+   "reference_stock": "Fuji Industrial 100",
+   "reference_stock_id": "fuji_industrial_100",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 3,
+    "contrast": 2
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomochrome_color_92_like",
+   "label": "LomoChrome Color 92-like",
+   "display_name": "LomoChrome Color 92",
+   "reference_stock": "LomoChrome Color 92",
+   "reference_stock_id": "lomochrome_color_92",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 5,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomochrome_purple_like",
+   "label": "LomoChrome Purple-like",
+   "display_name": "LomoChrome Purple",
+   "reference_stock": "LomoChrome Purple",
+   "reference_stock_id": "lomochrome_purple",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 5,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomochrome_metropolis_like",
+   "label": "LomoChrome Metropolis-like",
+   "display_name": "LomoChrome Metropolis",
+   "reference_stock": "LomoChrome Metropolis",
+   "reference_stock_id": "lomochrome_metropolis",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 1,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "cinestill_50d_like",
+   "label": "Cinestill 50D-like",
+   "display_name": "Cinestill 50D",
+   "reference_stock": "Cinestill 50D",
+   "reference_stock_id": "cinestill_50d",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 1,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_velvia_100_like",
+   "label": "Fuji Velvia 100-like",
+   "display_name": "Fuji Velvia 100",
+   "reference_stock": "Fuji Velvia 100",
+   "reference_stock_id": "fuji_velvia_100",
+   "category": "color_slide",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 5,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_provia_100f_like",
+   "label": "Fuji Provia 100F-like",
+   "display_name": "Fuji Provia 100F",
+   "reference_stock": "Fuji Provia 100F",
+   "reference_stock_id": "fuji_provia_100f",
+   "category": "color_slide",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_ektachrome_e100_like",
+   "label": "Kodak Ektachrome E100-like",
+   "display_name": "Kodak Ektachrome E100",
+   "reference_stock": "Kodak Ektachrome E100",
+   "reference_stock_id": "kodak_ektachrome_e100",
+   "category": "color_slide",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "agfaphoto_ct_precisa_100_like",
+   "label": "AgfaPhoto CT Precisa 100-like",
+   "display_name": "AgfaPhoto CT Precisa 100",
+   "reference_stock": "AgfaPhoto CT Precisa 100",
+   "reference_stock_id": "agfaphoto_ct_precisa_100",
+   "category": "color_slide",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 4,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_t_max_400_like",
+   "label": "Kodak T-Max 400-like",
+   "display_name": "Kodak T-Max 400",
+   "reference_stock": "Kodak T-Max 400",
+   "reference_stock_id": "kodak_t_max_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_t_max_100_like",
+   "label": "Kodak T-Max 100-like",
+   "display_name": "Kodak T-Max 100",
+   "reference_stock": "Kodak T-Max 100",
+   "reference_stock_id": "kodak_t_max_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_t_max_3200_like",
+   "label": "Kodak T-Max 3200-like",
+   "display_name": "Kodak T-Max 3200",
+   "reference_stock": "Kodak T-Max 3200",
+   "reference_stock_id": "kodak_t_max_3200",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_fp4_plus_like",
+   "label": "Ilford FP4 Plus-like",
+   "display_name": "Ilford FP4 Plus",
+   "reference_stock": "Ilford FP4 Plus",
+   "reference_stock_id": "ilford_fp4_plus",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_delta_100_like",
+   "label": "Ilford Delta 100-like",
+   "display_name": "Ilford Delta 100",
+   "reference_stock": "Ilford Delta 100",
+   "reference_stock_id": "ilford_delta_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 2
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_delta_400_like",
+   "label": "Ilford Delta 400-like",
+   "display_name": "Ilford Delta 400",
+   "reference_stock": "Ilford Delta 400",
+   "reference_stock_id": "ilford_delta_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_delta_3200_like",
+   "label": "Ilford Delta 3200-like",
+   "display_name": "Ilford Delta 3200",
+   "reference_stock": "Ilford Delta 3200",
+   "reference_stock_id": "ilford_delta_3200",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_xp2_super_400_like",
+   "label": "Ilford XP2 Super 400-like",
+   "display_name": "Ilford XP2 Super 400",
+   "reference_stock": "Ilford XP2 Super 400",
+   "reference_stock_id": "ilford_xp2_super_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "ilford_pan_f_plus_50_like",
+   "label": "Ilford Pan F Plus 50-like",
+   "display_name": "Ilford Pan F Plus 50",
+   "reference_stock": "Ilford Pan F Plus 50",
+   "reference_stock_id": "ilford_pan_f_plus_50",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 2
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kentmere_100_like",
+   "label": "Kentmere 100-like",
+   "display_name": "Kentmere 100",
+   "reference_stock": "Kentmere 100",
+   "reference_stock_id": "kentmere_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kentmere_400_like",
+   "label": "Kentmere 400-like",
+   "display_name": "Kentmere 400",
+   "reference_stock": "Kentmere 400",
+   "reference_stock_id": "kentmere_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fomapan_100_like",
+   "label": "Fomapan 100-like",
+   "display_name": "Fomapan 100",
+   "reference_stock": "Fomapan 100",
+   "reference_stock_id": "fomapan_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fomapan_200_like",
+   "label": "Fomapan 200-like",
+   "display_name": "Fomapan 200",
+   "reference_stock": "Fomapan 200",
+   "reference_stock_id": "fomapan_200",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fomapan_400_like",
+   "label": "Fomapan 400-like",
+   "display_name": "Fomapan 400",
+   "reference_stock": "Fomapan 400",
+   "reference_stock_id": "fomapan_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 0,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "rollei_rpx_100_like",
+   "label": "Rollei RPX 100-like",
+   "display_name": "Rollei RPX 100",
+   "reference_stock": "Rollei RPX 100",
+   "reference_stock_id": "rollei_rpx_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "rollei_rpx_400_like",
+   "label": "Rollei RPX 400-like",
+   "display_name": "Rollei RPX 400",
+   "reference_stock": "Rollei RPX 400",
+   "reference_stock_id": "rollei_rpx_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomography_earl_grey_100_like",
+   "label": "Lomography Earl Grey 100-like",
+   "display_name": "Lomography Earl Grey 100",
+   "reference_stock": "Lomography Earl Grey 100",
+   "reference_stock_id": "lomography_earl_grey_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 1,
+    "sharpness": 1,
+    "saturation": 0,
+    "contrast": 2
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomography_lady_grey_400_like",
+   "label": "Lomography Lady Grey 400-like",
+   "display_name": "Lomography Lady Grey 400",
+   "reference_stock": "Lomography Lady Grey 400",
+   "reference_stock_id": "lomography_lady_grey_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lomography_berlin_kino_400_like",
+   "label": "Lomography Berlin Kino 400-like",
+   "display_name": "Lomography Berlin Kino 400",
+   "reference_stock": "Lomography Berlin Kino 400",
+   "reference_stock_id": "lomography_berlin_kino_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "orwo_un54_like",
+   "label": "Orwo UN54-like",
+   "display_name": "Orwo UN54",
+   "reference_stock": "Orwo UN54",
+   "reference_stock_id": "orwo_un54",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "polaroid_i_type_like",
+   "label": "Polaroid i-Type-like",
+   "display_name": "Polaroid i-Type",
+   "reference_stock": "Polaroid i-Type",
+   "reference_stock_id": "polaroid_i_type",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "polaroid_600_like",
+   "label": "Polaroid 600-like",
+   "display_name": "Polaroid 600",
+   "reference_stock": "Polaroid 600",
+   "reference_stock_id": "polaroid_600",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "polaroid_sx_70_like",
+   "label": "Polaroid SX-70-like",
+   "display_name": "Polaroid SX-70",
+   "reference_stock": "Polaroid SX-70",
+   "reference_stock_id": "polaroid_sx_70",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_instax_mini_like",
+   "label": "Fuji Instax Mini-like",
+   "display_name": "Fuji Instax Mini",
+   "reference_stock": "Fuji Instax Mini",
+   "reference_stock_id": "fuji_instax_mini",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_instax_square_like",
+   "label": "Fuji Instax Square-like",
+   "display_name": "Fuji Instax Square",
+   "reference_stock": "Fuji Instax Square",
+   "reference_stock_id": "fuji_instax_square",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fuji_instax_wide_like",
+   "label": "Fuji Instax Wide-like",
+   "display_name": "Fuji Instax Wide",
+   "reference_stock": "Fuji Instax Wide",
+   "reference_stock_id": "fuji_instax_wide",
+   "category": "instant",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "shanghai_gp3_100_like",
+   "label": "Shanghai GP3 100-like",
+   "display_name": "Shanghai GP3 100",
+   "reference_stock": "Shanghai GP3 100",
+   "reference_stock_id": "shanghai_gp3_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 4
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lucky_shd_100_like",
+   "label": "Lucky SHD 100-like",
+   "display_name": "Lucky SHD 100",
+   "reference_stock": "Lucky SHD 100",
+   "reference_stock_id": "lucky_shd_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "lucky_shd_400_like",
+   "label": "Lucky SHD 400-like",
+   "display_name": "Lucky SHD 400",
+   "reference_stock": "Lucky SHD 400",
+   "reference_stock_id": "lucky_shd_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "park_pss_100_like",
+   "label": "Park PSS 100-like",
+   "display_name": "Park PSS 100",
+   "reference_stock": "Park PSS 100",
+   "reference_stock_id": "park_pss_100",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "harman_phoenix_200_like",
+   "label": "HARMAN Phoenix 200-like",
+   "display_name": "HARMAN Phoenix 200",
+   "reference_stock": "HARMAN Phoenix 200",
+   "reference_stock_id": "harman_phoenix_200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 4,
+    "sharpness": 2,
+    "saturation": 5,
+    "contrast": 5
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "harman_phoenix_200_ii_like",
+   "label": "HARMAN Phoenix 200 II-like",
+   "display_name": "HARMAN Phoenix 200 II",
+   "reference_stock": "HARMAN Phoenix 200 II",
+   "reference_stock_id": "harman_phoenix_200_ii",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "harman_red_125_like",
+   "label": "HARMAN Red 125-like",
+   "display_name": "HARMAN Red 125",
+   "reference_stock": "HARMAN Red 125",
+   "reference_stock_id": "harman_red_125",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 5,
+    "contrast": 5
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kentmere_pan_200_like",
+   "label": "Kentmere PAN 200-like",
+   "display_name": "Kentmere PAN 200",
+   "reference_stock": "Kentmere PAN 200",
+   "reference_stock_id": "kentmere_pan_200",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_advantix_100_like",
+   "label": "Kodak Advantix 100-like",
+   "display_name": "Kodak Advantix 100",
+   "reference_stock": "Kodak Advantix 100",
+   "reference_stock_id": "kodak_advantix_100",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 2,
+    "sharpness": 2,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_advantix_200_like",
+   "label": "Kodak Advantix 200-like",
+   "display_name": "Kodak Advantix 200",
+   "reference_stock": "Kodak Advantix 200",
+   "reference_stock_id": "kodak_advantix_200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_advantix_400_like",
+   "label": "Kodak Advantix 400-like",
+   "display_name": "Kodak Advantix 400",
+   "reference_stock": "Kodak Advantix 400",
+   "reference_stock_id": "kodak_advantix_400",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 4,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "kodak_advantix_b_w_400_like",
+   "label": "Kodak Advantix B&W 400-like",
+   "display_name": "Kodak Advantix B&W 400",
+   "reference_stock": "Kodak Advantix B&W 400",
+   "reference_stock_id": "kodak_advantix_b_w_400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fujifilm_nexia_a200_like",
+   "label": "Fujifilm Nexia A200-like",
+   "display_name": "Fujifilm Nexia A200",
+   "reference_stock": "Fujifilm Nexia A200",
+   "reference_stock_id": "fujifilm_nexia_a200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fujifilm_nexia_a400_like",
+   "label": "Fujifilm Nexia A400-like",
+   "display_name": "Fujifilm Nexia A400",
+   "reference_stock": "Fujifilm Nexia A400",
+   "reference_stock_id": "fujifilm_nexia_a400",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "fujifilm_nexia_h400_like",
+   "label": "Fujifilm Nexia H400-like",
+   "display_name": "Fujifilm Nexia H400",
+   "reference_stock": "Fujifilm Nexia H400",
+   "reference_stock_id": "fujifilm_nexia_h400",
+   "category": "black_and_white",
+   "monochrome": true,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 0,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "konica_centuria_aps_200_like",
+   "label": "Konica Centuria APS 200-like",
+   "display_name": "Konica Centuria APS 200",
+   "reference_stock": "Konica Centuria APS 200",
+   "reference_stock_id": "konica_centuria_aps_200",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  },
+  {
+   "id": "konica_centuria_aps_400_like",
+   "label": "Konica Centuria APS 400-like",
+   "display_name": "Konica Centuria APS 400",
+   "reference_stock": "Konica Centuria APS 400",
+   "reference_stock_id": "konica_centuria_aps_400",
+   "category": "color_negative",
+   "monochrome": false,
+   "ratings_1_to_5": {
+    "grain": 3,
+    "sharpness": 3,
+    "saturation": 3,
+    "contrast": 3
+   },
+   "ratings_source": "i50mm",
+   "source": "reference_knowledge.json subjective_profile (as film_catalog._reference_aesthetics)"
+  }
+ ]
+}

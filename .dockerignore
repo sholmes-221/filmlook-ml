@@ -1,0 +1,11 @@
+.venv
+data
+reports
+tests
+.git
+checkpoints
+src
+scripts
+dist/.verify-venv
+dist/*.tar.gz
+**/__pycache__

@@ -1,0 +1,10 @@
+{
+  "name": "filmlook-style",
+  "version": "1.0.0",
+  "description": "Offline photographer-style similarity (measurable characteristics only) for the FilmLook Xiaohongshu Mini Tool. Pure ES2017 JavaScript, no dependencies.",
+  "main": "dist/filmlook-style.js",
+  "files": ["dist/filmlook-style.js", "schema/style_output_v1.json", "examples/", "README.md"],
+  "scripts": { "test": "node --test test/style.test.js", "bench": "node bench/bench.js" },
+  "license": "UNLICENSED",
+  "private": true
+}

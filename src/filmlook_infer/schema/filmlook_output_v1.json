@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "filmlook_output_v1.json",
+  "title": "FilmLook analysis result",
+  "description": "Schema version 1.0. Backwards-compatible additions bump the minor version; any removal or meaning change bumps the major version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_version",
+    "language",
+    "film_score",
+    "attributes",
+    "attribute_names",
+    "style_tags",
+    "style_tag_names",
+    "monochrome",
+    "confidence",
+    "confidence_level",
+    "strengths",
+    "weaknesses",
+    "summary",
+    "disclaimer"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "language": {
+      "enum": [
+        "en",
+        "zh"
+      ]
+    },
+    "film_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Film-authenticity score; higher = more convincingly film-like rendering."
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "highlight_rolloff",
+        "color_response",
+        "microcontrast",
+        "grain_naturalness",
+        "tonal_depth",
+        "film_coherence"
+      ],
+      "properties": {
+        "highlight_rolloff": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "color_response": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "microcontrast": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "grain_naturalness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tonal_depth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "film_coherence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "description": "0-1, higher = more film-like/natural. color_response is null for monochrome images."
+    },
+    "attribute_names": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "highlight_rolloff",
+        "color_response",
+        "microcontrast",
+        "grain_naturalness",
+        "tonal_depth",
+        "film_coherence"
+      ],
+      "properties": {
+        "highlight_rolloff": {
+          "type": "string"
+        },
+        "color_response": {
+          "type": "string"
+        },
+        "microcontrast": {
+          "type": "string"
+        },
+        "grain_naturalness": {
+          "type": "string"
+        },
+        "tonal_depth": {
+          "type": "string"
+        },
+        "film_coherence": {
+          "type": "string"
+        }
+      }
+    },
+    "style_tags": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "monochrome",
+          "warm",
+          "cool",
+          "neutral",
+          "muted",
+          "vivid",
+          "soft",
+          "crisp",
+          "high_key",
+          "low_key",
+          "high_contrast",
+          "low_contrast",
+          "no_visible_grain",
+          "fine_grain",
+          "coarse_grain"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Measured, deterministic descriptors (not model judgements)."
+    },
+    "style_tag_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "monochrome": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Heuristic (ensemble agreement + in-distribution check). Not a calibrated probability."
+    },
+    "confidence_level": {
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "strengths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 3
+    },
+    "weaknesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 3
+    },
+    "summary": {
+      "type": "string"
+    },
+    "disclaimer": {
+      "type": "string"
+    }
+  }
+}

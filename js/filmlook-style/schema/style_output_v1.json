@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "style_output_v1.json",
+  "title": "FilmLook style similarity result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "model_version",
+    "language",
+    "status",
+    "message",
+    "monochrome",
+    "matches",
+    "dims",
+    "disclaimer"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "style-1.0"
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "language": {
+      "enum": [
+        "en",
+        "zh"
+      ]
+    },
+    "status": {
+      "enum": [
+        "match",
+        "uncertain"
+      ],
+      "description": "uncertain = no reliable match; show the message, not a photographer name"
+    },
+    "message": {
+      "type": "string"
+    },
+    "monochrome": {
+      "type": "boolean"
+    },
+    "matches": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "similarity",
+          "percentile",
+          "reliable",
+          "strength",
+          "evidence",
+          "counter_evidence",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "enum": [
+              "saul_leiter",
+              "william_eggleston",
+              "daido_moriyama",
+              "alex_webb",
+              "fan_ho",
+              "stephen_shore",
+              "fred_herzog",
+              "rinko_kawauchi",
+              "ernst_haas"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "similarity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "share of the style's distinctive measurable signature present (0 = typical photo)"
+          },
+          "percentile": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "rarity: fraction of ordinary reference photos scoring lower"
+          },
+          "reliable": {
+            "type": "boolean"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3
+          },
+          "counter_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 1
+          },
+          "basis": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "monochrome",
+        "saturation",
+        "accent",
+        "contrast",
+        "darkness",
+        "shadow_mass",
+        "softness",
+        "grain",
+        "warmth",
+        "red_yellow",
+        "high_key",
+        "complexity",
+        "spotlight"
+      ],
+      "properties": {
+        "monochrome": {
+          "type": "number"
+        },
+        "saturation": {
+          "type": "number"
+        },
+        "accent": {
+          "type": "number"
+        },
+        "contrast": {
+          "type": "number"
+        },
+        "darkness": {
+          "type": "number"
+        },
+        "shadow_mass": {
+          "type": "number"
+        },
+        "softness": {
+          "type": "number"
+        },
+        "grain": {
+          "type": "number"
+        },
+        "warmth": {
+          "type": "number"
+        },
+        "red_yellow": {
+          "type": "number"
+        },
+        "high_key": {
+          "type": "number"
+        },
+        "complexity": {
+          "type": "number"
+        },
+        "spotlight": {
+          "type": "number"
+        }
+      }
+    },
+    "disclaimer": {
+      "type": "string"
+    }
+  }
+}
