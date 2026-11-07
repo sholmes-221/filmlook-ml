@@ -431,3 +431,48 @@ experiments:
     record the leakage and keep the group evaluation-only'
   status: pending
   blocked_by: dataset:aic_photographs ready; script not written
+- id: E30_joint_generator_supcon
+  hypothesis: a family SupCon projection trained on the union of the filmsynth and sdxl TRAIN families (13 generator-namespaced
+    labels) transfers to the held-out generator (zimage) better than the filmsynth-only projection, without more content leakage
+    or generator fingerprint
+  motivation: 'E28: the family projection is generator-specific whichever layer feeds it (filmsynth-trained 0.467 on filmsynth
+    but 0.34 on zimage; sdxl-trained collapses on filmsynth to 0.19). Cross-pipeline training is the obvious next test and
+    costs seconds on cached features. Synthetic-only: no promotion can follow; a supported result queues the joint projection
+    as a candidate for the real-film evaluations (E27/E27b).'
+  value: 3
+  gpu_minutes: 1
+  gpu_mb: 2500
+  cpu_minutes: 3
+  disk_gb: 0.01
+  datasets:
+  - bench_features_v1
+  metric: 'scripts/joint_generator_supcon.py: zimage val B (held-out generator) with scene-bootstrap CI, own-source rank-1,
+    generator share; summary.supported'
+  confounders:
+  - sdxl TRAIN has only 4 families
+  - zimage shares a LoRA family name with sdxl (filmgrain_lora) but not the pipeline
+  - val split only
+  falsified_if: 'summary.supported == 0: the joint projection''s zimage B lower CI does not exceed the filmsynth-only point
+    estimate, or own-source rank-1 rises by > 0.05, or generator share rises by > 0.02'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/joint_generator_supcon.py
+  result_json: reports/joint_generator_supcon.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    zimage_gain:
+      path: summary.zimage_joint_minus_filmsynth
+      kind: synthetic
+    filmsynth_change:
+      path: summary.filmsynth_joint_minus_filmsynth
+      kind: synthetic
+  next_step: 'supported: add hybrid_joint_supcon as a fixed candidate in the real-film evaluation (E27/E27b decide on real
+    film); rejected: keep the single-generator projection and record that cross-pipeline families do not merge linearly'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

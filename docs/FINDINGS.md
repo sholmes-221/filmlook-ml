@@ -96,6 +96,13 @@ split, CI clear of chance; **low** = suggestive, CI touches chance or n is small
     lower (0.014 vs 0.019); explicit28 alone recovers the scanner best (0.581). E28, rejected under its pre-registered
     rule; the teacher target stays L4+L8. (medium; analysis data only)
 
+19. **Training the family projection on two pipelines does not make it generator-invariant.** A SupCon projection on
+    the union of filmsynth and sdxl train families (E30) lifts sdxl val B from 0.347 to 0.396 and keeps filmsynth
+    (0.457 vs 0.467), but the held-out generator moves only from 0.342 to 0.351 [0.324, 0.378] and the generator share
+    rises from 0.541 to 0.635: the projection learns both fingerprints rather than a shared treatment code. Rejected
+    under its pre-registered rule. Generator invariance has to come from the features or the training signal, not from
+    pooling pipelines. (medium; synthetic val only)
+
 ## What is not established
 - That any embedding captures aesthetics as a person would judge them (no human evaluation exists).
 - That same-stock retrieval generalises beyond one photographer's 1990s consumer stocks.

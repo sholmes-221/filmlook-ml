@@ -358,6 +358,16 @@ generators.
 - Learned: decision rejected: falsified: passes=0.0000 < 1
 - Next: not falsified: L3 stays a candidate for E27 on Commons (no promotion from this run); falsified: drop the L3 teacher target, keep L4+L8, record which shortcut
 
+### E30_joint_generator_supcon — a family SupCon projection trained on the union of the filmsynth and sdxl TRAIN families (13 generator-namespaced labels) transfers to the held-out generator (zimage) better than the filmsynth-only projection, without more content leakage or generator fingerprint
+- Status: done; wall 4.6 s; peak GPU 6287.0 MB (total on card).
+- supported [proxy]: 0.0
+- zimage_gain [synthetic]: 0.0089
+- filmsynth_change [synthetic]: -0.01
+- Decision rule: neutral: no credible real-film change
+- Readings (reports/joint_generator_supcon.json, val split only). Hybrid L4+L8 projections: filmsynth-trained B fs 0.467 / sdxl 0.347 / zimage 0.342; sdxl-trained 0.192 / 0.436 / 0.413; joint 0.457 / 0.396 / 0.351 [0.324, 0.378], generator share 0.541 -> 0.635, rank-1 0.369 -> 0.344. L3 features behave the same (joint 0.530 / 0.444 / 0.356, share 0.653). The joint projection gains on the second training pipeline and nothing on the held-out generator while the generator fingerprint grows: rejected (zimage CI overlaps the baseline; share excess 0.094 > 0.02). Cost 4.6 s GPU.
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: add hybrid_joint_supcon as a fixed candidate in the real-film evaluation (E27/E27b decide on real film); rejected: keep the single-generator projection and record that cross-pipeline families do not merge linearly
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
