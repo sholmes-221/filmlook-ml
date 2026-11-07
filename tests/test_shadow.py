@@ -40,3 +40,14 @@ def test_badge_rules_are_deterministic_and_explicit():
     assert {"warm_palette", "muted_colours", "pastel_tones", "soft_highlights", "deep_shadows", "fine_grain"} <= hits
     assert "cool_palette" not in hits and "high_contrast" not in hits
     assert hits == {k for k, r in BADGE_RULES.items() if r(dict(f))}
+
+
+@pytest.mark.skipif(not (FILM / "model.onnx").exists(), reason="no film checkpoint")
+def test_shadow_logger_writes_hash_only(tmp_path):
+    from filmlook_infer.shadow_log import ShadowLogger, content_hash
+    lg = ShadowLogger(ShadowAnalyzer(FILM), tmp_path / "shadow.jsonl", run_id="t1")
+    row = lg.log(SAMPLE, context={"filename": "secret.jpg", "source": "test"})
+    text = (tmp_path / "shadow.jsonl").read_text()
+    assert "secret.jpg" not in text and str(SAMPLE) not in text and "sample_synthetic" not in text
+    assert row["content_sha256"] == content_hash(SAMPLE) and row["context"] == {"source": "test"}
+    assert json.loads(text.splitlines()[0])["record"]["film_aesthetics"]["film_score"] == row["record"]["film_aesthetics"]["film_score"]
