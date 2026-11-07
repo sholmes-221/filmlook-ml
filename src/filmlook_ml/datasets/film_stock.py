@@ -64,7 +64,8 @@ def stock_claim(tags: str | list[str] | None) -> dict:
         if len(stocks) > 1:                                      # conflicting claims: record all, assert none
             return {"film_stock": None, "film_stock_speed": None, "film_brand": None, "film_type": None, "evidence_tags": [f[4] for f in found], "conflict": stocks}
         stock, brand, ftype, _, _ = found[0]; speed = next((f[3] for f in found if f[3]), None)
-        return {"film_stock": f"{stock}_{speed}" if speed else stock, "film_stock_line": stock, "film_stock_speed": speed, "film_brand": brand, "film_type": ftype,
+        named = f"{stock}_{speed}" if speed and not re.search(r"\d", stock) else stock      # lines that already carry a speed (cinestill_800t, fuji_c200) stay as they are
+        return {"film_stock": named, "film_stock_line": stock, "film_stock_speed": speed, "film_brand": brand, "film_type": ftype,
                 "evidence_tags": [f[4] for f in found]}
     for t in (normalise_tag(x) for x in raw):
         if _NEG.search(t):

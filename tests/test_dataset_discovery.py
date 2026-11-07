@@ -148,3 +148,37 @@ def test_dataset_groups_stay_separate_in_registry_and_pipeline():
     seeds = {r["key"]: r for r in D.verified_seed()}
     assert all(seeds[k]["status"] == "metadata_only" for k in ("condenast:photovogue", "iconicartist:dehazed", "iconicartist:gallery"))
     assert seeds["kaggle:xuhangc/filmset"]["auth_class"] == "D" and seeds["kaggle:xuhangc/filmset"]["status"] != "verified"
+
+
+# ---------------------------------------------------------------------------------------------- adapters
+def test_artefact_file_names_carry_owner_recorded_emulsions():
+    from scripts.ingest_artefact_film import parse_name
+    m = parse_name("cinestill800t_half_7_restored.jpg")
+    assert m["film_stock"] == "cinestill_800t" and m["film_format"] == "35mm half-frame" and m["restored"] and m["frame_id"] == "cinestill800t_half_7"
+    m = parse_name("portra400_135_2.jpg"); assert m["film_stock"] == "kodak_portra_400" and m["film_type"] == "colour_negative" and not m["restored"]
+    assert parse_name("velvia50_half_0.jpg")["film_type"] == "colour_reversal" and parse_name("README.txt") is None
+
+
+def test_aic_selection_caps_per_artist_and_splits_by_artist():
+    from scripts.ingest_aic_photographs import half_of, select
+    works = [{"id": i, "artist_title": f"artist{i % 5}", "image_id": f"img{i}"} for i in range(200)] + [{"id": 900 + i, "artist_title": None, "image_id": "x"} for i in range(30)]
+    sel = select(works, target=40, per_artist=8)
+    from collections import Counter
+    per = Counter(w.get("artist_title") or "unknown" for w in sel)
+    assert len(sel) == 40 and max(per.values()) <= 8 and len({w["id"] for w in sel}) == 40
+    assert all(half_of(a) == half_of(a) for a in per) and set(half_of(a) for a in per) <= {"analysis", "test"}
+
+
+def test_commoncatalog_film_record_has_the_standard_schema(tmp_path):
+    from scripts.ingest_commoncatalog_film import record_for
+    c = {"photoid": "1", "uid": "u", "unickname": "n", "pageurl": "http://flickr/1", "film_stock": "kodak_portra_400", "film_stock_line": "kodak_portra", "film_brand": "kodak",
+         "film_type": "colour_negative", "evidence_tags": ["portra400"], "camera": "NORITSU KOKI QSS-30", "software": "QSS", "license": "CC-BY-2.0", "licenseurl": "http://cc/by/2.0/",
+         "width": "1800", "height": "1200", "datetaken": "2010", "blip2_caption": "c", "subjects": ["street"], "monochrome_tag": False}
+    r = record_for(c, tmp_path / "cc_1.jpg", "deadbeef", "0f0f")
+    for k in ("image_id", "source_dataset", "source_url", "photographer_id", "uploader_id", "film_stock", "film_format", "camera", "scanner", "scan_process", "development_process",
+              "authenticity_class", "authenticity_evidence", "license", "commercial_use_allowed", "training_use_allowed", "image_width", "image_height", "sha256", "perceptual_hash", "split"):
+        assert k in r, k
+    assert r["authenticity_class"] == "B" and r["training_use_allowed"] is False and r["scanner_category"] == "noritsu" and r["split"] in ("analysis", "test")
+    assert r["kind"] == "film" and r["film_stock_claim"] == "kodak_portra_400" and r["uploader"] == "flickr:u"
+    c2 = {**c, "film_stock": None, "film_type": None}; r2 = record_for(c2, tmp_path / "cc_2.jpg", "x", "y")
+    assert r2["film_stock"] is None and r2["film_type"] == "unknown"                                               # unknown stays unknown
