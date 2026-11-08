@@ -995,3 +995,15 @@ Stock line (23 classes, chance 0.043): best 0.12 (student prototypes), CIs near 
 AUC: student 0.68, statistics 0.69, hybrids 0.67 to 0.69, DINOv2 0.49. Uploader share: student 0.13 (least
 leakage) … DINOv2 0.22, DINO-hybrid 0.25 (most). ECE on vote shares 0.17 to 0.43 everywhere. Storage: PCA-32
 int8 3.2 MB per 100k images, brute-force top-5 in 4.5 ms on this host. Documents: docs/research/*.md.
+
+## E58 — Film-likeness calibration on independent data; rendering-family prototypes across collections (2026-11-08)
+
+Script `scripts/e58_filmlikeness_calibration.py`; report `reports/e58_filmlikeness_calibration.json`; artifacts
+`checkpoints/retrieval_mvp/` (calibration.json for the student's capture head, prototypes.npz kept as experimental,
+meta.json). Data: TEST-split originals (30 film, 59 digital) + 324 fresh hd scans; FIT/READ halves by group (READ:
+180 film, 30 digital, 86 groups). Results on READ: v1 film_score AUROC 0.49 [0.35, 0.65] (chance; not film-likeness);
+student_sup P(film) 0.86 [0.79, 0.92], ECE 0.07 after Platt (raw 0.30); combined 0.75 (worse than the student alone).
+Robustness of the shipped estimate: JPEG q50 flips 0 %, mean shift 0.8 pts (p95 3.7); 0.5x rescale flips 0 %,
+mean 2.7 (p95 11.9). Prototypes fit on AIC, read on Met: balanced accuracy 0.23 vs chance 0.20 (rejected for the
+MVP). Serving benchmark (dev host, one core): 0.26 s p50 per 2048 px photo, 165 MB peak RSS. Code:
+`src/filmlook_infer/retrieval_mvp.py`, schema v2, `tests/test_retrieval_mvp.py` (6 pass). Docs: docs/ml/*.md.

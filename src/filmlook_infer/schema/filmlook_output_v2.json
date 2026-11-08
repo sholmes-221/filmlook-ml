@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "filmlook_output_v2.json",
+  "title": "FilmLook analysis result (statistics-first MVP)",
+  "description": "Schema 2.0 (2026-11-08). Film-likeness is a calibrated resemblance estimate, not proof of the medium; no film stock, photographer, subject, mood or aesthetic quality is claimed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "versions", "language", "film_likeness", "characteristics", "rendering_attributes", "style_tags", "style_tag_names", "monochrome", "look_suggestion", "strengths", "weaknesses", "summary", "disclaimer", "not_claimed"],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "versions": {"type": "object", "required": ["schema", "v1_model", "sup_model", "artifacts"], "additionalProperties": {"type": "string"}},
+    "language": {"enum": ["en", "zh"]},
+    "film_likeness": {
+      "type": "object", "additionalProperties": false,
+      "required": ["estimate", "estimate_pct", "band", "calibrated", "reference", "text", "raw_p_film"],
+      "properties": {
+        "estimate": {"type": "number", "minimum": 0, "maximum": 1},
+        "estimate_pct": {"type": "integer", "minimum": 0, "maximum": 100},
+        "band": {"type": "string"},
+        "calibrated": {"type": "boolean"},
+        "reference": {"type": "object", "required": ["auroc", "ci95", "ece", "labels"], "properties": {"auroc": {"type": "number"}, "ci95": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}, "ece": {"type": "number"}, "labels": {"type": "string"}}},
+        "text": {"type": "string"},
+        "raw_p_film": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "characteristics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["temperature", "saturation", "contrast", "key", "sharpness", "grain"],
+      "additionalProperties_note": "each: label, text, p (null for measured grain)",
+      "properties": {
+        "temperature": {"$ref": "#/$defs/char"}, "saturation": {"$ref": "#/$defs/char"}, "contrast": {"$ref": "#/$defs/char"},
+        "key": {"$ref": "#/$defs/char"}, "sharpness": {"$ref": "#/$defs/char"}, "grain": {"$ref": "#/$defs/char"}
+      }
+    },
+    "rendering_attributes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["highlight_rolloff", "color_response", "microcontrast", "grain_naturalness", "tonal_depth", "film_coherence"],
+      "properties": {
+        "highlight_rolloff": {"type": "number", "minimum": 0, "maximum": 1}, "color_response": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "microcontrast": {"type": "number", "minimum": 0, "maximum": 1}, "grain_naturalness": {"type": "number", "minimum": 0, "maximum": 1},
+        "tonal_depth": {"type": "number", "minimum": 0, "maximum": 1}, "film_coherence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "style_tags": {"type": "array", "items": {"type": "string"}},
+    "style_tag_names": {"type": "array", "items": {"type": "string"}},
+    "monochrome": {"type": "boolean"},
+    "look_suggestion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["look_id", "abstained", "basis", "text", "allowed_looks"],
+      "properties": {
+        "look_id": {"type": ["string", "null"]}, "abstained": {"type": "boolean"}, "basis": {"type": ["string", "null"]}, "text": {"type": "string"},
+        "allowed_looks": {"type": ["array", "null"], "items": {"type": "string"}}
+      }
+    },
+    "strengths": {"type": "array", "items": {"type": "string"}, "maxItems": 3},
+    "weaknesses": {"type": "array", "items": {"type": "string"}, "maxItems": 3},
+    "summary": {"type": "string"},
+    "disclaimer": {"type": "string"},
+    "not_claimed": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "char": {"type": "object", "required": ["label", "text", "p"], "properties": {"label": {"type": "string"}, "text": {"type": "string"}, "p": {"type": ["number", "null"]}, "source": {"type": "string"}}}
+  }
+}
