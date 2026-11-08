@@ -463,6 +463,73 @@ generators.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: ship-candidate post-processing (a fixed 64x64 matrix) recorded for the student; verify once on the held-out halves at the end of the session (--final) together with the synthetic benchmark; falsified: the collapse must be fixed at training time (non-collapsed target or anti-collapse term in the student loss, E37)
 
+### E37_within_photographer_stock — with the photographer held fixed (same uploader, scans from other days only), the hybrid teacher ranks a scan's same-stock-line scans above its other-line scans: within-uploader pairwise AUC lower CI above 0.5 and a within-uploader permutation p-value below 0.05 on the commoncatalog_film analysis half
+- Status: done; wall 81.2 s; peak GPU 6257.0 MB (total on card).
+- supported [proxy]: 1.0
+- teacher_auc_different_day [real]: 0.6405
+- teacher_perm_p [real]: 0.0
+- n_significant_different_day [real]: 9.0
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: the within-library stock-similarity claim is kept (BlueNeg + CommonCatalog), the cross-photographer claim is dropped from the model card, and the student is judged on the within-uploader AUC too; falsified: no embedding separates stocks even within a photographer on Flickr scans, so stock similarity leaves the product roadmap until owner-recorded stocks from many photographers exist
+
+### Session 5 synthesis (2026-11-08, E32-E37): what the E29 teacher learned and why the students lost it
+
+All six runs use cached features of the analysis halves only (no test half, no BlueNeg); E32-E37 cost under a GPU-minute
+in total. Reports: `reports/e29_audit.json`, `frozen_head_choice.json`, `head_anticollapse.json`,
+`head_photographer_invariant.json`, `student_whitening.json`, `within_photographer_stock.json`.
+
+1. **Format inflates E29 but does not explain it (E32, supported).** 76 of the 306 analysis prints are stereo cards
+   (aspect ratio ~2:1, all albumen); a 2-d format baseline (log aspect ratio, stereo flag) alone retrieves the process
+   at 0.479 vs chance 0.389. With stereo cards removed the hybrid teacher is 0.410 [0.343, 0.479] vs 0.266; with the
+   candidate bank also restricted to the query's decade it is 0.483 [0.401, 0.560] vs 0.358. The rendering signal is
+   real. Its carriers are the colour-tone statistics (0.520 no-stereo) and the DINOv2 L4+L8 statistics (0.489); the
+   family SupCon projection keeps less of it (0.410) than its own inputs.
+2. **The distillation target is collapsed, and the students inherit the collapse (E32).** The SupCon projection has an
+   effective rank of 3.9 on Flickr film scans and 3.3 on museum prints; the six students' 64-d outputs have 3.1-3.2 and
+   2.1-2.6, with a mean pairwise cosine of 0.63-0.79 on the monochrome prints (0.14-0.28 on Flickr). Label-free PCA
+   whitening fitted on the evaluated half restores every student's museum p@5 to 0.50-0.54 with lower CIs above chance,
+   and artist-grouped ridge probes recover the teacher projection from the students at R^2 0.37-0.43. The information is
+   present; the metric geometry is degenerate. This answers E29's teacher-student gap: not representation collapse
+   in the student alone, but a collapsed target reproduced faithfully.
+3. **Every head that keeps the information also clusters by photographer (E33-E36, all falsified on the leakage
+   guards).** Label-free whitened PCA heads on the frozen L4+L8 statistics (fit on independent CC-BY originals) reach
+   stock-line p@5 0.103 [0.080, 0.128] vs chance 0.066 with the uploader excluded and museum 0.565 vs 0.358, but their
+   uploader share is 0.14-0.17 (projection 0.06, prior 0.03) and artist share 0.21-0.28 (projection 0.10). Raising the
+   projection's rank with VICReg moves both together (rank 3.8 -> 10: stock 0.071 -> 0.093, artist share 0.10 -> 0.19;
+   E34). Removing the top-32 between-uploader LDA directions estimated on 92 multi-image CC-BY uploaders changes nothing
+   that removing 32 random directions does not (E35: uploader share 0.155 vs 0.146 random). Whitening the students with
+   an independent fit restores all seven museum lower CIs (0.48-0.56) and raises artist share to 0.11-0.18 (E36).
+   The scanner probe never rises above its 0.44 majority in any of these runs, so the shared factor is not the scanner.
+4. **Within a photographer the embeddings do separate stock lines (E37, supported).** Among the 15 uploaders with
+   two or more stock lines (182 scans), comparing each scan only with the same uploader's scans from other days, the
+   hybrid teacher's pairwise AUC is 0.640 [0.563, 0.734] against a within-uploader permutation null of [0.454, 0.547]
+   (p < 0.001); colour-tone statistics alone reach 0.681 and the real-distilled student 0.673. Restricted to colour
+   scans (8 uploaders, 64 queries) the teacher drops to 0.555 [0.473, 0.682], p = 0.06: much of the within-photographer
+   separation is the monochrome-vs-colour cue, and the colour-only remainder is underpowered on this source.
+
+Reading across the six: the frozen DINOv2-Small statistics carry a real photographic-rendering signal (print process,
+coarse stock family, photographer's look) in the same directions, and no linear head or label-free post-processing
+tested here separates them. The collapsed family projection is the one head with low photographer clustering, and it
+has that property because it discards almost everything. For the product this means photographer-style similarity and
+film-look similarity are not separable features of this representation; they should be presented as one
+"similar look" signal with the abstention rule, and stock similarity claimed only within a user's own library
+(E37) or for one photographer's rolls (BlueNeg). E38 tests whether a non-collapsed target gives the student the
+same signals at an acceptable synthetic cost; its result is recorded below.
+
+### E38_student_targets — the real-distilled student loses the teacher's museum-print signal because its distillation target is the collapsed SupCon projection (E32): a student distilled with the same recipe from the SupCon + VICReg (lambda 3) head keeps the real-photograph signals (museum p@5 lower CI above chance, within-uploader different-day stock AUC lower CI above 0.5, stock-line p@5 within 0.01 of the baseline student) at an effective rank >= 8, with the scanner probe within +0.05 and the synthetic family p@5 within 0.10 of the baseline student
+- Status: done; wall 186.4 s; peak GPU 7647.0 MB (total on card).
+- supported [proxy]: 0.0
+- primary_museum_p5 [real]: 0.4808
+- baseline_museum_p5 [real]: 0.4192
+- primary_within_auc [real]: 0.7179
+- primary_stock_line_p5 [real]: 0.0839
+- primary_synth_family_p5 [proxy]: 0.6667
+- primary_eff_rank [proxy]: 5.9
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the vic3 student becomes the promotion candidate; one final evaluation on the held-out halves and the synthetic benchmark test at the end of the session, latency check, model card update; falsified: record which signal was lost; if the seed control moves the real metrics as much as the target change, the real matrix needs more photographers before any student decision
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

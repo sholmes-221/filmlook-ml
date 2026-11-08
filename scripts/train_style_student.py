@@ -92,6 +92,8 @@ def main():
     ap.add_argument("--no-blueneg-eval", action="store_true", help="selection run: skip the BlueNeg (final-only) evaluation")
     ap.add_argument("--kd-only-generators", default="", help="E23c: generators whose TRAIN outputs are distillation-only inputs (no labels), e.g. sdxl")
     ap.add_argument("--teacher-layers", default="4,8", help="E27: DINOv2 hidden-state layers (mean++std) in the teacher's style features; default L4+L8")
+    ap.add_argument("--kd-target", default="supcon", choices=["supcon", "supcon_vic3", "pcaw64"],
+                    help="E38: distillation target on the frozen teacher features: synthetic-family SupCon projection (default), the same with VICReg anti-collapse (lambda 3), or a label-free PCA-whitened 64-d head of the L4+L8 statistics fitted on the real distillation inputs")
     a = ap.parse_args()
     SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
@@ -149,8 +151,17 @@ def main():
     dg, ds = dino(ims)
     hyb = np.hstack([ex, ds])
     fs_tr = (gen == "filmsynth") & (split == "train")
-    proj = X.supcon(hyb[fs_tr], np.array([fams[i] if i >= 0 else "none" for i in fam_i])[fs_tr], dev)
-    T = proj(hyb)
+    fam_names = np.array([fams[i] if i >= 0 else "none" for i in fam_i])
+    if a.kd_target == "supcon":
+        T = X.supcon(hyb[fs_tr], fam_names[fs_tr], dev)(hyb)
+    elif a.kd_target == "supcon_vic3":
+        from head_anticollapse import train_head
+        T = train_head(hyb[fs_tr], fam_names[fs_tr], dev, tau=0.1, lam_vic=3.0, seed=a.seed)(hyb)
+    else:                                                    # label-free: whitening fitted on the real distillation inputs (or the synthetic train sources without them)
+        from frozen_head_choice import PCAW
+        fit_rows = (gen == "real") if (gen == "real").any() else fs_tr
+        T = PCAW(64).fit(ds[fit_rows])(ds)
+    rep["kd_target"] = a.kd_target
     rep["teacher_seconds"] = round(time.time() - t0, 1)
 
     # student data
@@ -302,7 +313,7 @@ def main():
     torch.onnx.export(W(net.cpu().eval()), (torch.zeros(1, 3, 224, 224),), str(out / "model.onnx"), input_names=["pixel_values"],
                       output_names=["treated_logit", "family_logits", "style_embedding"], dynamic_axes={"pixel_values": {0: "batch"}},
                       opset_version=17, dynamo=False)
-    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers),
+    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target,
                                                "outputs": ["treated_logit", "family_logits", "style_embedding"], "input_size": 224,
                                                "label_sources": "synthetic parameter supervision + SupCon teacher distillation; no human labels"}, indent=1))
     import onnxruntime as ort

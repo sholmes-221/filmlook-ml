@@ -50,6 +50,21 @@ python -m research.orchestrator loop --interval 900        # periodic ticks for 
 python -m research.orchestrator add <task_id> <data|research|eval> --command "..." [--depends dataset:commons_film] [--gpu-mb 6000]
 ```
 
+### Session 5 scripts (real-photograph diagnostics; cached features, analysis halves only)
+```bash
+python scripts/e29_audit.py                      # E32: format controls, component ablation, collapse diagnostics  -> reports/e29_audit.json
+python scripts/frozen_head_choice.py             # E33: label-free heads on frozen L4+L8 vs the SupCon projection -> reports/frozen_head_choice.json
+python scripts/head_anticollapse.py              # E34: SupCon temperature / VICReg rank controls                 -> reports/head_anticollapse.json
+python scripts/features_for_manifest.py --dataset commoncatalog_ccby --split train --edit-type original --tag ccby_train_originals --students <tags>
+python scripts/head_photographer_invariant.py    # E35: between-uploader subspace removal + controls              -> reports/head_photographer_invariant.json
+python scripts/student_whitening.py              # E36: independent whitening of the students' 64-d outputs       -> reports/student_whitening.json
+python scripts/within_photographer_stock.py      # E37: within-uploader stock AUC with permutation null           -> reports/within_photographer_stock.json
+python scripts/student_real_matrix.py --tags <tag,...> --reference style_fs_v2_real   # the real-photograph matrix for any student checkpoint
+python scripts/e38_student_targets.py            # E38: three student retrains (kd targets) + the matrix          -> reports/e38_student_targets.json
+python scripts/train_style_student.py ... --kd-target {supcon,supcon_vic3,pcaw64}     # distillation target choice (E38)
+```
+Every script above writes `analysis_data_only: true`; none reads a test half or BlueNeg.
+
 ## Data pipeline
 
 `research/downloader.py` is the resumable, rate-limit-aware downloader. Per-file state lives in an append-only

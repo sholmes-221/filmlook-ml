@@ -106,3 +106,15 @@ dataset (Commons analysis half; the test half once, with `--final`):
 
 ### Note added 2026-11-08 (after the first commoncatalog_film evaluation)
 The decision metric stays same-stock p@5 on the uploader-claimed label as recorded (speed-level when the uploader gave one). On the first snapshot every candidate, baseline included, was at chance on it (54 stocks, 20 with >= 2 uploaders). `same_stock_line` (brand + line, speed dropped) is now reported as a *secondary* reading and `same_type` as a sanity check; neither replaces the decision rule, and no threshold was changed. Larger snapshots are acquired to raise uploaders per stock, not to change the rule.
+
+### Note added 2026-11-08 (session 5, after E32-E37): the real-photograph matrix
+The decision rule above is unchanged. Session 5 showed that the pre-registered leakage guards (uploader share, artist
+share) move together with every informative embedding on the frozen DINOv2-Small statistics (claims 23-26 in
+`docs/FINDINGS.md`), so a candidate is now also *described* by the real-photograph matrix of
+`scripts/student_real_matrix.py` (analysis halves only, group bootstrap CIs):
+museum process p@5 with stereo cards removed and the decade matched (format control), artist share, stock-line p@5 with
+the uploader excluded, uploader share, scanner probe, content- and aspect-controlled same-uploader retrieval, within-
+uploader different-day stock AUC (and its colour-only reading) against a within-uploader permutation null, synthetic
+family p@5 on the filmsynth validation split (the cost of a real-data gain), and the effective rank of the embedding
+(collapse diagnostic; the current students are at 2-3 of 64). A candidate is judged on pre-registered thresholds over
+this matrix (see E38 in `research/backlog.yaml`); the test halves and BlueNeg stay reserved for one final evaluation.

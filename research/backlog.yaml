@@ -813,3 +813,188 @@ experiments:
     be fixed at training time (non-collapsed target or anti-collapse term in the student loss, E37)'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E37_within_photographer_stock
+  hypothesis: 'with the photographer held fixed (same uploader, scans from other days only), the hybrid teacher ranks a scan''s
+    same-stock-line scans above its other-line scans: within-uploader pairwise AUC lower CI above 0.5 and a within-uploader
+    permutation p-value below 0.05 on the commoncatalog_film analysis half'
+  motivation: across photographers stock retrieval is at chance (E27b) and every informative head clusters by photographer
+    (E33-E36); whether stock information exists at all once content, camera and scanner are roughly held fixed decides whether
+    the stock-similarity product claim can be made within a user's own library
+  value: 5
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 5
+  disk_gb: 0.01
+  datasets:
+  - commoncatalog_film
+  - commoncatalog_ccby
+  metric: 'scripts/within_photographer_stock.py: within-uploader pairwise AUC (all days / different day) with uploader bootstrap
+    CI and a 1000-draw within-uploader permutation null for the teacher, label-free heads, explicit statistics and three students
+    raw and independently whitened; summary.supported'
+  confounders:
+  - 15 uploaders carry two or more stock lines (182 scans); one or two prolific uploaders dominate
+  - stock lines are uploader claims; a mislabelled roll lowers every AUC
+  - different-day candidates can still share a location or camera
+  falsified_if: 'summary.supported == 0: the teacher''s different-day AUC lower CI is not above 0.5 or its permutation p >=
+    0.05'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/within_photographer_stock.py
+  result_json: reports/within_photographer_stock.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    teacher_auc_different_day:
+      path: summary.teacher_auc_different_day
+      kind: real
+    teacher_perm_p:
+      path: summary.teacher_perm_p
+      kind: real
+    n_significant_different_day:
+      path: summary.n_significant_different_day
+      kind: real
+  next_step: 'supported: the within-library stock-similarity claim is kept (BlueNeg + CommonCatalog), the cross-photographer
+    claim is dropped from the model card, and the student is judged on the within-uploader AUC too; falsified: no embedding
+    separates stocks even within a photographer on Flickr scans, so stock similarity leaves the product roadmap until owner-recorded
+    stocks from many photographers exist'
+  status: supported
+  result: 'not falsified: supported=1.0000 >= 1'
+- id: E38_student_targets
+  hypothesis: 'the real-distilled student loses the teacher''s museum-print signal because its distillation target is the
+    collapsed SupCon projection (E32): a student distilled with the same recipe from the SupCon + VICReg (lambda 3) head keeps
+    the real-photograph signals (museum p@5 lower CI above chance, within-uploader different-day stock AUC lower CI above
+    0.5, stock-line p@5 within 0.01 of the baseline student) at an effective rank >= 8, with the scanner probe within +0.05
+    and the synthetic family p@5 within 0.10 of the baseline student'
+  motivation: E32 diagnosed the collapse and E36 showed post-hoc whitening restores the museum signal only at the price of
+    photographer clustering; fixing the target at training time is the remaining route for a deployable 64-d student. A seed
+    control and a label-free whitened target bound the comparison.
+  value: 5
+  gpu_minutes: 12
+  gpu_mb: 6000
+  cpu_minutes: 10
+  disk_gb: 0.05
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e38_student_targets.py: trains style_fs_v2_real_s1 (seed control), style_fs_v2_real_vic3 (primary) and
+    style_fs_v2_real_pcaw, then scripts/student_real_matrix.py on the analysis halves (museum p@5, artist share, stock-line
+    p@5, uploader share, scanner probe, content/aspect-controlled photographer p@5, within-uploader AUC, colour-only AUC,
+    synthetic family p@5, effective rank); summary.supported'
+  confounders:
+  - one seed per variant; the seed control gives the scale of seed noise
+  - the VICReg head itself clusters more by photographer than the collapsed projection (E34)
+  - synthetic test numbers printed by the trainer are not used for the decision
+  falsified_if: 'summary.supported == 0: the primary student fails a real lower CI, loses stock-line p@5, exceeds the scanner
+    guard, pays more than 0.10 synthetic family p@5, or stays collapsed (effective rank < 8)'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e38_student_targets.py
+  result_json: reports/e38_student_targets.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    primary_museum_p5:
+      path: summary.primary_museum_p5
+      kind: real
+    baseline_museum_p5:
+      path: summary.baseline_museum_p5
+      kind: real
+    primary_within_auc:
+      path: summary.primary_within_auc
+      kind: real
+    primary_stock_line_p5:
+      path: summary.primary_stock_line_p5
+      kind: real
+    primary_synth_family_p5:
+      path: summary.primary_synth_family_p5
+      kind: proxy
+    primary_eff_rank:
+      path: summary.primary_eff_rank
+      kind: proxy
+  next_step: 'supported: the vic3 student becomes the promotion candidate; one final evaluation on the held-out halves and
+    the synthetic benchmark test at the end of the session, latency check, model card update; falsified: record which signal
+    was lost; if the seed control moves the real metrics as much as the target change, the real matrix needs more photographers
+    before any student decision'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E39_seed_robustness
+  hypothesis: 'the anti-collapse (SupCon + VICReg lambda 3) distillation target gives the real-distilled student a
+    seed-robust real-photograph gain: over three seeds every vic3 student has a museum p@5 lower CI above chance and a
+    within-uploader different-day AUC lower CI above 0.5, the vic3 seed-mean museum p@5 exceeds the baseline recipe''s
+    seed-mean by >= 0.03, the stock-line seed-mean is within 0.01 of the baseline''s, every seed keeps synthetic family p@5
+    within 0.10 and the scanner probe within 0.05 of the baseline seed-means, and the seed-mean effective rank is >= 5'
+  motivation: 'E38 fell on stock-line p@5 (0.084 vs the 0.087 bound) and effective rank (5.9 < 8) while the seed control
+    moved stock-line p@5 by 0.021; the vic3 student was the first raw student with a museum lower CI above chance and the
+    best within-uploader AUC (0.718). Thresholds here were set after E38 (stated in the script); the E38 rank threshold
+    stays on record as failed.'
+  value: 5
+  gpu_minutes: 10
+  gpu_mb: 6000
+  cpu_minutes: 10
+  disk_gb: 0.05
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e39_seed_robustness.py: three seeds of each recipe on the real-photograph matrix (scripts/student_real_matrix.py);
+    summary.supported'
+  confounders:
+  - three seeds bound but do not remove seed noise; museum CIs of individual seeds overlap
+  - artist share rises with the vic3 target (E38: 0.057 -> 0.126), which claim 25 says is inseparable from the gain
+  - thresholds set after E38
+  falsified_if: 'summary.supported == 0: any vic3 seed fails a lower CI, the museum gain is below 0.03, stock-line falls by
+    more than 0.01, a seed pays more than 0.10 synthetic family p@5 or exceeds the scanner guard, or the rank stays below 5'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e39_seed_robustness.py
+  result_json: reports/e39_seed_robustness.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    vic_museum_mean:
+      path: summary.vic_museum_mean
+      kind: real
+    baseline_museum_mean:
+      path: summary.baseline_museum_mean
+      kind: real
+    vic_stock_line_mean:
+      path: summary.vic_stock_line_mean
+      kind: real
+    vic_within_auc_mean:
+      path: summary.vic_within_auc_mean
+      kind: real
+    vic_synth_mean:
+      path: summary.vic_synth_mean
+      kind: proxy
+    vic_eff_rank_mean:
+      path: summary.vic_eff_rank_mean
+      kind: proxy
+  next_step: 'supported: the seed-0 vic3 student is the promotion candidate for one final held-out evaluation (commoncatalog_film
+    and aic_photographs test halves, benchmark v1 test, BlueNeg) at the end of the session, with the artist-share rise
+    recorded as a known property; falsified: the gain is seed noise or costs too much, the student stays unpromoted and the
+    real matrix needs more photographers'
+  status: pending

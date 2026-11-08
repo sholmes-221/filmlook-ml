@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 5135.6801675891875,
- "disk_bytes": 461962768,
+ "gpu_seconds": 5322.033084068298,
+ "disk_bytes": 475160908,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -287,6 +287,22 @@
    "gpu": false,
    "disk_bytes": 0,
    "peak_gpu_mb_total": 5740.0,
+   "returncode": 0
+  },
+  {
+   "id": "E37_within_photographer_stock",
+   "wall_seconds": 81.2,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6257.0,
+   "returncode": 0
+  },
+  {
+   "id": "E38_student_targets",
+   "wall_seconds": 186.4,
+   "gpu": true,
+   "disk_bytes": 13198140,
+   "peak_gpu_mb_total": 7647.0,
    "returncode": 0
   }
  ],
