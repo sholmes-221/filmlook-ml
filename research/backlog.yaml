@@ -1797,10 +1797,10 @@ experiments:
     from the museum digitisations to the film scans because a 10 % crop of a museum digitisation loses the nearest neighbour
     a third of the time, consistent with mounts and borders being part of the signal; museum robustness is recorded, not ruled;
     the spent half also reads criterion (e) at +0.078 [-0.025, 0.202] over 92 queries, i.e. the one claimed advantage is not
-    statistically established there either, and (e) is kept unchanged as the decisive criterion; amendment 16:15, before
-    the read: the 44 ARTeFACT originals (one photographer, owner-recorded emulsions, never read by any style embedding) are
-    added as a recorded within-photographer reading - same-emulsion AUC and p@3, CI over queries - outside the rule,
-    because the second CommonCatalog snapshot holds too few multi-stock uploaders for criterion (e)); and (e) the seed-mean within-uploader
+    statistically established there either, and (e) is kept unchanged as the decisive criterion; amendment 16:15, before the
+    read: the 44 ARTeFACT originals (one photographer, owner-recorded emulsions, never read by any style embedding) are added
+    as a recorded within-photographer reading - same-emulsion AUC and p@3, CI over queries - outside the rule, because the
+    second CommonCatalog snapshot holds too few multi-stock uploaders for criterion (e)); and (e) the seed-mean within-uploader
     different-day AUC exceeds the untrained ImageNet backbone with the same PCA by a paired-bootstrap lower CI above 0 (the
     one claim that distinguishes training from the backbone, E48)'
   motivation: the session-5/6 candidate was selected and read on halves that are now spent (E44); the session-7 brief asks
@@ -1960,3 +1960,55 @@ experiments:
   next_step: 'supported: the gate becomes the product rule for any label claim (abstain otherwise; "similar look" is always
     shown); falsified: label claims stay off and only "similar look" with the abstention rule is offered'
   status: pending
+- id: E56_shortcut_audit
+  hypothesis: 'the candidate''s film-stock signal on real scans does not run through the scanner or the photographer: on the
+    spent commoncatalog_film analysis half, for every candidate seed (PCA-32 int8) the stock-line p@5 restricted to candidates
+    from a DIFFERENT scanner family is at least the unrestricted value minus 0.02, and the uploader-identity variance explained
+    (ridge, random split) is below that of the untrained ImageNet backbone with the same PCA'
+  motivation: the session-7 brief asks whether the trained representation learns film-stock characteristics rather than photographer
+    identity, content, scanner artefacts or dataset shortcuts (E24 showed the scanner family drives same-look neighbours in
+    the teacher); this audit decomposes the candidate's variance (stock, scanner, content, uploader) and re-runs stock retrieval
+    with the scanner cue removed or reversed, with the ImageNet-init control under identical settings; diagnostics run on
+    spent data so the fresh holdout stays untouched
+  value: 4
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 6
+  disk_gb: 0.001
+  datasets:
+  - commoncatalog_film
+  - commoncatalog_ccby
+  metric: 'scripts/e56_shortcut_audit.py: summary.supported'
+  confounders:
+  - the scanner family is known for only part of the rows (EXIF capture device); same-scanner banks are smaller
+  - uploader-identity R^2 on a random split measures within-sample identity, not generalisation
+  falsified_if: 'summary.supported == 0: a seed loses more than 0.02 stock-line p@5 when the scanner family must differ, or
+    explains more uploader identity than the untrained backbone'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e56_shortcut_audit.py
+  result_json: reports/e56_shortcut_audit.json
+  watched_paths:
+  - checkpoints/frozen_session7
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: real
+    r2_uploader_candidate:
+      path: summary.candidate_r2_uploader_mean
+      kind: proxy
+    r2_uploader_init:
+      path: summary.init_r2_uploader
+      kind: proxy
+    stock_p5_diff_scanner:
+      path: summary.candidate_stock_p5_different_scanner_mean
+      kind: real
+  next_step: 'supported: the stock-line signal is recorded as scanner-independent (still exploratory, at or near chance across
+    uploaders); falsified: the stock-line reading is attributed to the scanner or the photographer and removed from product
+    claims'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

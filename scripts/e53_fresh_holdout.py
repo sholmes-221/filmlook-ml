@@ -192,6 +192,19 @@ def eff_rank(Z):
     return round(float(lam.sum() ** 2 / (lam ** 2).sum()), 2)
 
 
+def per_label(q, label, min_n=5):
+    """Mean top-5 precision per query label (hits are per query; labels with fewer than min_n queries are pooled as 'other')."""
+    lab = label[q["qi"]]; out = {}
+    for u in sorted(set(lab)):
+        m = lab == u
+        if m.sum() >= min_n:
+            out[str(u)] = {"precision": round(float(q["hits"][m].mean()), 4), "n_queries": int(m.sum())}
+    rest = ~np.isin(lab, list(out))
+    if rest.any():
+        out["other_pooled"] = {"precision": round(float(q["hits"][rest].mean()), 4), "n_queries": int(rest.sum()), "n_labels": int(len(set(lab[rest])))}
+    return out
+
+
 def failure_cases(q, rows, label, group, n=10):
     """Queries with no relevant neighbour in the top 5: ids and catalogue labels only."""
     bad = np.where(q["hits"] == 0)[0][:n]; out = []
@@ -295,6 +308,16 @@ def main():
                "robustness_min_invariant_min": min(res["robustness"][f"{t}|scans"]["min_invariant"] for t in CANDIDATE) if rows_s else None,
                "corner_crop_min": min(res["robustness"][f"{t}|scans"]["crop70_corner"] for t in CANDIDATE) if rows_s else None,
                "museum_robustness_min_invariant_min": min(res["robustness"][f"{t}|museum"]["min_invariant"] for t in CANDIDATE) if rows_m else None, "seconds": round(time.time() - t0, 1)}
+    per = {}
+    for t in CANDIDATE + ["imagenet_init", "explicit28_std"]:
+        c = f"{t}:pca32_int8" if t in CANDIDATE else ("imagenet_init:pca64" if t == "imagenet_init" else t); pr = {}
+        if rows_m:
+            pr["museum_process"] = per_label(Q[c + "|museum"], Lm["proc"])
+        if rows_s:
+            pr["scans_stock_line"] = per_label(Q[c + "|scans"], Ls["line"])
+        if rows_f:
+            pr["artefact_emulsion_p3"] = per_label(Q[c + "|artefact"], Lf["stock"], min_n=2)
+        per[c] = pr
     fails = {}
     if rows_m:
         fails["museum"] = failure_cases(Q[f"{CANDIDATE[0]}:pca32_int8|museum"], rows_m, Lm["proc"], Lm["artist"])
@@ -302,7 +325,7 @@ def main():
         fails["scans"] = failure_cases(Q[f"{CANDIDATE[0]}:pca32_int8|scans"], rows_s, Ls["line"], Ls["up"])
     out = {"experiment": "E53_fresh_holdout" if a.final else "E53_self_test", "held_out_data": bool(a.final), "data": label, "n_museum": len(rows_m), "n_scans": len(rows_s), "n_artefact": len(rows_f), "n_museum_artists": int(len(set(Lm["artist"]))) if rows_m else 0,
            "n_scan_uploaders": int(len(set(Ls["up"]))) if rows_s else 0, "frozen": {t: freeze["tags"][t]["model_sha256"] for t in freeze["tags"]}, "representations": R, "robustness": res.get("robustness"), "effect_sizes": eff,
-           "failure_cases": fails, "summary": summary}
+           "per_label": per, "failure_cases": fails, "summary": summary}
     P.REPORTS.mkdir(exist_ok=True); OUT.write_text(json.dumps(out, indent=1, default=str))
     np.savez(QOUT, **{f"{k}|{f}": v for k, q in Q.items() for f, v in q.items()}, museum_proc=Lm["proc"] if rows_m else np.array([]), museum_artist=Lm["artist"] if rows_m else np.array([]),
              scans_line=Ls["line"] if rows_s else np.array([]), scans_up=Ls["up"] if rows_s else np.array([]), artefact_stock=Lf["stock"] if rows_f else np.array([]), museum_ids=np.array([r["image_id"] for r in rows_m]), scans_ids=np.array([r["image_id"] for r in rows_s]))

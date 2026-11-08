@@ -832,6 +832,25 @@ students (`student_style_fs_v2_real_f576{,_s1,_s2}`) are the reference throughou
 - Learned: decision supported: not falsified: supported=1.0000 >= 1
 - Next: supported: the degrade-augmented recipe replaces E23b as the reference recipe for the next fresh-holdout reading; falsified: the robustness gap is recorded as a limitation and the recipe stays E23b
 
+### E54_characteristic_probe — the frozen candidate (PCA-32 int8 of each degrade-augmented seed) encodes single-parameter photographic characteristics as scene-independent, decodable directions: on the 113 CC-BY validation originals edited at five magnitudes of temperature, saturation, gamma, contrast, lift, grain and blur, a scene-grouped ridge recovers the parameter with R^2 >= 0.5 for at least five of the seven attributes on every seed, and a scene-grouped classifier names the attribute from the displacement vector with accuracy >= 0.7 (chance 0.14)
+- Status: done; wall 443.1 s; peak GPU 7770.0 MB (total on card).
+- supported [real]: 0.0
+- min_attributes_r2 [proxy]: 2.0
+- min_attr_acc [proxy]: 0.4709
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the attribute directions can back an explainable "why similar" display (with the 28 statistics); falsified: the embedding is a holistic look signature and the explicit statistics stay the explanation layer
+
+### E56_shortcut_audit — the candidate's film-stock signal on real scans does not run through the scanner or the photographer: on the spent commoncatalog_film analysis half, for every candidate seed (PCA-32 int8) the stock-line p@5 restricted to candidates from a DIFFERENT scanner family is at least the unrestricted value minus 0.02, and the uploader-identity variance explained (ridge, random split) is below that of the untrained ImageNet backbone with the same PCA
+- Status: done; wall 15.4 s; peak GPU 5740.0 MB (total on card).
+- supported [real]: 0.0
+- r2_uploader_candidate [proxy]: -0.048
+- r2_uploader_init [proxy]: -0.0998
+- stock_p5_diff_scanner [real]: 0.1134
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the stock-line signal is recorded as scanner-independent (still exploratory, at or near chance across uploaders); falsified: the stock-line reading is attributed to the scanner or the photographer and removed from product claims
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

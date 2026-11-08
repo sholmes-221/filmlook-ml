@@ -65,6 +65,25 @@ python scripts/train_style_student.py ... --kd-target {supcon,supcon_vic3,pcaw64
 ```
 Every script above writes `analysis_data_only: true`; none reads a test half or BlueNeg.
 
+### Session 7 scripts (fresh holdouts, frozen candidate, single read, abstention, probes)
+```bash
+python scripts/ingest_met_photographs.py --prepare                      # MetObjects.csv (CC0) -> 7,029 public-domain photograph candidates (metadata only)
+python scripts/ingest_met_photographs.py --download --max-minutes 100 --target 700 --per-artist 6   # objects endpoint (0.6 s spacing) + primaryImageSmall -> met_photographs (698 rows)
+python scripts/ingest_commoncatalog_film.py --dataset-id commoncatalog_film_hd --range least_dim_range=2048-4096 --scan --shards 400 --scan-workers 8 --seed 7   # second snapshot: metadata scan (also 768-1024 and 512-768 with --min-side 512)
+python scripts/ingest_commoncatalog_film.py --dataset-id commoncatalog_film_hd --exclude-manifest commoncatalog_film --caps 30,10,150 --min-side 512 --download --max-minutes 110   # new uploaders only
+python -m research.data_pipeline validate met_photographs | commoncatalog_film_hd
+python scripts/freeze_candidate.py                                      # checkpoints/frozen_session7 (ONNX copies, pca.npz, freeze.json with SHA-256s); refuses to re-freeze
+python scripts/e53_fresh_holdout.py --self-test                         # the same code on the spent analysis halves (calibration of the rule; reports/e53_self_test.json)
+python -m research.research_loop --once --id E53_fresh_holdout          # the single holdout read (--final; refuses to run twice) -> reports/e53_fresh_holdout.json + _queries.npz
+python -m research.research_loop --once --id E55_abstention             # abstention rule calibrated on the spent halves, evaluated on the stored E53 query records (no re-read)
+python -m research.research_loop --once --id E54_characteristic_probe   # single-parameter edits (temperature, saturation, gamma, contrast, lift, grain, blur) on the 113 validation originals
+python -m research.research_loop --once --id E56_shortcut_audit         # stock vs scanner vs uploader vs content on the spent commoncatalog_film analysis half
+pytest -q tests/test_session7.py
+```
+Recovery: both ingest adapters are resumable (`download_state.jsonl`); the Met adapter caches per-object records in
+`data/raw/met_photographs/objects.jsonl`; the CommonCatalog scan keeps `data/candidates/commoncatalog_film_hd_scanned.json`.
+Never run `--final` evaluations twice; the frozen directory is read-only (chmod 444) and hash-checked.
+
 ### Session 6 scripts (lightweight extractor: teacher-free training, reductions, frozen baselines, robustness, look vs content)
 ```bash
 python scripts/train_style_student.py ... --kd 0 --vic-pooled 1 [--vic-mode source]   # E46/E51: no teacher (DINOv2 pass skipped), VICReg on the pooled layer
