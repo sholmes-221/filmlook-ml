@@ -12,6 +12,8 @@ statistics standardised on that set. Readings:
   museum (met_photographs): process p@5, artist excluded, stereo views removed, decade matched; artist share of top-5;
   film scans (commoncatalog_film_hd): stock-line p@5 uploader excluded; uploader share; scanner probe; within-uploader
   different-day AUC (all / colour-only); photographer p@5 (subjects disjoint, aspect matched);
+  ARTeFACT (final only): same-emulsion AUC and p@3 among the 44 originals of one photographer (owner-recorded
+  emulsions; damaged scans by design; CI over queries; recorded, never part of the rule);
   controlled transformations on the museum half: own-image rank-1 under centre crop 80 %, flip, JPEG q50, 0.5x rescale,
   70 % corner crop;
   effect sizes: paired bootstrap over artists / uploaders of the candidate minus explicit-28 and minus ImageNet-init;
@@ -219,14 +221,29 @@ def main():
         rows_m = [r for r in read_jsonl(P.MANIFESTS / "aic_photographs_manifest.jsonl") if r["split"] == "analysis"]
         rows_s = [r for r in read_jsonl(P.MANIFESTS / "commoncatalog_film_manifest.jsonl") if r["split"] == "analysis" and r.get("film_stock")]
         label = {"museum": "aic_photographs analysis half (spent; self-test only)", "scans": "commoncatalog_film analysis half (spent; self-test only)"}
+    rows_f = [r for r in read_jsonl(P.MANIFESTS / "artefact_film_manifest.jsonl") if r.get("kind") == "film" and r.get("film_stock")] if a.final else []
+    if a.final:
+        label["artefact"] = "artefact_film originals (44, one photographer, owner-recorded emulsions; recorded, not ruled)"
     arrays = {}
     if rows_m:
         arrays["museum"] = load_arrays(rows_m)
     if rows_s:
         arrays["scans"] = load_arrays(rows_s)
+    if rows_f:
+        arrays["artefact"] = load_arrays(rows_f)
     Lm = museum_labels(rows_m) if rows_m else None; Ls = scan_labels(rows_s) if rows_s else None
+    Lf = {"stock": np.array([r["film_stock"] for r in rows_f]), "idx": np.arange(len(rows_f))} if rows_f else None
     reps, frozen, _ = representations(arrays, dev)
     res = evaluate(reps, frozen, arrays, rows_m, rows_s, Lm, Ls, label)
+    if rows_f:                                                             # ARTeFACT: same-emulsion AUC and p@3 within one photographer (CI over queries)
+        for name, e in reps.items():
+            Ef = unit(np.nan_to_num(e["artefact"].astype(np.float32))); st = Lf["stock"]
+            au, ag = within_auc(Ef, st, np.array(["one"] * len(Ef)), np.array(["?"] * len(Ef)), False)
+            h, g, pr, qi, top = hits(Ef, st, Lf["idx"], None, k=3)
+            res["representations"][name]["artefact_same_stock_auc"] = {"auc": round(float(au.mean()), 4), "ci95_over_queries": boot_groups(au, np.arange(len(au))), "n_queries": int(len(au))} if len(au) else None
+            res["representations"][name]["artefact_same_stock_p3"] = {"precision@3": round(float(h.mean()), 4), "ci95_over_queries": boot_groups(h, np.arange(len(h))), "chance": round(float(pr.mean()), 4), "n": int(len(h))} if len(h) else None
+            res["queries"][name + "|artefact"] = {"hits": h, "groups": np.arange(len(h)), "qi": qi, "top": top, "S_top": (Ef @ Ef.T)[qi[:, None], top], "within_auc": au, "within_groups": np.arange(len(au))}
+            print(f"artefact {name:40s} auc {res['representations'][name]['artefact_same_stock_auc']} p@3 {res['representations'][name]['artefact_same_stock_p3']}", flush=True)
     R = res["representations"]; Q = res["queries"]
     # effect sizes: candidate seeds (PCA-32 int8) minus explicit-28 and minus ImageNet-init PCA-64, paired over queries
     eff = {}
@@ -271,6 +288,10 @@ def main():
                "stock_line_chance": cand[0]["stock_line_p5"].get("chance") if rows_s else None, "candidate_within_auc_seed_mean": round(float(np.mean([c["within_uploader_auc"]["auc"] for c in cand])), 4) if rows_s and n_within else None,
                "init_within_auc": R["imagenet_init:pca64"]["within_uploader_auc"]["auc"] if rows_s and n_within else None, "explicit_within_auc": R["explicit28_std"]["within_uploader_auc"]["auc"] if rows_s and n_within else None,
                "candidate_uploader_share_max": max(c["uploader_share"] for c in cand) if rows_s else None, "init_uploader_share": R["imagenet_init:pca64"]["uploader_share"] if rows_s else None,
+               "artefact_auc_seed_mean": round(float(np.mean([c["artefact_same_stock_auc"]["auc"] for c in cand])), 4) if rows_f else None,
+               "artefact_auc_init": R["imagenet_init:pca64"]["artefact_same_stock_auc"]["auc"] if rows_f else None, "artefact_auc_explicit": R["explicit28_std"]["artefact_same_stock_auc"]["auc"] if rows_f else None,
+               "artefact_auc_dino_style": R["dino_style:pca64"]["artefact_same_stock_auc"]["auc"] if rows_f else None,
+               "artefact_p3_seed_mean": round(float(np.mean([c["artefact_same_stock_p3"]["precision@3"] for c in cand])), 4) if rows_f else None, "artefact_p3_chance": cand[0]["artefact_same_stock_p3"]["chance"] if rows_f else None,
                "robustness_min_invariant_min": min(res["robustness"][f"{t}|scans"]["min_invariant"] for t in CANDIDATE) if rows_s else None,
                "corner_crop_min": min(res["robustness"][f"{t}|scans"]["crop70_corner"] for t in CANDIDATE) if rows_s else None,
                "museum_robustness_min_invariant_min": min(res["robustness"][f"{t}|museum"]["min_invariant"] for t in CANDIDATE) if rows_m else None, "seconds": round(time.time() - t0, 1)}
@@ -279,12 +300,12 @@ def main():
         fails["museum"] = failure_cases(Q[f"{CANDIDATE[0]}:pca32_int8|museum"], rows_m, Lm["proc"], Lm["artist"])
     if rows_s:
         fails["scans"] = failure_cases(Q[f"{CANDIDATE[0]}:pca32_int8|scans"], rows_s, Ls["line"], Ls["up"])
-    out = {"experiment": "E53_fresh_holdout" if a.final else "E53_self_test", "held_out_data": bool(a.final), "data": label, "n_museum": len(rows_m), "n_scans": len(rows_s), "n_museum_artists": int(len(set(Lm["artist"]))) if rows_m else 0,
+    out = {"experiment": "E53_fresh_holdout" if a.final else "E53_self_test", "held_out_data": bool(a.final), "data": label, "n_museum": len(rows_m), "n_scans": len(rows_s), "n_artefact": len(rows_f), "n_museum_artists": int(len(set(Lm["artist"]))) if rows_m else 0,
            "n_scan_uploaders": int(len(set(Ls["up"]))) if rows_s else 0, "frozen": {t: freeze["tags"][t]["model_sha256"] for t in freeze["tags"]}, "representations": R, "robustness": res.get("robustness"), "effect_sizes": eff,
            "failure_cases": fails, "summary": summary}
     P.REPORTS.mkdir(exist_ok=True); OUT.write_text(json.dumps(out, indent=1, default=str))
     np.savez(QOUT, **{f"{k}|{f}": v for k, q in Q.items() for f, v in q.items()}, museum_proc=Lm["proc"] if rows_m else np.array([]), museum_artist=Lm["artist"] if rows_m else np.array([]),
-             scans_line=Ls["line"] if rows_s else np.array([]), scans_up=Ls["up"] if rows_s else np.array([]), museum_ids=np.array([r["image_id"] for r in rows_m]), scans_ids=np.array([r["image_id"] for r in rows_s]))
+             scans_line=Ls["line"] if rows_s else np.array([]), scans_up=Ls["up"] if rows_s else np.array([]), artefact_stock=Lf["stock"] if rows_f else np.array([]), museum_ids=np.array([r["image_id"] for r in rows_m]), scans_ids=np.array([r["image_id"] for r in rows_s]))
     print(json.dumps(summary, default=str))
 
 
