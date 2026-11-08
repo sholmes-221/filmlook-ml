@@ -49,3 +49,13 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
 ## Standing storage (not charged to any session)
 `data/hf_cache` 39 GB (SDXL, Z-Image-Turbo, LoRAs, BlueNeg previews), `data/synthetic` 0.2 GB, `data/raw/commons_film` 0.07 GB (growing; evaluation-only),
 `data/embeddings` 0.1 GB + benchmark caches (0.15 GB), `checkpoints` 0.3 GB. Nothing is deleted without approval.
+
+## Session 5 (2026-11-08, E29 investigation E32-E39)
+- GPU: E32-E37 ran on cached features (CPU, 6-81 s each; the tiny SupCon heads train on the card in seconds). E38 trained
+  three MobileNetV3-Small students (186 s wall, peak 7.6 GB on the card including the 5.7 GB other job) and E39 three
+  more (same recipe); two frozen-teacher feature passes over the 601 CC-BY training originals (about 60 s each). Session
+  total about 8 GPU-minutes, all metered through the research loop; ledger total across sessions 5,322 GPU-seconds
+  (89 minutes) of the 4-hour-per-session budget.
+- Disk: six student checkpoints (26 MB), feature caches `ccby_train_originals_features_v1` and `student_matrix_*`
+  (< 30 MB), reports < 5 MB. `checkpoints` 299 MB, `data/embeddings` 316 MB in total. Nothing deleted.
+- Network: none (no acquisition this session; the Commons retry stays with the orchestrator's backoff).
