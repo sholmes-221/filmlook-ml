@@ -75,6 +75,19 @@ def _explicit_any(p, real):
     return X.explicit_of(X.to_short(load_image(p, max_side=1280))) if real else X._explicit_path(p)
 
 
+def degrade(xb, rng, p):
+    """E52: re-encode a share p of the crops the way uploads arrive: half JPEG q40-70, half 0.5x rescale and back (uint8 in, uint8 out)."""
+    import io
+    out = np.ascontiguousarray(xb).copy()
+    for i in range(len(out)):
+        u = rng.random()
+        if u < p / 2:
+            b = io.BytesIO(); Image.fromarray(out[i]).save(b, "JPEG", quality=int(rng.integers(40, 71))); out[i] = np.asarray(Image.open(io.BytesIO(b.getvalue())).convert("RGB"))
+        elif u < p:
+            im = Image.fromarray(out[i]); h, w = out[i].shape[:2]; out[i] = np.asarray(im.resize((w // 2, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR))
+    return out
+
+
 def auroc(y, s):
     from sklearn.metrics import roc_auc_score
     return round(float(roc_auc_score(y, s)), 4)
@@ -98,6 +111,8 @@ def main():
                     help="E46: VICReg variance + covariance regularisation (this weight on both terms) applied to the 576-d pooled layer itself, so that its rank is kept without any teacher")
     ap.add_argument("--vic-mode", default="batch", choices=["batch", "source"],
                     help="E51: 'source' centres the VICReg features on their synthetic source's in-batch mean (batches led by 12 sources x 4 rows), expanding treatment variance only")
+    ap.add_argument("--aug-degrade", type=float, default=0.0,
+                    help="E52: share of training crops re-encoded (JPEG q40-70 or 0.5x rescale) so the pooled layer is robust to re-encoded uploads")
     a = ap.parse_args()
     SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
@@ -211,6 +226,8 @@ def main():
             xb = Xu8[bi][:, oy:oy + 224, ox:ox + 224]
             if rng.random() < 0.5:
                 xb = xb[:, :, ::-1]
+            if a.aug_degrade > 0:
+                xb = degrade(xb, rng, a.aug_degrade)
             x = S.to_tensor(np.ascontiguousarray(xb), dev)
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 f, lt, lf, lp, kd = net(x)
@@ -239,7 +256,7 @@ def main():
         hist.append(round(tot / len(tr), 4))
     rep["train"] = {"seconds": round(time.time() - t0, 1), "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2),
                     "loss_curve": hist, "params": int(sum(p.numel() for p in net.parameters())), "seed": a.seed,
-                    "epochs": a.epochs, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode, "gpu": torch.cuda.get_device_name(0) + " (dev workstation)"}
+                    "epochs": a.epochs, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode, "aug_degrade": a.aug_degrade, "gpu": torch.cuda.get_device_name(0) + " (dev workstation)"}
 
     net.eval()
 
@@ -341,7 +358,7 @@ def main():
     torch.onnx.export(W(net.cpu().eval()), (torch.zeros(1, 3, 224, 224),), str(out / "model.onnx"), input_names=["pixel_values"],
                       output_names=["treated_logit", "family_logits", "style_embedding", "features_576"], dynamic_axes={"pixel_values": {0: "batch"}},
                       opset_version=17, dynamo=False)
-    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode,
+    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode, "aug_degrade": a.aug_degrade,
                                                "outputs": ["treated_logit", "family_logits", "style_embedding", "features_576"], "input_size": 224,
                                                "label_sources": "synthetic parameter supervision + SupCon teacher distillation; no human labels"}, indent=1))
     import onnxruntime as ort

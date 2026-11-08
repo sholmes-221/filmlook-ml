@@ -74,6 +74,8 @@ python scripts/e48_frozen_vs_trained.py          # E48: ImageNet-init MobileNetV
 python scripts/e49_robustness.py                 # E49: crop/flip/JPEG/rescale invariance, manifest-edit sensitivity (ccby val) -> reports/e49_robustness.json
 python scripts/e50_aesthetic_vs_content.py       # E50: neighbour attribute coherence, rendering/content/provenance R^2  -> reports/e50_aesthetic_vs_content.json
 python scripts/e51_source_vicreg.py              # E51: source-centred VICReg (treatment variance only), three seeds       -> reports/e51_source_vicreg.json
+python scripts/train_style_student.py ... --aug-degrade 0.5                            # E52: half the crops re-encoded (JPEG q40-70 / 0.5x rescale)
+python scripts/e52_degrade_augmentation.py       # E52: three degrade-augmented seeds through the E49 protocol + the matrix -> reports/e52_degrade_augmentation.json
 ```
 E49 reads the commoncatalog_ccby validation split (never a training input); the others read the analysis halves only.
 `checkpoints/student_imagenet_init` is the untrained control exported by E48 (ImageNet backbone, random heads).

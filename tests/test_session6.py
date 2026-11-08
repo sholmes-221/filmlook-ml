@@ -49,6 +49,14 @@ def test_onehots_one_column_per_level():
     X = onehots([np.array(["a", "b", "a"]), np.array(["x", "x", "y"])]); assert X.shape == (3, 4) and np.allclose(X.sum(1), 2)
 
 
-def test_trainer_exposes_pooled_vicreg_options():
+def test_trainer_exposes_pooled_vicreg_and_degrade_options():
     src = (ROOT / "scripts" / "train_style_student.py").read_text()
-    assert '"--vic-pooled"' in src and '"--vic-mode"' in src and 'choices=["batch", "source"]' in src and "vic_src" in src
+    assert '"--vic-pooled"' in src and '"--vic-mode"' in src and 'choices=["batch", "source"]' in src and "vic_src" in src and '"--aug-degrade"' in src
+
+
+def test_degrade_reencodes_only_a_share_of_the_crops():
+    from train_style_student import degrade
+    rng = np.random.default_rng(0); xb = rng.integers(0, 256, (40, 224, 224, 3), dtype=np.uint8)
+    out = degrade(xb[:, :, ::-1], rng, 0.5); assert out.shape == xb.shape and out.dtype == np.uint8 and out.flags["C_CONTIGUOUS"]
+    changed = np.array([not np.array_equal(out[i], xb[i, :, ::-1]) for i in range(40)]); assert 8 <= changed.sum() <= 32
+    assert np.array_equal(degrade(xb, rng, 0.0), xb)

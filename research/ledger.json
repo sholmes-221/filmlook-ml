@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 6482.420165452957,
- "disk_bytes": 549950819,
+ "gpu_seconds": 6723.583366308212,
+ "disk_bytes": 563149304,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -407,6 +407,14 @@
    "gpu": true,
    "disk_bytes": 13198410,
    "peak_gpu_mb_total": 7441.0,
+   "returncode": 0
+  },
+  {
+   "id": "E52_degrade_augmentation",
+   "wall_seconds": 241.2,
+   "gpu": true,
+   "disk_bytes": 13198485,
+   "peak_gpu_mb_total": 7647.0,
    "returncode": 0
   }
  ],

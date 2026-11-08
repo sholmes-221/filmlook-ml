@@ -1715,3 +1715,71 @@ experiments:
     rank control on the pooled layer is closed in this architecture and the teacher-distilled E43 student stays the baseline'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E52_degrade_augmentation
+  hypothesis: 're-encoding half of the training crops (JPEG q40-70 or 0.5x rescale and back, --aug-degrade 0.5) makes the
+    teacher-distilled student''s pooled PCA-64 robust to re-encoded uploads without dulling its edit sensitivity or its real
+    signal: for each of three seeds, own-image rank-1 on the commoncatalog_ccby validation originals is >= 0.9 under centre
+    crop, flip, JPEG q50 and rescale, edit-type p@5 is within 0.03 of the E49 reference seed-mean (>= 0.436), an edited image
+    retrieves its original at most half the time, and on the analysis halves the PCA-64 keeps effective rank >= 8, own-source
+    rank-1 <= 0.45, museum p@5 lower CI above chance and within-uploader different-day AUC lower CI above 0.5'
+  motivation: 'E49 measured the one product-relevant weakness of the candidate: JPEG q50 and 0.5x rescale lose the nearest
+    neighbour 5-11 % of the time (one seed 11.5 %). The risk of the fix is that re-encoding during training removes the grain
+    and micro-contrast cues the representation needs (the explicit statistics lose 55 % of their neighbours under rescale),
+    which the edit-type and real-matrix readings guard.'
+  value: 4
+  gpu_minutes: 5
+  gpu_mb: 6000
+  cpu_minutes: 10
+  disk_gb: 0.02
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e52_degrade_augmentation.py: the E49 robustness protocol (three new seeds) and the real-photograph matrix;
+    summary.supported'
+  confounders:
+  - the augmentation also changes the synthetic treated/family targets'' difficulty (grain treatments become harder to see)
+  - the validation originals are 113 images; a 0.9 bound is 11 images
+  falsified_if: 'summary.supported == 0: a seed still loses more than 10 % of its neighbours under one of the four perturbations,
+    loses more than 0.03 edit-type p@5, lets content in, or fails a real lower CI'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e52_degrade_augmentation.py
+  result_json: reports/e52_degrade_augmentation.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    min_invariant_rank1:
+      path: summary.min_invariant_rank1
+      kind: real
+    jpeg50_rank1_mean:
+      path: summary.jpeg50_rank1_mean
+      kind: real
+    rescale0.5_rank1_mean:
+      path: summary.rescale0.5_rank1_mean
+      kind: real
+    edit_p5_mean:
+      path: summary.edit_p5_mean
+      kind: real
+    museum_mean:
+      path: summary.museum_mean
+      kind: real
+    within_auc_mean:
+      path: summary.within_auc_mean
+      kind: real
+    own_source_mean:
+      path: summary.own_source_mean
+      kind: proxy
+  next_step: 'supported: the degrade-augmented recipe replaces E23b as the reference recipe for the next fresh-holdout reading;
+    falsified: the robustness gap is recorded as a limitation and the recipe stays E23b'
+  status: supported
+  result: 'not falsified: supported=1.0000 >= 1'

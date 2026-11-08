@@ -803,9 +803,34 @@ students (`student_style_fs_v2_real_f576{,_s1,_s2}`) are the reference throughou
    from the 28 statistics 0.01-0.02, from provenance one-hots -0.03: not a linear function of either, so the rule's
    "rendering R^2 >= content R^2" passed on two numbers near zero and carries no weight; the coherence ratios do.
    Museum prints: colour 0.68-0.70, texture 0.82-0.84. `reports/e50_aesthetic_vs_content.json`.
-7. **Standing of the candidate.** No new candidate: every teacher-free rank control traded content, so the E43
-   teacher-distilled pooled PCA-64 remains the strongest lightweight representation (held-out reading E44, not
-   promoted). Nothing was read on a test half this session; the spent holdouts were not re-used.
+7. **Re-encoding half of the training crops closes the JPEG / rescale gap (E52, supported on three seeds).** The E23b
+   recipe with `--aug-degrade 0.5` (JPEG q40-70 or 0.5x rescale and back, applied to half of every batch's crops):
+   own-image rank-1 on the validation originals under JPEG q50 0.98-1.00 (reference 0.90-0.95), 0.5x rescale
+   0.99-1.00 (0.89-0.94), centre crop 0.96-0.99, flip 1.00, corner crop 0.84-0.88 (0.74-0.82); edit-type p@5 0.44-0.45
+   (reference seed-mean 0.466; bound 0.436), edited own-source rank-1 0.45-0.46 (0.41-0.42), film-emulation displacement
+   6.0-6.3x the centre crop (7.6-7.8x), fake grain 8.4-9.2x. Analysis-half matrix of the PCA-64: museum 0.490-0.511
+   (lower CIs 0.397-0.419 vs 0.358), within-uploader AUC 0.619-0.636, own-source 0.30-0.31, rank 8.75-8.98, synthetic
+   family 0.596-0.602 (reference 0.627), stock-line 0.088-0.102. The grain/edit sensitivity is slightly dulled, within
+   the pre-registered margins; the recipe is now the reference recipe for the next fresh-holdout reading. The ledger
+   lists `rescale0.5_rank1_mean` as missing because the dot in the key is read as a path separator; the value is in
+   the report (0.997). `reports/e52_degrade_augmentation.json`, `e52_robustness.json`.
+8. **Standing of the candidate.** The teacher-distilled pooled PCA-64 remains the strongest lightweight representation
+   (held-out reading E44 for the E23b seeds, not promoted); the degrade-augmented seeds (E52) are its robust variant,
+   read on the analysis halves and the validation split only. Every teacher-free rank control traded content. Nothing
+   was read on a test half this session; the spent holdouts were not re-used.
+
+### E52_degrade_augmentation — re-encoding half of the training crops (JPEG q40-70 or 0.5x rescale and back, --aug-degrade 0.5) makes the teacher-distilled student's pooled PCA-64 robust to re-encoded uploads without dulling its edit sensitivity or its real signal: for each of three seeds, own-image rank-1 on the commoncatalog_ccby validation originals is >= 0.9 under centre crop, flip, JPEG q50 and rescale, edit-type p@5 is within 0.03 of the E49 reference seed-mean (>= 0.436), an edited image retrieves its original at most half the time, and on the analysis halves the PCA-64 keeps effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance and within-uploader different-day AUC lower CI above 0.5
+- Status: done; wall 241.2 s; peak GPU 7647.0 MB (total on card).
+- supported [proxy]: 1.0
+- min_invariant_rank1 [real]: 0.9646
+- jpeg50_rank1_mean [real]: 0.9912
+- edit_p5_mean [real]: 0.4463
+- museum_mean [real]: 0.503
+- within_auc_mean [real]: 0.629
+- own_source_mean [proxy]: 0.3079
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: the degrade-augmented recipe replaces E23b as the reference recipe for the next fresh-holdout reading; falsified: the robustness gap is recorded as a limitation and the recipe stays E23b
 
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 

@@ -65,7 +65,7 @@ def student_embed(tag, arrays, output="features_576"):
     return np.concatenate(acc).astype(np.float32)
 
 
-def main():
+def main(REF=REF, name="E49_robustness", out_name="e49_robustness.json", refs=True):
     import torch
     t0 = time.time(); dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     man = [r for r in read_jsonl(P.DATA / "manifests" / "manifest.jsonl") if r.get("dataset_id") == "commoncatalog_ccby"]
@@ -85,13 +85,14 @@ def main():
     Fit = dict(np.load(FIT.with_suffix(".npz")))
     # embeddings of every array under every representation
     reps = {}
-    for tag in (*REF, INIT):
+    for tag in (*REF, *([INIT] if refs else [])):
         reps[f"{tag}:pca64"] = PCA64(fit_embed(tag, fit_paths))(student_embed(tag, arrays))
     with Pool(16) as pool:
         ex = np.stack(pool.map(X.explicit_of, [Image.fromarray(a) for a in arrays], chunksize=8))
     mu, sd = Fit["explicit"].mean(0), Fit["explicit"].std(0) + 1e-6; reps["explicit28_std"] = (ex - mu) / sd
-    dg, ds = X.Dino(dev)([Image.fromarray(a) for a in arrays]); reps["dino_global:pca64"] = PCA64(Fit["dino_global"])(dg); reps["dino_style:pca64"] = PCA64(Fit["dino_style"])(ds)
-    out = {"experiment": "E49_robustness", "validation_data_only": True, "n_originals": n0, "n_edits": ne, "media": {m: int((medium == m).sum()) for m in sorted(set(medium))}, "representations": {}}
+    if refs:
+        dg, ds = X.Dino(dev)([Image.fromarray(a) for a in arrays]); reps["dino_global:pca64"] = PCA64(Fit["dino_global"])(dg); reps["dino_style:pca64"] = PCA64(Fit["dino_style"])(ds)
+    out = {"experiment": name, "validation_data_only": True, "n_originals": n0, "n_edits": ne, "media": {m: int((medium == m).sum()) for m in sorted(set(medium))}, "representations": {}}
     for name, Z in reps.items():
         E = unit(np.nan_to_num(Z.astype(np.float32))); Eo = E[idx["orig"]]; r = {"invariance": {}, "displacement": {}}
         for k in PERTURB:
@@ -107,7 +108,7 @@ def main():
         out["representations"][name] = r
         print(f"{name:34s} crop80 {r['invariance']['crop80']['own_rank1']:.3f} flip {r['invariance']['flip']['own_rank1']:.3f} jpeg {r['invariance']['jpeg50']['own_rank1']:.3f} rescale {r['invariance']['rescale0.5']['own_rank1']:.3f} corner {r['invariance']['crop70_corner']['own_rank1']:.3f} | "
               f"edit p@5 {r['edit_type_p5']['precision@5']:.3f} ch {r['edit_type_p5']['chance']:.3f} | edited own-source {r['content']['edited_own_source_rank1']:.3f} | film_emulation disp x{r['displacement']['film_emulation']['relative_to_crop80']:.1f}", flush=True)
-    checks = {}
+    checks = {}; refs_rows = [n for n in (f"{INIT}:pca64", "dino_global:pca64", "dino_style:pca64", "explicit28_std") if n in reps]
     for tag in REF:
         r = out["representations"][f"{tag}:pca64"]
         checks[tag] = {"invariant_rank1_ge_0.9": min(r["invariance"][k]["own_rank1"] for k in INVARIANT) >= 0.9, "edit_p5_ge_0.25": r["edit_type_p5"]["precision@5"] >= 0.25, "edited_own_source_le_0.5": r["content"]["edited_own_source_rank1"] <= 0.5}
@@ -116,10 +117,10 @@ def main():
     out["summary"] = {"supported": int(ok), "seeds_passing": int(sum(all(c.values()) for c in checks.values())), "student_min_invariant_rank1": round(float(min(out["representations"][f"{t}:pca64"]["invariance"][k]["own_rank1"] for t in REF for k in INVARIANT)), 4),
                       "student_corner_rank1_mean": mean(lambda r: r["invariance"]["crop70_corner"]["own_rank1"]), "student_edit_p5_mean": mean(lambda r: r["edit_type_p5"]["precision@5"]), "edit_p5_chance": out["representations"][f"{REF[0]}:pca64"]["edit_type_p5"]["chance"],
                       "student_edited_own_source_mean": mean(lambda r: r["content"]["edited_own_source_rank1"]), "student_film_emulation_disp_rel_mean": mean(lambda r: r["displacement"]["film_emulation"]["relative_to_crop80"]),
-                      **{f"{n}_edit_p5": out["representations"][n]["edit_type_p5"]["precision@5"] for n in (f"{INIT}:pca64", "dino_global:pca64", "dino_style:pca64", "explicit28_std")},
-                      **{f"{n}_edited_own_source": out["representations"][n]["content"]["edited_own_source_rank1"] for n in (f"{INIT}:pca64", "dino_global:pca64", "dino_style:pca64", "explicit28_std")},
-                      **{f"{n}_crop80_rank1": out["representations"][n]["invariance"]["crop80"]["own_rank1"] for n in (f"{INIT}:pca64", "dino_global:pca64", "dino_style:pca64", "explicit28_std")}, "seconds": round(time.time() - t0, 1)}
-    (P.REPORTS / "e49_robustness.json").write_text(json.dumps(out, indent=1, default=str)); print(json.dumps(out["summary"]))
+                      **{f"{n}_edit_p5": out["representations"][n]["edit_type_p5"]["precision@5"] for n in refs_rows},
+                      **{f"{n}_edited_own_source": out["representations"][n]["content"]["edited_own_source_rank1"] for n in refs_rows},
+                      **{f"{n}_crop80_rank1": out["representations"][n]["invariance"]["crop80"]["own_rank1"] for n in refs_rows}, "seconds": round(time.time() - t0, 1)}
+    (P.REPORTS / out_name).write_text(json.dumps(out, indent=1, default=str)); print(json.dumps(out["summary"]))
 
 
 if __name__ == "__main__":

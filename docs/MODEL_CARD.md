@@ -85,7 +85,10 @@ retrieval (the student is best on synthetic and at the reference on real).
   over-sharpening and posterising. Neighbours share colour-tone statistics (0.65 of the random difference) more than
   texture statistics (0.85-0.87). A VICReg term on the pooled layer, or whitening its PCA components, raises every
   real metric and re-admits scene content (own-source 0.60-0.61); PCA truncation is the content filter, and 32
-  components (float or int8) keep the signal within 0.01 of 64. Claims 29-32 in `docs/FINDINGS.md`.
+  components (float or int8) keep the signal within 0.01 of 64. Re-encoding half of the training crops (E52,
+  `--aug-degrade 0.5`, `student_style_fs_v2_real_f576_deg{,_s1,_s2}`) lifts the JPEG q50 and 0.5x rescale readings
+  to 0.98-1.00 and the corner crop to 0.84-0.88 with edit-type p@5 0.45 (vs 0.47) and the real matrix unchanged; that
+  variant has analysis-half and validation readings only, no held-out reading. Claims 29-34 in `docs/FINDINGS.md`.
 
 ## Compute and cost
 Local RTX 4090 only; no paid API or cloud GPU at any point. Session budgets in `docs/RESOURCE_USAGE.md`.

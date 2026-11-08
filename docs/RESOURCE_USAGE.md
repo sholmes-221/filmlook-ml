@@ -61,13 +61,13 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
   (< 30 MB), reports < 5 MB. `checkpoints` 299 MB, `data/embeddings` 316 MB in total. Nothing deleted.
 - Network: none (no acquisition this session; the Commons retry stays with the orchestrator's backoff).
 
-## Session 6 (2026-11-08, lightweight extractor E46-E51)
+## Session 6 (2026-11-08, lightweight extractor E46-E52)
 - GPU: E46 trained five MobileNetV3-Small students (311 s wall, peak 7.5 GB on the card including the 5.7 GB other job;
-  the no-teacher runs skip the DINOv2 pass) and E51 three (224 s); E49 ran DINOv2-Small on 1,582 validation images
+  the no-teacher runs skip the DINOv2 pass) E51 three (224 s) and E52 three more with the re-encoding augmentation (241 s); E49 ran DINOv2-Small on 1,582 validation images
   (36 s, peak 7.4 GB); E47, E48 and E50 ran on cached features (7-27 s, CPU; E48 also timed DINOv2-Small on one CPU
-  thread). Session total about 10 GPU-minutes; ledger total across sessions 6,480 GPU-seconds (108 minutes) of the
+  thread). Session total about 14 GPU-minutes; ledger total across sessions 6,726 GPU-seconds (112 minutes) of the
   4-hour-per-session budget.
-- Disk: nine student checkpoints (40 MB) plus the untrained ImageNet control export (4.4 MB), feature caches
+- Disk: twelve student checkpoints (53 MB) plus the untrained ImageNet control export (4.4 MB), feature caches
   `student_matrix_*` and `student_fit_*` (< 40 MB), reports < 3 MB. `checkpoints` 370 MB, `data/embeddings` 348 MB in
   total. Nothing deleted.
 - Network: none (no acquisition this session; the Commons retry stays with the orchestrator's backoff; the HF model
