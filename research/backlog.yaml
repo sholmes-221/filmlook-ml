@@ -933,15 +933,14 @@ experiments:
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
 - id: E39_seed_robustness
-  hypothesis: 'the anti-collapse (SupCon + VICReg lambda 3) distillation target gives the real-distilled student a
-    seed-robust real-photograph gain: over three seeds every vic3 student has a museum p@5 lower CI above chance and a
-    within-uploader different-day AUC lower CI above 0.5, the vic3 seed-mean museum p@5 exceeds the baseline recipe''s
-    seed-mean by >= 0.03, the stock-line seed-mean is within 0.01 of the baseline''s, every seed keeps synthetic family p@5
-    within 0.10 and the scanner probe within 0.05 of the baseline seed-means, and the seed-mean effective rank is >= 5'
-  motivation: 'E38 fell on stock-line p@5 (0.084 vs the 0.087 bound) and effective rank (5.9 < 8) while the seed control
-    moved stock-line p@5 by 0.021; the vic3 student was the first raw student with a museum lower CI above chance and the
-    best within-uploader AUC (0.718). Thresholds here were set after E38 (stated in the script); the E38 rank threshold
-    stays on record as failed.'
+  hypothesis: 'the anti-collapse (SupCon + VICReg lambda 3) distillation target gives the real-distilled student a seed-robust
+    real-photograph gain: over three seeds every vic3 student has a museum p@5 lower CI above chance and a within-uploader
+    different-day AUC lower CI above 0.5, the vic3 seed-mean museum p@5 exceeds the baseline recipe''s seed-mean by >= 0.03,
+    the stock-line seed-mean is within 0.01 of the baseline''s, every seed keeps synthetic family p@5 within 0.10 and the
+    scanner probe within 0.05 of the baseline seed-means, and the seed-mean effective rank is >= 5'
+  motivation: E38 fell on stock-line p@5 (0.084 vs the 0.087 bound) and effective rank (5.9 < 8) while the seed control moved
+    stock-line p@5 by 0.021; the vic3 student was the first raw student with a museum lower CI above chance and the best within-uploader
+    AUC (0.718). Thresholds here were set after E38 (stated in the script); the E38 rank threshold stays on record as failed.
   value: 5
   gpu_minutes: 10
   gpu_mb: 6000
@@ -960,7 +959,8 @@ experiments:
   - artist share rises with the vic3 target (E38: 0.057 -> 0.126), which claim 25 says is inseparable from the gain
   - thresholds set after E38
   falsified_if: 'summary.supported == 0: any vic3 seed fails a lower CI, the museum gain is below 0.03, stock-line falls by
-    more than 0.01, a seed pays more than 0.10 synthetic family p@5 or exceeds the scanner guard, or the rank stays below 5'
+    more than 0.01, a seed pays more than 0.10 synthetic family p@5 or exceeds the scanner guard, or the rank stays below
+    5'
   falsify:
     metric: supported
     below: 1
@@ -994,7 +994,60 @@ experiments:
       path: summary.vic_eff_rank_mean
       kind: proxy
   next_step: 'supported: the seed-0 vic3 student is the promotion candidate for one final held-out evaluation (commoncatalog_film
-    and aic_photographs test halves, benchmark v1 test, BlueNeg) at the end of the session, with the artist-share rise
-    recorded as a known property; falsified: the gain is seed noise or costs too much, the student stays unpromoted and the
-    real matrix needs more photographers'
-  status: pending
+    and aic_photographs test halves, benchmark v1 test, BlueNeg) at the end of the session, with the artist-share rise recorded
+    as a known property; falsified: the gain is seed noise or costs too much, the student stays unpromoted and the real matrix
+    needs more photographers'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E40_head_content_leakage
+  hypothesis: 'the real-photograph gains of the non-collapsed heads are bought with scene content: every head whose commoncatalog_film
+    stock-line p@5 exceeds the SupCon projection''s by >= 0.02 has an own-source rank-1 (treated filmsynth validation image
+    retrieving its own untreated source among 15 sources; chance 0.067) of at least 0.5, while the projection''s own-source
+    rank-1 is at most 0.25'
+  motivation: 'E38/E39 trainer reports: own-source rank-1 of the kd head is 0.16-0.18 for the baseline students, 0.25-0.29
+    with the VICReg target and 0.76 with the label-free whitened target, in step with their real-matrix gains and their artist
+    share. If the frozen heads show the same, claim 25 (film signal and photographer identity share directions) resolves into:
+    the shared factor is scene content, and the family projection is content-invariant because it is collapsed.'
+  value: 4
+  gpu_minutes: 0
+  gpu_mb: 500
+  cpu_minutes: 3
+  disk_gb: 0.01
+  datasets:
+  - bench_features_v1
+  - commoncatalog_film
+  - aic_photographs
+  - commoncatalog_ccby
+  metric: 'scripts/head_content_leakage.py: own-source rank-1 on the filmsynth validation split next to stock-line p@5 and
+    museum p@5 for 15 heads; summary.supported'
+  confounders:
+  - 15 validation sources only (rank-1 chance 0.067); the number is coarse
+  - the synthetic treatments are a proxy for real film treatment
+  falsified_if: 'summary.supported == 0: a gaining head keeps own-source rank-1 below 0.5 (its gain is not content), or the
+    projection itself is content-dominated'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/head_content_leakage.py
+  result_json: reports/head_content_leakage.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    projection_rank1:
+      path: summary.projection_rank1
+      kind: proxy
+    n_gaining:
+      path: summary.n_gaining
+      kind: proxy
+    n_gaining_content_dominated:
+      path: summary.n_gaining_content_dominated
+      kind: proxy
+  next_step: 'supported: own-source rank-1 joins the real matrix as a mandatory guard and the next target must raise rank
+    without content (continuous treatment-parameter targets, more treatment families, or augmentation positives on real sources);
+    falsified: a non-collapsed, content-invariant head exists among the gainers and becomes the student target'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

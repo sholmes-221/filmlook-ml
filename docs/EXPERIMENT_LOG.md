@@ -530,6 +530,56 @@ same signals at an acceptable synthetic cost; its result is recorded below.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: the vic3 student becomes the promotion candidate; one final evaluation on the held-out halves and the synthetic benchmark test at the end of the session, latency check, model card update; falsified: record which signal was lost; if the seed control moves the real metrics as much as the target change, the real matrix needs more photographers before any student decision
 
+### E39_seed_robustness — the anti-collapse (SupCon + VICReg lambda 3) distillation target gives the real-distilled student a seed-robust real-photograph gain: over three seeds every vic3 student has a museum p@5 lower CI above chance and a within-uploader different-day AUC lower CI above 0.5, the vic3 seed-mean museum p@5 exceeds the baseline recipe's seed-mean by >= 0.03, the stock-line seed-mean is within 0.01 of the baseline's, every seed keeps synthetic family p@5 within 0.10 and the scanner probe within 0.05 of the baseline seed-means, and the seed-mean effective rank is >= 5
+- Status: done; wall 187.7 s; peak GPU 7665.0 MB (total on card).
+- supported [proxy]: 0.0
+- vic_museum_mean [real]: 0.4572
+- baseline_museum_mean [real]: 0.4189
+- vic_stock_line_mean [real]: 0.0877
+- vic_within_auc_mean [real]: 0.6915
+- vic_synth_mean [proxy]: 0.6502
+- vic_eff_rank_mean [proxy]: 5.35
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the seed-0 vic3 student is the promotion candidate for one final held-out evaluation (commoncatalog_film and aic_photographs test halves, benchmark v1 test, BlueNeg) at the end of the session, with the artist-share rise recorded as a known property; falsified: the gain is seed noise or costs too much, the student stays unpromoted and the real matrix needs more photographers
+
+### E40_head_content_leakage — the real-photograph gains of the non-collapsed heads are bought with scene content: every head whose commoncatalog_film stock-line p@5 exceeds the SupCon projection's by >= 0.02 has an own-source rank-1 (treated filmsynth validation image retrieving its own untreated source among 15 sources; chance 0.067) of at least 0.5, while the projection's own-source rank-1 is at most 0.25
+- Status: done; wall 8.7 s; peak GPU 6295.0 MB (total on card).
+- supported [proxy]: 0.0
+- projection_rank1 [proxy]: 0.2952
+- n_gaining [proxy]: 7.0
+- n_gaining_content_dominated [proxy]: 6.0
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: own-source rank-1 joins the real matrix as a mandatory guard and the next target must raise rank without content (continuous treatment-parameter targets, more treatment families, or augmentation positives on real sources); falsified: a non-collapsed, content-invariant head exists among the gainers and becomes the student target
+
+### Session 5 synthesis, part 2 (E38-E40): a non-collapsed target helps the student, but the help is scene content
+
+5. **E38 (falsified on two sub-rules) and E39 (falsified on one seed).** Retraining the real-distilled student with the
+   E23b recipe from the SupCon + VICReg (lambda 3) target (`--kd-target supcon_vic3`) raises its effective rank from
+   3.2 to 5.0-5.9 and, over three seeds, museum p@5 from 0.419 to 0.457 (seed SDs 0.009 / 0.017; lower CI above chance
+   for seeds 0 and 2, 0.004 below for seed 1), within-uploader stock AUC from 0.660 to 0.692, with no synthetic-family
+   cost (0.638 -> 0.650) and a lower scanner probe; stock-line p@5 is unchanged within seed noise (0.084 vs 0.088; the
+   seed control alone moved it by 0.021). The artist share doubles (0.058 -> 0.133). The label-free whitened target
+   (`pcaw64`) gives the largest real numbers (museum 0.540, stock-line 0.113 [0.088, 0.143]) and the largest costs
+   (synthetic family 0.387, artist share 0.183). Reports `reports/e38_student_targets.json`, `e39_seed_robustness.json`.
+6. **The trainer's content-invariance test explains the pattern (E38/E39 reports; E40).** Own-source rank-1 of the
+   64-d kd head (a treated synthetic image retrieving its own untreated source among 15; chance 0.067) is 0.16-0.18 for
+   the baseline students, 0.25-0.29 for the vic3 students and 0.76 for the pcaw student. On the frozen features (E40,
+   `reports/head_content_leakage.json`) every head that gains >= 0.02 stock-line p@5 over the projection is content-
+   dominated: raw L4+L8 1.00, standardised 0.98, whitened PCA 0.92-0.97, VICReg heads 0.71-0.72, explicit statistics
+   0.72 (colour-tone alone 0.41); the projection reads 0.30 and the synthetic-only student 0.10. E40's rule was
+   falsified only because the projection's own rank-1 is 0.30 rather than the pre-registered 0.25 and because that
+   collapsed student also crossed the gain bound.
+
+Reading across E32-E40: the "real-photograph signals" that come with higher rank (museum process under decade
+matching, cross-photographer stock line, same-photographer retrieval) are carried to a large extent by scene content;
+the family SupCon projection and the students distilled from it are content-invariant *because* they are collapsed onto
+a few treatment directions. The one head that keeps content out and still separates stocks within a photographer is
+the collapsed one. A target that raises rank with treatment rather than content (continuous treatment parameters,
+more treatment families, or same-source treatment positives on real photographs) is the open hypothesis; own-source
+rank-1 now sits in the real matrix as a mandatory guard. No student was promoted and no held-out half was spent.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

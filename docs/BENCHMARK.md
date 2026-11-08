@@ -118,3 +118,4 @@ uploader different-day stock AUC (and its colour-only reading) against a within-
 family p@5 on the filmsynth validation split (the cost of a real-data gain), and the effective rank of the embedding
 (collapse diagnostic; the current students are at 2-3 of 64). A candidate is judged on pre-registered thresholds over
 this matrix (see E38 in `research/backlog.yaml`); the test halves and BlueNeg stay reserved for one final evaluation.
+After E40 (same day) own-source rank-1 on the filmsynth validation split (content leakage; chance 0.067) is a mandatory column of that matrix: a real-metric gain that comes with own-source rank-1 above 0.5 is read as scene content, not film look.

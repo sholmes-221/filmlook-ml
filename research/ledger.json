@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 5322.033084068298,
- "disk_bytes": 475160908,
+ "gpu_seconds": 5509.734495315552,
+ "disk_bytes": 488359059,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -303,6 +303,22 @@
    "gpu": true,
    "disk_bytes": 13198140,
    "peak_gpu_mb_total": 7647.0,
+   "returncode": 0
+  },
+  {
+   "id": "E39_seed_robustness",
+   "wall_seconds": 187.7,
+   "gpu": true,
+   "disk_bytes": 13198151,
+   "peak_gpu_mb_total": 7665.0,
+   "returncode": 0
+  },
+  {
+   "id": "E40_head_content_leakage",
+   "wall_seconds": 8.7,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6295.0,
    "returncode": 0
   }
  ],

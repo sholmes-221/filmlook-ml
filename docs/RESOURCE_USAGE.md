@@ -53,7 +53,7 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
 ## Session 5 (2026-11-08, E29 investigation E32-E39)
 - GPU: E32-E37 ran on cached features (CPU, 6-81 s each; the tiny SupCon heads train on the card in seconds). E38 trained
   three MobileNetV3-Small students (186 s wall, peak 7.6 GB on the card including the 5.7 GB other job) and E39 three
-  more (same recipe); two frozen-teacher feature passes over the 601 CC-BY training originals (about 60 s each). Session
+  more (188 s); E40 ran on cached features (8 s); two frozen-teacher feature passes over the 601 CC-BY training originals (about 60 s each). Session
   total about 8 GPU-minutes, all metered through the research loop; ledger total across sessions 5,322 GPU-seconds
   (89 minutes) of the 4-hour-per-session budget.
 - Disk: six student checkpoints (26 MB), feature caches `ccby_train_originals_features_v1` and `student_matrix_*`
