@@ -65,6 +65,19 @@ python scripts/train_style_student.py ... --kd-target {supcon,supcon_vic3,pcaw64
 ```
 Every script above writes `analysis_data_only: true`; none reads a test half or BlueNeg.
 
+### Session 6 scripts (lightweight extractor: teacher-free training, reductions, frozen baselines, robustness, look vs content)
+```bash
+python scripts/train_style_student.py ... --kd 0 --vic-pooled 1 [--vic-mode source]   # E46/E51: no teacher (DINOv2 pass skipped), VICReg on the pooled layer
+python scripts/e46_pooled_vicreg.py              # E46: three VICReg + three plain no-teacher seeds vs the E43 reference  -> reports/e46_pooled_vicreg.json
+python scripts/e47_pooled_reductions.py          # E47: PCA 8-128, whitening, random projection, int8 on the pooled layer -> reports/e47_pooled_reductions.json
+python scripts/e48_frozen_vs_trained.py          # E48: ImageNet-init MobileNetV3, frozen DINOv2, explicit 28, with CPU cost -> reports/e48_frozen_vs_trained.json
+python scripts/e49_robustness.py                 # E49: crop/flip/JPEG/rescale invariance, manifest-edit sensitivity (ccby val) -> reports/e49_robustness.json
+python scripts/e50_aesthetic_vs_content.py       # E50: neighbour attribute coherence, rendering/content/provenance R^2  -> reports/e50_aesthetic_vs_content.json
+python scripts/e51_source_vicreg.py              # E51: source-centred VICReg (treatment variance only), three seeds       -> reports/e51_source_vicreg.json
+```
+E49 reads the commoncatalog_ccby validation split (never a training input); the others read the analysis halves only.
+`checkpoints/student_imagenet_init` is the untrained control exported by E48 (ImageNet backbone, random heads).
+
 ## Data pipeline
 
 `research/downloader.py` is the resumable, rate-limit-aware downloader. Per-file state lives in an append-only

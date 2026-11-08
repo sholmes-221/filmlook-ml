@@ -74,6 +74,18 @@ retrieval (the student is best on synthetic and at the reference on real).
   same-stock 0.191 [0.126, 0.263] vs 0.117 (teacher 0.248), benchmark B 0.589, own-source rank-1 0.32, effective rank
   9.0; its within-uploader stock AUC lower CI (0.452) missed the pre-registered bound, as every comparator's did on that
   half. `reports/final_holdout_e44.json`.
+- What the training buys, and what it does not (session 6, E46-E50, analysis halves and the CC-BY validation split):
+  the untrained ImageNet MobileNetV3-Small pooled layer with the same PCA-64 reaches the same museum process p@5
+  (0.528 vs 0.515) but is content-dominated (own-source rank-1 0.93 vs 0.26-0.30) and separates stocks within a
+  photographer only at 0.55 (trained 0.63-0.67); museum p@5 is reached by every representation down to 28
+  deterministic statistics (0.594) and must not be read as evidence for the student on its own. The pooled PCA-64
+  keeps its nearest neighbour under an 80 % centre crop and a flip (0.96-1.00) but loses it under JPEG q50 and 0.5x
+  rescale 5-11 % of the time and under a 70 % corner crop 18-26 % of the time; an edit from an unseen edit pipeline
+  moves the embedding 7-10 times as far as a crop for film and monochrome emulations and 0.3-0.5 times for
+  over-sharpening and posterising. Neighbours share colour-tone statistics (0.65 of the random difference) more than
+  texture statistics (0.85-0.87). A VICReg term on the pooled layer, or whitening its PCA components, raises every
+  real metric and re-admits scene content (own-source 0.60-0.61); PCA truncation is the content filter, and 32
+  components (float or int8) keep the signal within 0.01 of 64. Claims 29-32 in `docs/FINDINGS.md`.
 
 ## Compute and cost
 Local RTX 4090 only; no paid API or cloud GPU at any point. Session budgets in `docs/RESOURCE_USAGE.md`.

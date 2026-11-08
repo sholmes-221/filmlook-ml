@@ -1650,17 +1650,16 @@ experiments:
   status: supported
   result: 'not falsified: supported=1.0000 >= 1'
 - id: E51_source_vicreg
-  hypothesis: 'the rank/content trade-off of E46 can be broken by expanding treatment variance only: a VICReg term on the pooled
-    layer computed on features centred on their synthetic source''s in-batch mean (--vic-mode source, batches led by 12
-    sources x 4 rows, --kd 0, weight 1) gives, for each of three seeds, a PCA-64 with effective rank >= 8, own-source rank-1
-    <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5 and synthetic family
-    p@5 within 0.10 of the E43 reference seed-mean, with the seed-mean museum p@5 not more than 0.02 below the plain
-    no-teacher seed-mean'
+  hypothesis: 'the rank/content trade-off of E46 can be broken by expanding treatment variance only: a VICReg term on the
+    pooled layer computed on features centred on their synthetic source''s in-batch mean (--vic-mode source, batches led by
+    12 sources x 4 rows, --kd 0, weight 1) gives, for each of three seeds, a PCA-64 with effective rank >= 8, own-source rank-1
+    <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5 and synthetic family p@5
+    within 0.10 of the E43 reference seed-mean, with the seed-mean museum p@5 not more than 0.02 below the plain no-teacher
+    seed-mean'
   motivation: 'E46 raised the rank to 22 and the real metrics (museum 0.52, within AUC 0.66) but own-source rank-1 rose from
-    0.28 to 0.61: the batch-wise variance term expands between-photograph (content) directions as readily as treatment
-    directions. Centring on the source removes the content component from the regulariser; if the rank still rises
-    without content, the pooled layer gets a teacher-free rank control; if not, rank and content are not separable in
-    this architecture either.'
+    0.28 to 0.61: the batch-wise variance term expands between-photograph (content) directions as readily as treatment directions.
+    Centring on the source removes the content component from the regulariser; if the rank still rises without content, the
+    pooled layer gets a teacher-free rank control; if not, rank and content are not separable in this architecture either.'
   value: 5
   gpu_minutes: 5
   gpu_mb: 6000
@@ -1672,13 +1671,14 @@ experiments:
   - aic_photographs
   - commoncatalog_film
   - bench_features_v1
-  metric: 'scripts/e51_source_vicreg.py: real-photograph matrix (pooled 576-d and PCA-64) for three source-centred VICReg seeds
-    next to the E46 no-teacher seeds and the E43 reference; summary.supported'
+  metric: 'scripts/e51_source_vicreg.py: real-photograph matrix (pooled 576-d and PCA-64) for three source-centred VICReg
+    seeds next to the E46 no-teacher seeds and the E43 reference; summary.supported'
   confounders:
-  - the batch composition changes with the mode (48 grouped synthetic rows + 16 random rows), which alters the other losses' sampling
+  - the batch composition changes with the mode (48 grouped synthetic rows + 16 random rows), which alters the other losses'
+    sampling
   - the within-source variance is small, so the hinge at 1 rescales the layer strongly
-  falsified_if: 'summary.supported == 0: a seed fails rank, content, a lower CI or the synthetic margin, or the seed-mean museum
-    p@5 falls more than 0.02 below the plain no-teacher seed-mean'
+  falsified_if: 'summary.supported == 0: a seed fails rank, content, a lower CI or the synthetic margin, or the seed-mean
+    museum p@5 falls more than 0.02 below the plain no-teacher seed-mean'
   falsify:
     metric: supported
     below: 1
@@ -1713,4 +1713,5 @@ experiments:
       kind: proxy
   next_step: 'supported: the source-centred VICReg student is the teacher-free candidate for the next fresh holdout; falsified:
     rank control on the pooled layer is closed in this architecture and the teacher-distilled E43 student stays the baseline'
-  status: pending
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

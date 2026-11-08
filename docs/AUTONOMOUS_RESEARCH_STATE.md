@@ -3,95 +3,102 @@
 Resume from this file, `docs/RESEARCH_BACKLOG.md` (rendered from `research/backlog.yaml`), `research/registry.jsonl`,
 `research/ledger.json`, and the live pipeline state (`python -m research.orchestrator status`,
 `cat reports/orchestrator/loop_state.json`). Conversation context is not the record. Validated claims with their
-evidence are in `docs/FINDINGS.md` (claims 1-28); the research model card is `docs/MODEL_CARD.md`; the selection
+evidence are in `docs/FINDINGS.md` (claims 1-33); the research model card is `docs/MODEL_CARD.md`; the selection
 instrument is `docs/BENCHMARK.md`; pipelines, commands and recovery are in `docs/PIPELINES.md`; data sources in
 `docs/REAL_FILM_DATASETS.md` and `docs/CURATED_PHOTOGRAPHY_SOURCES.md`; the per-experiment record with the session
 syntheses is `docs/EXPERIMENT_LOG.md`.
 
-Last updated: 2026-11-08 09:00 (session 5; the 20-hour orchestrator loop PID 335761 runs until 2026-11-08 17:47:57).
+Last updated: 2026-11-08 14:40 (session 6; the 20-hour orchestrator loop PID 335761 runs until 2026-11-08 17:47:57).
 
 ## Current objective
-A lightweight, scientifically defensible film-aesthetic representation that transfers to real photographs
-(DINOv2-Small research teacher, MobileNetV3-Small students for deployment): explainable attributes, cross-photo
-"similar look" retrieval, badge attributes. Film authenticity is a separate task with the EXIF student as its unchanged
-baseline. Session 5 answered the E29 question (what the teacher learned, why the students lost it) and found the first
-student representation with a held-out gain; nothing is promoted or deployed.
+A lightweight, reliable photography-style feature extractor for the Xiaohongshu Mini Tool: real-world generalisation,
+compact size, fast inference, meaningful style representations, over synthetic benchmark scores (owner's session-6
+brief). Film authenticity is a separate task with the EXIF student as its unchanged baseline. Session 6 judged the
+session-5 candidate on what the product needs (reductions, no-training control, robustness, look-vs-content) and
+closed the teacher-free rank-control line. Nothing is promoted or deployed.
 
 ## Hardware and budget
-RTX 4090 24 GB shared (another job holds ~5.7 GB); 32 cores; 61 GB RAM. Session 5: about 13 GPU-minutes (eleven
-student retrains at ~1 minute each, two feature passes, the rest on cached features); ledger total 96 metered
-GPU-minutes and 0.5 GB charged across all sessions (`docs/RESOURCE_USAGE.md`). Nothing paid.
+RTX 4090 24 GB shared (another job holds ~5.7 GB); 32 cores; 61 GB RAM. Session 6: about 10 GPU-minutes (eight
+student retrains at ~40-60 s each, one DINOv2 pass over 1,582 images, the rest on cached features); ledger total 108
+metered GPU-minutes and 0.5 GB charged across all sessions (`docs/RESOURCE_USAGE.md`). Nothing paid.
 
-## Best verified models (all proxies; no human labels anywhere)
-| task | model | number to quote | source |
-|---|---|---|---|
-| film authenticity (EXIF labels) | `checkpoints/student_sup` capture head | within-source AUROC 0.78 [0.69, 0.88], ECE 0.20 | `reports/film_authenticity_eval.json` |
-| film-aesthetics attributes | v1 measured-statistics model `checkpoints/best`; deterministic attributes in `filmlook_infer` | shipped; edit orderings 0.994 | `REPORT.md` |
-| cross-photo similar look, research teacher | hybrid (explicit + DINOv2 L4+L8) + family SupCon | BlueNeg same-stock p@5 0.25 [0.16, 0.31] (chance 0.12); museum process (test half, decade matched) 0.535 vs 0.448; cross-photographer stock at chance | `reports/style_benchmark_test.json`, `reports/final_holdout_e44.json` |
-| abstention | top-1 cosine, answer the 50 % most confident | BlueNeg rank-1 0.22 -> 0.37 at 50 % coverage | `reports/abstention_test.json` |
-| lightweight research candidate (session 5, **not promoted**) | PCA-64 of the pooled 576-d features of `student_style_fs_v2_real_f576` (PCA fitted on CC-BY train originals) | held-out: museum 0.593 [0.504, 0.683] vs 0.448; stock-line 0.103 vs 0.077; BlueNeg 0.191 [0.126, 0.263]; B 0.589; own-source rank-1 0.32; rank 9.0; within-uploader AUC lower CI 0.452 (rule failed) | `reports/final_holdout_e44.json`, `e43_penultimate_pca.json` |
-| lightweight student, shipped research baseline | `student_style_fs_v2` 64-d head (4.4 MB, 1.2 ms) | best on synthetic; BlueNeg 0.18; collapsed (rank 3) | `style_benchmark_test.json` |
+## Strongest lightweight representation (research; not promoted, not deployed)
+PCA-64 (or PCA-32, float or int8) of the pooled 576-d features of the teacher-distilled students
+`student_style_fs_v2_real_f576{,_s1,_s2}` (E23b recipe, seeds 0-2), PCA fitted on the 601 CC-BY train originals.
+MobileNetV3-Small, 4.4 MB fp32 ONNX, 1.3 ms per image on one CPU thread at 224 px; the PCA is a 576x64 matrix.
 
-## What session 5 established (E32-E44; details in `docs/EXPERIMENT_LOG.md`, claims 23-28)
-- E29's teacher signal is print rendering, inflated by format: with stereo cards removed and the decade matched the
-  teacher stays above chance (0.483 [0.401, 0.560] vs 0.358); colour-tone and the raw L4+L8 statistics carry more of it
-  than the family projection.
-- The family SupCon projection is collapsed (effective rank ~4) and the students inherit it (rank 2-3, mean cosine
-  0.6-0.8 on monochrome prints); whitening restores their museum signal. That is why the real-distilled students
-  "lost" E29: a collapsed target reproduced faithfully.
-- On frozen DINOv2-Small statistics, every head that keeps real-photograph information lets scene content in
-  (own-source rank-1 0.7-1.0) and clusters by photographer; collapse controls, photographer-subspace removal,
-  independent whitening and treatment-parameter supervision all trade the same way (E33-E36, E40, E41). The content-
-  invariant embeddings are the collapsed ones.
-- Within a photographer, stock lines are separable (AUC 0.640 [0.563, 0.734] vs a permutation null of 0.45-0.55),
-  mostly through the monochrome-vs-colour cue; colour-only is underpowered (p = 0.06).
-- A non-collapsed distillation target (SupCon + VICReg) gives the student a small, seed-consistent museum gain with no
-  synthetic cost, but one seed misses chance by 0.004 and artist share doubles (E38/E39, falsified).
-- The end-to-end student's 576-d pooled layer is the first representation with rank > 8, own-source rank-1 < 0.45 and
-  museum lower CIs above chance on three seeds; a label-free PCA-64 keeps it (E42/E43 supported). Its one held-out
-  reading confirms the museum gain and no cost on B or BlueNeg, but the within-uploader AUC lower CI failed the
-  pre-registered rule, as it did for every comparator on that half (E44 falsified; not promoted).
-- The pooled-layer signal is the same without the teacher term (E45: `--kd 0` pooled museum 0.494 vs 0.517, PCA-64
-  rank 7.99 vs the 8 the rule asked, own-source 0.24): the teacher's contribution lands in the collapsed head only.
-- Infrastructure: `scripts/student_real_matrix.py` (the real-photograph matrix with own-source rank-1 and effective
-  rank), `scripts/features_for_manifest.py`, `--kd-target` in the trainer and the 576-d export, nine helper tests
-  (208 tests pass), all experiments pre-registered and recorded through the research loop.
+| reading | value | where |
+|---|---|---|
+| museum process p@5, held-out half (one reading, E44) | 0.593 [0.504, 0.683] vs chance 0.448 | `reports/final_holdout_e44.json` |
+| BlueNeg same-stock p@5, held-out (E44) | 0.191 [0.126, 0.263] vs 0.117 (teacher 0.248) | same |
+| within-uploader stock AUC, held-out (E44) | 0.582 [0.452, 0.713] (rule failed; under-powered half) | same |
+| analysis halves, three seeds (E43/E47) | museum 0.50-0.53 (lower CIs above 0.358), within-AUC 0.63-0.67, own-source rank-1 0.26-0.30, rank 8.6-8.9 | `e43_penultimate_pca.json`, `e47_pooled_reductions.json` |
+| no-training control (E48) | ImageNet backbone + same PCA: museum 0.528, within-AUC 0.550, own-source 0.93 | `e48_frozen_vs_trained.json` |
+| robustness, ccby validation (E49) | own-image rank-1: crop80 0.96-1.00, flip 0.99-1.00, JPEG q50 0.90-0.95, rescale 0.89-0.94, corner crop 0.74-0.82; edit-type p@5 0.46-0.48 vs 0.11 | `e49_robustness.json` |
+| look vs content (E50) | neighbour colour-tone difference 0.65x random, texture 0.85-0.87x; content R^2 -0.02 | `e50_aesthetic_vs_content.json` |
+
+Other models to quote: film authenticity `checkpoints/student_sup` (AUROC 0.78 [0.69, 0.88], ECE 0.20); attributes
+v1 `checkpoints/best`; research teacher hybrid + family SupCon (BlueNeg 0.25 [0.16, 0.31]; 88 MB, 90 ms); abstention
+top-1 cosine at 50 % coverage (BlueNeg rank-1 0.22 -> 0.37).
+
+## What session 6 established (E46-E51; details in `docs/EXPERIMENT_LOG.md`, claims 29-33)
+- Rank control on the pooled layer is closed: VICReg on the layer (E46) and VICReg on source-centred features (E51)
+  raise rank to ~23 and the real metrics, and re-admit scene content (own-source 0.61 / 0.73 vs 0.28); the plain
+  no-teacher recipe over three seeds confirms E45 (rank 8.0, museum 0.489, own-source 0.28).
+- The content lives in the low-variance directions of the pooled layer: PCA 8-128 trace museum 0.45-0.52 against
+  own-source 0.18-0.29; whitening gives 0.54 at 0.60; PCA-32 equals PCA-64 within 0.01 (falsified only on the rank-8
+  bound written for 64 dims); int8 is free (E47).
+- The training buys content invariance and within-photographer stock separation, not museum p@5, which every
+  representation reaches (ImageNet-init 0.528, DINOv2 L4+L8 0.545, 28 statistics 0.594) (E48, supported).
+- Robustness: crops and flips are safe; JPEG q50 and 0.5x rescale lose the nearest neighbour 5-11 % of the time (one
+  seed 11.5 %, which falsified E49); the manifest's unseen edit pipeline is recognised at 0.47 vs 0.11 and moves the
+  embedding 7-10x a crop for film/monochrome emulations.
+- Neighbours share colour-tone statistics (0.65x random) more than texture (0.85-0.87x); the embedding is not a
+  linear function of content, of the 28 statistics, or of provenance (E50; the R^2 sub-rule was trivial).
+- Infrastructure: trainer `--kd 0` skips the DINOv2 pass, `--vic-pooled`, `--vic-mode source`; scripts E46-E51;
+  `checkpoints/student_imagenet_init` (untrained control); five helper tests (`tests/test_session6.py`, 213 pass).
 
 ## Live state at the time of writing
-- Orchestrator loop PID 335761 (started 2026-11-07 21:47:57, deadline 17:47:57, 15-minute ticks, 40 ticks, 0 errors).
-  Restart after a crash: `python -m research.orchestrator loop --interval 900 --resume`.
-- `data_commons_film_acquire` retryable (attempt 6 at 14:02, 12 max; every attempt so far HTTP 429 on every file).
-  No other task pending. The loop idles between ticks by design.
-- Datasets ready: commoncatalog_film 905, artefact_film 88, aic_photographs 593, plus the earlier seven. Test halves of
-  commoncatalog_film and aic_photographs, the filmsynth test split and BlueNeg were read once (E44) for the session-5
-  candidate and its three comparators; they are spent for those representations.
-- Checkpoints added this session (all research, none deployed): `student_style_fs_v2_real_{s1,s2,vic3,vic3_s1,vic3_s2,pcaw,f576,f576_s1,f576_s2,nokd,vic3f}`.
+- Orchestrator loop PID 335761 (started 2026-11-07 21:47:57, deadline 17:47:57, 15-minute ticks, 62 ticks, 0
+  errors). Restart after a crash: `python -m research.orchestrator loop --interval 900 --resume`.
+- `data_commons_film_acquire` attempt 6 running since 14:02 (12 max; every attempt so far HTTP 429 on every file,
+  Retry-After honoured). No other task pending.
+- Datasets ready: commoncatalog_film 905, artefact_film 88, aic_photographs 593, plus the earlier seven. Test halves
+  of commoncatalog_film and aic_photographs, the filmsynth test split and BlueNeg were read once (E44) for the
+  session-5 candidate and its comparators; session 6 read no test half.
+- Checkpoints added this session (all research, none deployed): `student_style_fs_v2_real_{nokd_s1,nokd_s2,nvic1,
+  nvic1_s1,nvic1_s2,svic1,svic1_s1,svic1_s2}`, `student_imagenet_init`.
 
 ## Known limitations
 - Stock labels are uploader claims (CommonCatalog) or one photographer's records (BlueNeg, ARTeFACT); "process" on
-  museum prints correlates with decade and subject even after decade matching.
-- Content leakage is measured with 15 synthetic validation/test sources (own-source rank-1 is coarse).
-- Photographer clustering (artist/uploader share) rises with every informative representation; it is recorded, not
-  guarded, because it is inseparable from film look in these features (claim 25) and is itself a product feature.
-- No human evaluation exists; nothing here says what a person would call a film look.
+  museum prints correlates with decade and subject even after decade matching, and is reached by untrained features.
+- Content leakage is measured with 15 synthetic validation sources (own-source rank-1 is coarse) and, in E49, with 113
+  real originals under eight edits.
+- Photographer clustering (artist/uploader share) rises with every informative representation; recorded, not guarded
+  (claim 25); the "similar look" signal includes the photographer's look.
+- No human evaluation exists; neighbour attribute coherence (E50) is a proxy for "look".
+- The within-uploader AUC rule is under-powered on both halves (15 multi-stock uploaders on the analysis half).
 
 ## Rejected approaches (do not repeat without a new hypothesis)
-Earlier sessions: E3, E2/E4, E9/E9b, E11, E12, E16, E17, E18, E19, E10, E23c, E25, E26, E28/E27b (L3), E30, E31.
-Session 5: the no-teacher pooled layer as a promotion candidate at rank 7.99 (E45, by 0.01; repeat only with seeds); label-free heads on frozen features as a student target (E33), VICReg/temperature rank controls on the
-projection (E34), LDA photographer-subspace removal (E35), post-hoc whitening of the students (E36), the VICReg
-distillation target as a promotion candidate (E38/E39), treatment-parameter heads with VICReg (E41).
+Earlier sessions: E3, E2/E4, E9/E9b, E11, E12, E16, E17, E18, E19, E10, E23c, E25, E26, E28/E27b (L3), E30, E31,
+E33, E34, E35, E36, E38/E39, E41, E45.
+Session 6: VICReg on the pooled layer, batch-wise (E46) and source-centred (E51); whitening of the pooled PCA (E47
+row `pcaw64`); the ImageNet backbone without training as a candidate (E48 control). PCA-32 is not rejected on signal
+(E47 fell on the rank bound); a 32-d rule needs its own pre-registered bound.
 
 ## Next recommended actions (in order)
-1. Student head that keeps the pooled layer's rank (pre-register before running): since E45 shows the teacher term adds
-   nothing measurable to the pooled layer, train the recipe with `--kd 0` plus a VICReg term on the pooled layer (or a
-   PCA-64 of a first-pass student's pooled features as the target) over three seeds; judge on the analysis-half matrix (rank >= 8, own-source <= 0.45,
-   museum lower CI above chance, within-AUC, synthetic cost); the test halves are spent for the current candidate, so a
-   new candidate needs a fresh holdout decision (a third snapshot of commoncatalog_film or a new museum source).
-2. Within-uploader power: the test half carries too few multi-stock uploaders for the AUC rule; acquire more scans per
-   uploader x stock (raise the 6/uploader x stock cap on a new snapshot) before using that rule as a gate again.
-3. Explainable attributes: the ridge treatment-parameter estimate (E41 `params_ridge6`, own-source 0.39) is the
-   cheapest interpretable layer; evaluate it against the deterministic attributes on real scans, no selection use.
-4. ARTeFACT: EXIF authenticity student on the 44 originals as a sanity check (unchanged from session 4).
-5. Commons: leave the backoff alone; next session may widen spacing and caps; never change identities.
-6. Product: "similar look" (one signal for film look and photographer look) with the abstention rule; no stock or
-   photographer identification; no deployment.
+1. Fresh holdout before any promotion: a third commoncatalog_film snapshot with higher per-uploader x stock caps
+   (raises the within-uploader power) or a new museum source; the E44 halves are spent for the candidate. Until then
+   every reading is analysis-half only.
+2. Augmentation for the two measured weaknesses (pre-register first): JPEG q40-70 and 0.5x rescale as training-time
+   augmentations of the synthetic inputs, judged by E49's own-image rank-1 (rule: >= 0.9 on all three seeds) with the
+   edit-type p@5 and own-source held within 0.03 (the risk is losing grain sensitivity).
+3. PCA-32 int8 as the shipping size: pre-register a 32-d rule (rank >= 6, own-source <= 0.45, museum lower CI above
+   chance, within-AUC lower CI above 0.5) and read it once on the fresh holdout of item 1.
+4. Explainable attributes: the deterministic 28 statistics already explain neighbour coherence (E50) and are a strong
+   museum/within-uploader baseline (E48) at a scanner-probe cost (0.56); a product "similar look" can re-rank the
+   embedding's neighbours by them without any model change.
+5. ARTeFACT: EXIF authenticity student on the 44 originals as a sanity check (unchanged from session 4).
+6. Commons: leave the backoff alone; never change identities.
+7. Product: "similar look" with the abstention rule; stock and photographer matches are exploratory similarity
+   estimates, never identifications; no deployment without the owner's approval.

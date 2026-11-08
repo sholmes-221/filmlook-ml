@@ -743,6 +743,70 @@ with the same matrix.
 - Learned: decision supported: not falsified: supported=1.0000 >= 1
 - Next: supported: "similar look" retrieval and attribute-based badge suggestions can be built on the pooled PCA-64 (exploratory, no identification claims); falsified: the neighbourhoods are content or provenance and the similarity feature needs an explicit-attribute re-ranking
 
+### E51_source_vicreg — the rank/content trade-off of E46 can be broken by expanding treatment variance only: a VICReg term on the pooled layer computed on features centred on their synthetic source's in-batch mean (--vic-mode source, batches led by 12 sources x 4 rows, --kd 0, weight 1) gives, for each of three seeds, a PCA-64 with effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5 and synthetic family p@5 within 0.10 of the E43 reference seed-mean, with the seed-mean museum p@5 not more than 0.02 below the plain no-teacher seed-mean
+- Status: done; wall 224.2 s; peak GPU 7441.0 MB (total on card).
+- supported [proxy]: 0.0
+- vic_museum_mean [real]: 0.5256
+- nokd_museum_mean [real]: 0.4885
+- vic_within_auc_mean [real]: 0.6227
+- vic_own_source_mean [proxy]: 0.7365
+- vic_eff_rank_min [proxy]: 22.57
+- vic_synth_mean [proxy]: 0.5435
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the source-centred VICReg student is the teacher-free candidate for the next fresh holdout; falsified: rank control on the pooled layer is closed in this architecture and the teacher-distilled E43 student stays the baseline
+
+### Session 6 synthesis (2026-11-08, E46-E51): the lightweight extractor, judged on what the product needs
+
+All on the analysis halves (E49 on the commoncatalog_ccby validation split); no test half, no BlueNeg; every reduction
+fitted on the 601 CC-BY train originals; three seeds wherever a student is involved. The E43 teacher-distilled
+students (`student_style_fs_v2_real_f576{,_s1,_s2}`) are the reference throughout.
+
+1. **A VICReg term on the pooled layer itself raises rank and the real metrics, and re-admits scene content (E46,
+   falsified on every seed).** No-teacher recipe (`--kd 0`, the DINOv2 pass skipped) plus VICReg weight 1 on the 576-d
+   layer: PCA-64 rank 22.4-23.0, museum 0.520 (lower CIs 0.419-0.45 vs chance 0.358), within-uploader AUC 0.657,
+   colour-only AUC 0.620, stock-line 0.093; own-source rank-1 0.61 (rule <= 0.45; the plain no-teacher seeds 0.28), artist
+   share 0.18, synthetic family 0.575. The plain no-teacher seeds (0-2) read rank 7.99-8.01, museum 0.489, own-source
+   0.28, within-AUC 0.631: E45's one-seed reading holds. `reports/e46_pooled_vicreg.json`.
+2. **Centring the VICReg features on their synthetic source does not help (E51, falsified on every seed).** With the
+   batch led by 12 sources x 4 rows and the variance/covariance terms computed on within-source-centred features, the
+   PCA-64 reads rank 22.6-23.5, museum 0.493-0.547, within-AUC 0.60-0.64, and own-source rank-1 0.72-0.75 (raw layer
+   0.82-0.83); synthetic family 0.53-0.55. Expanding the treatment-induced variance of this backbone expands content
+   with it; rank control on the pooled layer is closed in this architecture. `reports/e51_source_vicreg.json`.
+3. **The reduction curve (E47, falsified on the 32-d rank bound only).** PCA 8/16/32/64/128 of the reference students:
+   museum 0.447/0.486/0.507/0.515/0.523, own-source 0.18/0.23/0.26/0.28/0.29, within-AUC 0.628-0.642, stock-line
+   0.083-0.087, synthetic 0.62-0.63 throughout; PCA-32 and PCA-64 agree within 0.01 on every real metric but PCA-32's
+   effective rank is 7.2 against the bound of 8 written for 64 dimensions (the rule stands; a 32-d rule would need its
+   own bound, pre-registered). Whitening the 64 components (museum 0.539, own-source 0.60) and a random 64-d projection
+   (0.498 / 0.29) bracket the picture: the content lives in the low-variance directions, PCA truncation filters it. int8
+   with one scale per component changes nothing (0.512 / 0.503). `reports/e47_pooled_reductions.json`.
+4. **Is the training necessary? (E48, supported.)** The untrained ImageNet MobileNetV3-Small pooled layer with the same
+   PCA-64: museum 0.528 [0.446, 0.605], within-AUC 0.550 [0.464, 0.611], own-source 0.93, synthetic 0.217, uploader
+   share 0.112; it fails the candidate rule on content and on the within-uploader lower CI, and ties the trained students
+   on museum p@5 (0.515). Frozen DINOv2-Small L4+L8 PCA-64: museum 0.545, within-AUC 0.594, own-source 1.00; CLS++mean
+   0.486 / 0.526 / 1.00; the 28 explicit statistics 0.594 [0.481, 0.691] / 0.631 / 0.705, scanner probe 0.56 (majority
+   0.44). Cost (one CPU thread, 224 px): MobileNetV3-Small 4.4 MB / 1.3 ms, DINOv2-Small 88 MB / 90 ms. Museum process
+   p@5 is reached by everything; the training's measurable contribution is content invariance (0.93 -> 0.28) and
+   within-photographer stock separation (0.55 -> 0.64). `reports/e48_frozen_vs_trained.json`.
+5. **Robustness (E49, falsified by one seed's rescale reading).** On 113 real validation originals (five media) and
+   their eight manifest-pipeline edits (never a training input): own-image rank-1 under centre crop 80 % 0.96-1.00,
+   flip 0.99-1.00, JPEG q50 0.90-0.95, 0.5x rescale 0.89-0.94 (seed 0: 0.885 < 0.9), corner crop 70 % 0.74-0.82;
+   edit-type p@5 0.46-0.48 vs chance 0.11 (explicit 0.53, DINOv2 L4+L8 0.24, CLS 0.13, ImageNet-init 0.23); edited
+   own-source rank-1 0.41-0.42 (content encoders 0.99-1.00); displacement relative to the centre crop: monochrome
+   emulation 10.5x, fake grain 9.0-9.5x, film emulation 7.6-7.8x, HDR 6.2-6.7x, clean-sharp 1.4-1.8x, over-sharpen
+   0.5x, posterise 0.3-0.4x. The content encoders are perfectly invariant and nearly blind to the edits.
+   `reports/e49_robustness.json`.
+6. **Look versus content (E50, supported; the R^2 sub-rule is uninformative).** Neighbour coherence on 389 scans
+   (uploader excluded): colour-tone 0.65, texture 0.85-0.87, all 28 0.74-0.75 of the random difference (DINOv2 CLS 0.95 /
+   0.85 / 0.90, ImageNet-init 0.86 / 0.83 / 0.84, the statistics themselves 0.45 / 0.58 / 0.51); monochrome agreement
+   0.95 vs prior 0.69. Uploader-grouped ridge R^2 of the student embedding from a 28-d content PCA -0.02 (CLS 0.39),
+   from the 28 statistics 0.01-0.02, from provenance one-hots -0.03: not a linear function of either, so the rule's
+   "rendering R^2 >= content R^2" passed on two numbers near zero and carries no weight; the coherence ratios do.
+   Museum prints: colour 0.68-0.70, texture 0.82-0.84. `reports/e50_aesthetic_vs_content.json`.
+7. **Standing of the candidate.** No new candidate: every teacher-free rank control traded content, so the E43
+   teacher-distilled pooled PCA-64 remains the strongest lightweight representation (held-out reading E44, not
+   promoted). Nothing was read on a test half this session; the spent holdouts were not re-used.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
