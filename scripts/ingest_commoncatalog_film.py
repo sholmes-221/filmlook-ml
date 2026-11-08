@@ -4,6 +4,8 @@
   python scripts/ingest_commoncatalog_film.py --scan --shards 240          # metadata-only shard scan (resumable; no pixels)
   python scripts/ingest_commoncatalog_film.py --download [--max-minutes 120] # select + fetch (resumable; exit 0 complete, 3 resumable)
   python scripts/ingest_commoncatalog_film.py --status
+  python scripts/ingest_commoncatalog_film.py --dataset-id commoncatalog_film_hd --range least_dim_range=2048-4096 \
+      --exclude-manifest commoncatalog_film --caps 30,10,150 --scan --shards 400 --scan-workers 8     # session-7 fresh holdout
 
 Source: https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by (YFCC100M Flickr photos, CC-BY per row; the
 Hub's dataset tag is not relied on). Rows qualify when (1) the per-row licenceurl is creativecommons.org/licenses/by/<v>/,
@@ -78,6 +80,27 @@ def scan_shard(path: str) -> list[dict]:
                 continue
             r.pop("exif", None); r["datetaken"] = str(r.get("datetaken"))
             out.append({"file": path, "row_group": g, "row": i, **{k: r.get(k) for k in META_COLS if k != "exif"}, **c, **claim})
+    return out
+
+
+def configure(dataset_id: str, caps: str | None = None, min_side: int | None = None) -> None:
+    """Session 7: a second, independent snapshot (`commoncatalog_film_hd`, the 2048-4096 px shards, uploaders of the first
+    snapshot excluded) uses its own candidate, state, image and manifest files; the split salt is the dataset id."""
+    global DS, RAW, IMG, CAND, SCANNED, MANIFEST, STATE, LOG, CAPS, MIN_SIDE
+    if min_side:
+        MIN_SIDE = min_side
+    DS = dataset_id; RAW = P.RAW / DS; IMG = RAW / "images"; CAND = P.DATA / "candidates" / f"{DS}_candidates.jsonl"; SCANNED = P.DATA / "candidates" / f"{DS}_scanned.json"
+    MANIFEST = P.MANIFESTS / f"{DS}_manifest.jsonl"; STATE = RAW / "download_state.jsonl"; LOG = RAW / "download.log"
+    if caps:
+        a, b, c = (int(x) for x in caps.split(",")); CAPS = {"per_uploader": a, "per_uploader_stock": b, "per_stock": c}
+
+
+def manifest_uploaders(dataset_ids: str) -> set[str]:
+    """Bare Flickr uploader ids of earlier snapshots (both halves), excluded from a fresh holdout."""
+    out = set()
+    for d in [x for x in dataset_ids.split(",") if x]:
+        m = P.MANIFESTS / f"{d}_manifest.jsonl"
+        out |= {str(r.get("uploader_id") or r.get("uploader") or "").split(":", 1)[-1] for r in read_jsonl(m)} if m.exists() else set()
     return out
 
 
@@ -167,7 +190,7 @@ def write_outputs(state: DownloadState, selected: list[dict], complete: bool) ->
     (RAW / "summary.json").write_text(json.dumps(summary, indent=1)); return summary
 
 
-def do_download(max_minutes: float, seed: int, workers: int = 2) -> int:
+def do_download(max_minutes: float, seed: int, workers: int = 2, exclude: set[str] | None = None) -> int:
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     from huggingface_hub import HfFileSystem
@@ -178,7 +201,7 @@ def do_download(max_minutes: float, seed: int, workers: int = 2) -> int:
     cands = [json.loads(l) for l in open(CAND)]
     for c in cands:                                                          # claims are recomputed from the stored tags: parser fixes apply without a rescan
         c.update(stock_claim(c.get("usertags")))
-    selected = select(cands, seed, exclude_uploaders=training_uploaders())
+    selected = select(cands, seed, caps=CAPS, exclude_uploaders=training_uploaders() | (exclude or set()))
     IMG.mkdir(parents=True, exist_ok=True); state = DownloadState(STATE); t0 = time.time(); deadline = t0 + max_minutes * 60
     todo = [c for c in selected if state.get(c["photoid"]).get("status") not in ("validated", "permanent_failure")]
     log(f"download: {len(selected)} selected from {len(cands)} candidates ({len({c['uid'] for c in selected})} uploaders); {len(todo)} to fetch; state {state.counts()}")
@@ -244,12 +267,14 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--scan", action="store_true"); ap.add_argument("--download", action="store_true"); ap.add_argument("--status", action="store_true")
     ap.add_argument("--shards", type=int, default=120); ap.add_argument("--range", default="least_dim_range=1024-2048"); ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--max-minutes", type=float, default=120); ap.add_argument("--workers", type=int, default=2)
+    ap.add_argument("--max-minutes", type=float, default=120); ap.add_argument("--workers", type=int, default=2); ap.add_argument("--scan-workers", type=int, default=4)
+    ap.add_argument("--dataset-id", default=DS); ap.add_argument("--caps", default=None, help="per_uploader,per_uploader_stock,per_stock"); ap.add_argument("--exclude-manifest", default="", help="comma-separated dataset ids whose uploaders are excluded"); ap.add_argument("--min-side", type=int, default=None)
     a = ap.parse_args(); rc = 0
+    configure(a.dataset_id, a.caps, a.min_side)
     if a.scan:
-        print(json.dumps(do_scan(a.shards, a.range, a.seed)))
+        print(json.dumps(do_scan(a.shards, a.range, a.seed, a.scan_workers)))
     if a.download:
-        rc = do_download(a.max_minutes, a.seed, a.workers)
+        rc = do_download(a.max_minutes, a.seed, a.workers, manifest_uploaders(a.exclude_manifest))
     if a.status:
         print((RAW / "summary.json").read_text() if (RAW / "summary.json").exists() else "no summary yet")
     raise SystemExit(rc)

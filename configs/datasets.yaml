@@ -186,6 +186,38 @@ datasets:
       excludes the query's uploader and bootstraps over uploaders).
     verified_on: 2026-11-07
 
+  - id: commoncatalog_film_hd
+    name: CommonCatalog CC-BY film scans, second independent snapshot (session-7 fresh holdout; 2048-4096 px shards, new uploaders only)
+    source_url: https://huggingface.co/datasets/common-canvas/commoncatalog-cc-by
+    license: CC-BY-2.0          # per-row licenseurl checked as for commoncatalog_film
+    commercial_use: true
+    ml_training: false
+    num_images: "scan-limited (caps 30 per uploader, 10 per uploader x stock, 150 per stock); uploaders of commoncatalog_film (both halves) and of the training manifest excluded"
+    labels: [film_stock (uploader tag), film_brand, film_type, scanner EXIF, uploader, caption]
+    download_method: same adapter as commoncatalog_film with --dataset-id commoncatalog_film_hd (scripts/ingest_commoncatalog_film.py)
+    attribution: required - author, page URL and licence URL per image (data/raw/commoncatalog_film_hd/ATTRIBUTION.jsonl)
+    redistribution: allowed with attribution; images stay local
+    training_allowed: false     # HELD-OUT EVALUATION ONLY: read once by the pre-registered E53; never used for selection
+    authenticity_class: B
+    risks: as commoncatalog_film; smaller than the first snapshot (the 2048-4096 px shards yield about two qualifying rows each)
+    verified_on: 2026-11-08
+
+  - id: met_photographs
+    name: The Met public-domain photographs (session-7 fresh museum holdout, CC0)
+    source_url: https://metmuseum.github.io/
+    license: CC0-1.0            # The Met Open Access: public-domain works (Is Public Domain = true in MetObjects.csv, re-checked per object via the API)
+    commercial_use: true
+    ml_training: true           # CC0 would permit it; project policy below forbids it for this set
+    num_images: target 700 of 7,029 candidates (department Photographs, classification Photographs, medium recorded; cap 6 per artist)
+    labels: [artist, date, medium/process (albumen, salted paper, daguerreotype, cyanotype, gelatin silver ...), classification, credit line]
+    download_method: MetObjects.csv (open-access release) for the listing; objects endpoint per selected work (no key, one request per 0.6 s, Retry-After honoured); primaryImageSmall renditions via research.downloader (scripts/ingest_met_photographs.py)
+    attribution: not required (CC0); artist, title and page URL kept per image anyway
+    redistribution: permitted (CC0); not done
+    training_allowed: false     # HELD-OUT EVALUATION ONLY (session-7 policy; the licence is not the reason)
+    authenticity_class: A       # museum records of the physical print; digitised prints; 1840s-1890s dominate
+    risks: 19th-century processes only (albumen and salted paper dominate); period and subject confounds as for aic_photographs; museum digitisation is a shared nuisance
+    verified_on: 2026-11-08
+
   - id: artefact_film
     name: ARTeFACT authentically damaged & manually restored 35mm scans (Ivanova et al., Eurographics 2023)
     source_url: https://figshare.com/articles/dataset/Authentically_damaged_film_scans/21803304

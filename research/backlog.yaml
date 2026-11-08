@@ -1783,3 +1783,71 @@ experiments:
     falsified: the robustness gap is recorded as a limitation and the recipe stays E23b'
   status: supported
   result: 'not falsified: supported=1.0000 >= 1'
+- id: E53_fresh_holdout
+  hypothesis: 'on previously unseen real photographs (The Met public-domain prints, analysis half; a second independent
+    CommonCatalog film-scan snapshot from new uploaders), the frozen candidate (PCA-32 int8 of the pooled features of the
+    three degrade-augmented seeds, checkpoints/frozen_session7) keeps the real signal and the content invariance measured on
+    the spent halves: for every seed (a) museum process p@5 lower CI above chance, (b) museum p@5 >= explicit-28 p@5 - 0.05,
+    (c) artist share <= 0.10, (d) own-image rank-1 >= 0.9 under centre crop, flip, JPEG q50 and 0.5x rescale, (f) uploader
+    share <= ImageNet-init + 0.02; and (e) the seed-mean within-uploader different-day AUC exceeds the untrained ImageNet
+    backbone with the same PCA by a paired-bootstrap lower CI above 0 (the one claim that distinguishes training from the
+    backbone, E48)'
+  motivation: 'the session-5/6 candidate was selected and read on halves that are now spent (E44); the session-7 brief asks
+    for a genuinely fresh holdout, a frozen model, baselines (DINOv2-Small, ImageNet-init, 28 statistics), effect sizes
+    and failure cases, read once. Criterion (e) is the only statistically supported improvement over a simple baseline
+    that the analysis halves predict; (a)-(d),(f) guard signal, leakage and robustness.'
+  value: 5
+  gpu_minutes: 4
+  gpu_mb: 4000
+  cpu_minutes: 15
+  disk_gb: 0.05
+  datasets:
+  - met_photographs
+  - commoncatalog_film_hd
+  - commoncatalog_ccby
+  metric: 'scripts/e53_fresh_holdout.py --final: summary.supported (all of a-f on every seed and e on the seed-mean);
+    summary.inconclusive = 1 when the within-uploader reading has fewer than 30 queries (criterion e not evaluable), in
+    which case the status is set to inconclusive by hand after the run and the remaining checks are reported as such'
+  confounders:
+  - the Met half is 19th-century (albumen and salted paper dominate); process correlates with decade and subject even after decade matching
+  - the second CommonCatalog snapshot is small (the 2048-4096 px shards yield about two qualifying rows each, one in seven from a new uploader)
+  - stock labels remain uploader claims; artist "unknown" is one group
+  falsified_if: 'summary.supported == 0 and summary.inconclusive == 0: a seed fails one of a-d or f, or the within-uploader
+    paired difference against ImageNet-init has a lower CI at or below 0 with at least 30 queries'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e53_fresh_holdout.py
+  - --final
+  result_json: reports/e53_fresh_holdout.json
+  watched_paths:
+  - checkpoints/frozen_session7
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: real
+    inconclusive:
+      path: summary.inconclusive
+      kind: real
+    museum_mean:
+      path: summary.candidate_museum_p5_seed_mean
+      kind: real
+    explicit_museum:
+      path: summary.explicit_museum_p5
+      kind: real
+    within_auc_mean:
+      path: summary.candidate_within_auc_seed_mean
+      kind: real
+    init_within_auc:
+      path: summary.init_within_auc
+      kind: real
+    robustness_min:
+      path: summary.robustness_min_invariant_min
+      kind: real
+  next_step: 'supported: the frozen candidate is the recommended research representation (still not deployed); falsified:
+    the failing criterion names the limitation and the test halves stay untouched; inconclusive: acquire more film-scan
+    uploaders before any further reading'
+  status: pending

@@ -45,6 +45,14 @@ DATASETS: dict[str, dict] = {
     "aic_photographs": {"manifest": ROOT / "data" / "manifests" / "aic_photographs_manifest.jsonl", "min_rows": 200, "sample": 20,
                         "acquire": [PY, "scripts/ingest_aic_photographs.py", "--download", "--max-minutes", "90"],
                         "summary": ROOT / "data" / "raw" / "aic_photographs" / "summary.json", "max_attempts": 4, "training_allowed": True},
+    # session 7 fresh holdouts (read once by scripts/e53_fresh_holdout.py; never used for selection or training)
+    "met_photographs": {"manifest": ROOT / "data" / "manifests" / "met_photographs_manifest.jsonl", "min_rows": 300, "sample": 20,
+                        "acquire": [PY, "scripts/ingest_met_photographs.py", "--download", "--max-minutes", "100"],
+                        "summary": ROOT / "data" / "raw" / "met_photographs" / "summary.json", "max_attempts": 4, "training_allowed": False},
+    "commoncatalog_film_hd": {"manifest": ROOT / "data" / "manifests" / "commoncatalog_film_hd_manifest.jsonl", "min_rows": 150, "sample": 20,
+                              "acquire": [PY, "scripts/ingest_commoncatalog_film.py", "--dataset-id", "commoncatalog_film_hd", "--range", "least_dim_range=2048-4096",
+                                          "--exclude-manifest", "commoncatalog_film", "--caps", "30,10,150", "--download", "--max-minutes", "110"],
+                              "summary": ROOT / "data" / "raw" / "commoncatalog_film_hd" / "summary.json", "max_attempts": 6, "training_allowed": False},
     # existing datasets: validated from their manifests (no acquisition command: already on disk)
     "commoncatalog_ccby": {"manifest": ROOT / "data" / "manifests" / "manifest.jsonl", "filter": {"dataset_id": "commoncatalog_ccby"}, "min_rows": 1000, "sample": 40},
     "pd12m_pilot": {"manifest": ROOT / "data" / "manifests" / "manifest.jsonl", "filter": {"dataset_id": "pd12m_pilot"}, "min_rows": 500, "sample": 20},
