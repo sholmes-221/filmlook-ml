@@ -75,11 +75,11 @@ def test_student_matrix_reads_only_analysis_rows(monkeypatch):
     import student_real_matrix as M
     if not (M.AIC.with_suffix(".json").exists() and M.CCF.with_suffix(".json").exists()):
         pytest.skip("feature caches absent")
-    ra, rg, rv, L = M.labels()
+    ra, rg, rv, rb, L = M.labels()
     rows_a = json.loads(M.AIC.with_suffix(".json").read_text())["rows"]; rows_g = json.loads(M.CCF.with_suffix(".json").read_text())["rows"]
     assert all(rows_a[i]["split"] == "analysis" for i in L["ia"]) and all(rows_g[i]["split"] == "analysis" for i in L["ig"])
     assert all(r["split"] == "analysis" for r in ra) and all(r["split"] == "analysis" for r in rg)
-    assert len(ra) < len(rows_a) and len(rg) < len(rows_g)
+    assert len(ra) < len(rows_a) and len(rg) < len(rows_g) and len(rb) == 15 and len(L["src_b"]) == 15
 
 
 def test_train_style_student_exposes_kd_target_choices():

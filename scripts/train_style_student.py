@@ -309,12 +309,12 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     class W(nn.Module):
         def __init__(s, n): super().__init__(); s.n = n
-        def forward(s, x): f, t, fam, p, kd = s.n(x); return t, fam, kd
+        def forward(s, x): f, t, fam, p, kd = s.n(x); return t, fam, kd, f          # E42: the 576-d pooled features are exported too
     torch.onnx.export(W(net.cpu().eval()), (torch.zeros(1, 3, 224, 224),), str(out / "model.onnx"), input_names=["pixel_values"],
-                      output_names=["treated_logit", "family_logits", "style_embedding"], dynamic_axes={"pixel_values": {0: "batch"}},
+                      output_names=["treated_logit", "family_logits", "style_embedding", "features_576"], dynamic_axes={"pixel_values": {0: "batch"}},
                       opset_version=17, dynamo=False)
     (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target,
-                                               "outputs": ["treated_logit", "family_logits", "style_embedding"], "input_size": 224,
+                                               "outputs": ["treated_logit", "family_logits", "style_embedding", "features_576"], "input_size": 224,
                                                "label_sources": "synthetic parameter supervision + SupCon teacher distillation; no human labels"}, indent=1))
     import onnxruntime as ort
     so = ort.SessionOptions(); so.intra_op_num_threads = 1

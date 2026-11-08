@@ -1051,3 +1051,116 @@ experiments:
     falsified: a non-collapsed, content-invariant head exists among the gainers and becomes the student target'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E41_head_treatment_params
+  hypothesis: a head on the frozen hybrid features that is trained to regress the six continuous synthetic treatment parameters
+    alongside the family SupCon objective, with VICReg, raises the effective rank to >= 8 while keeping scene content out
+    (own-source rank-1 <= 0.35), and is not worse than the collapsed projection on museum process p@5, within 0.02 on the
+    within-uploader stock AUC and within 0.10 on synthetic family p@5
+  motivation: 'E40: every rank-raising head so far let scene content back in; the treatment parameters are the one continuous,
+    content-free supervision the synthetic study offers. A parameter-regression head is also the interpretable "treatment
+    estimate" the product attributes need.'
+  value: 5
+  gpu_minutes: 1
+  gpu_mb: 1500
+  cpu_minutes: 5
+  disk_gb: 0.01
+  datasets:
+  - bench_features_v1
+  - commoncatalog_film
+  - aic_photographs
+  metric: 'scripts/head_treatment_params.py: the real-photograph matrix (scripts/student_real_matrix.py) incl. own-source
+    rank-1 and effective rank for seven heads; summary.supported for supcon_params_vic64'
+  confounders:
+  - the parameters describe the synthetic pipeline''s treatments, not real film; their estimates on real scans are proxies
+  - 15 validation sources for own-source rank-1
+  - one seed per head
+  falsified_if: 'summary.supported == 0: the primary head stays below rank 8, lets content in (own-source rank-1 > 0.35),
+    or loses on museum, within-uploader AUC or synthetic family p@5 beyond the margins'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/head_treatment_params.py
+  result_json: reports/head_treatment_params.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    primary_eff_rank:
+      path: summary.primary_eff_rank
+      kind: proxy
+    primary_own_source_rank1:
+      path: summary.primary_own_source_rank1
+      kind: proxy
+    primary_museum_p5:
+      path: summary.primary_museum_p5
+      kind: real
+    primary_within_auc:
+      path: summary.primary_within_auc
+      kind: real
+    primary_synth_family_p5:
+      path: summary.primary_synth_family_p5
+      kind: proxy
+  next_step: 'supported: the multi-task head becomes the student target (E42, E38 recipe) and the ridge parameter estimate
+    is evaluated as the explainable treatment layer; falsified: rank and content invariance are not separable with the current
+    synthetic supervision; the next session needs more treatment families or same-source treatment positives on real photographs'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E42_student_penultimate
+  hypothesis: 'the end-to-end student''s 576-d pooled representation carries a higher-rank, content-invariant film signal
+    than its collapsed 64-d head: effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 and within-uploader stock AUC
+    not below the head''s, synthetic family p@5 within 0.10'
+  motivation: 'E40/E41: on frozen DINOv2-Small statistics rank and content invariance are not separable with the available
+    supervision. The students are trained end to end on content-free synthetic supervision; their penultimate layer (own-source
+    rank-1 0.31-0.42 in the trainer reports) may hold what the collapsed head discards.'
+  value: 4
+  gpu_minutes: 3
+  gpu_mb: 6000
+  cpu_minutes: 5
+  disk_gb: 0.02
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e42_student_penultimate.py: real-photograph matrix for the 64-d head and the 576-d features of one retrained
+    baseline student; summary.supported'
+  confounders:
+  - one seed; the retrain is the baseline recipe with an extra export
+  - 576-d features are not a deployable similarity embedding without reduction (latency and index size)
+  falsified_if: 'summary.supported == 0: the 576-d features are collapsed, content-dominated, or worse than the head'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e42_student_penultimate.py
+  result_json: reports/e42_student_penultimate.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    f576_eff_rank:
+      path: summary.f576_eff_rank
+      kind: proxy
+    f576_own_source_rank1:
+      path: summary.f576_own_source_rank1
+      kind: proxy
+    f576_museum_p5:
+      path: summary.f576_museum_p5
+      kind: real
+    f576_within_auc:
+      path: summary.f576_within_auc
+      kind: real
+  next_step: 'supported: a label-free reduction of the 576-d features (PCA fitted on training-allowed real photographs) replaces
+    the collapsed head as the student''s similarity output, judged on the same matrix; falsified: the student''s content invariance
+    is bound to its collapse too, and the next session must change the supervision (more treatment families, same-source treatment
+    positives on real photographs) rather than the head'
+  status: supported
+  result: 'not falsified: supported=1.0000 >= 1'
