@@ -983,3 +983,15 @@ students (`student_style_fs_v2_real_f576{,_s1,_s2}`) are the reference throughou
    embedding for retrieval only, labelled experimental.
 3. Report BlueNeg numbers as "film scans by one photographer, 1990s consumer stocks"; they are not a general film
    benchmark.
+
+## E57 — Retrieval methods on the fresh sets (2026-11-08, post-hoc, exploratory)
+
+Purpose: compare *methods* (hybrid descriptors, plain / cosine-weighted / class-balanced kNN at K = 5, 10, 20,
+class prototypes, vote-share calibration) on the fixed fresh sets E53 read once. Not pre-registered; no rule.
+Script `scripts/e57_retrieval_methods.py`; report `reports/e57_retrieval_methods.json`; 88 s on the dev host.
+Results: process family (Met, 4 classes, chance 0.25): 28 statistics 5-NN balanced accuracy 0.847, hybrids with
+the statistics 0.84 to 0.85, student alone 0.68, ImageNet init 0.63, DINOv2 global 0.58; prototypes 0.71 to 0.75.
+Stock line (23 classes, chance 0.043): best 0.12 (student prototypes), CIs near chance for all. Within-uploader
+AUC: student 0.68, statistics 0.69, hybrids 0.67 to 0.69, DINOv2 0.49. Uploader share: student 0.13 (least
+leakage) … DINOv2 0.22, DINO-hybrid 0.25 (most). ECE on vote shares 0.17 to 0.43 everywhere. Storage: PCA-32
+int8 3.2 MB per 100k images, brute-force top-5 in 4.5 ms on this host. Documents: docs/research/*.md.
