@@ -1,6 +1,6 @@
 # Real analog-film datasets: discovery, verification, acquisition
 
-Last updated: 2026-11-08 (session 4). Machine-readable records: `data/manifests/discovery_registry.json`
+Last updated: 2026-11-08 (session 7: second CommonCatalog snapshot for the fresh holdout; earlier text from session 4). Machine-readable records: `data/manifests/discovery_registry.json`
 (`python -m research.dataset_discovery report`), dataset gate: `configs/datasets.yaml`, readiness:
 `python -m research.data_pipeline status`. This is an engineering record, not legal advice.
 
@@ -42,6 +42,7 @@ deep-learning dataset round-ups). The registry prevents re-searching a query wit
 | **CommonCatalog CC-BY film scans with uploader stock tags** (`commoncatalog_film`) — Flickr/YFCC100M rows whose EXIF capture device is a film scanner or minilab and whose uploader tagged a stock | B | CC-BY-2.0 per row (checked) | all 1,076 shards of the 1024-2048 px range scanned (5,130 qualifying rows); caps 20/uploader, 6/uploader×stock, 150/stock | **acquired: 905 scans, 252 uploaders, 88 uploader-claimed stocks** (two snapshots: 487 on 11-08 00:15, 905 on 02:23); evaluated twice (E27b) | evaluation-only; uploaders in the training manifest excluded; analysis/test halves by uploader hash |
 | **ARTeFACT** damaged & manually restored 35mm scans, Ivanova et al., Eurographics 2023 (`artefact_film`) | A | CC BY 4.0 (figshare 21803304) | 44 originals + 44 restored, 11 emulsions (Portra 160/400, Ektar 100, Gold 200, Ultramax 400, Ektachrome 100, Provia 100, Velvia 50, Superia 400, CineStill 50D/800T), one photographer | **acquired 88/88** (md5 + sha256 verified) | authenticity and per-emulsion sanity checks (within-photographer only) |
 | **BlueNeg** (ICCV 2025), 491 colour negatives with roll records | A | CC-BY derivative, credit Tien-Tsin Wong | 491 | acquired (session 1) | benchmark v1 test; blue-corrupted partition retired for selection (E26) |
+| **CommonCatalog CC-BY film scans, second snapshot** (`commoncatalog_film_hd`, session 7) — the 2048-4096 px shards (never scanned before), uploaders of the first snapshot (both halves) and of the training manifest excluded, caps 30/uploader, 10/uploader×stock, 150/stock | B | CC-BY-2.0 per row (checked) | scan-limited: the large shards yield about two qualifying rows each and one in seven from a new uploader | **acquiring** (session 7); see `docs/EXPERIMENT_LOG.md` session 7 for the final count | fresh held-out evaluation only (E53, read once); `training_allowed: false` |
 | **Wikimedia Commons film-brand categories** (`commons_film`) | B | per file CC0/PD/CC-BY/CC-BY-SA | 5,743 items, 266 stored | acquiring; Wikimedia throttles this client (HTTP 429, Retry-After honoured); deprioritised, retries with doubling backoff | evaluation-only |
 
 ## Recorded but not ingested

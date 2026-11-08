@@ -1,6 +1,6 @@
 # Curated photography sources (dataset group B)
 
-Last updated: 2026-11-08. Group B is kept separate from group A (real analog film, `docs/REAL_FILM_DATASETS.md`) and
+Last updated: 2026-11-08 (session 7: The Met acquired as the fresh museum holdout). Group B is kept separate from group A (real analog film, `docs/REAL_FILM_DATASETS.md`) and
 group C (local synthetic film simulations). Nothing in this group is assumed to be film, and editorial selection is
 never treated as ground truth of photographic quality.
 
@@ -21,7 +21,7 @@ surfaced no openly licensed editorial collections; stock-image sites (写真AC, 
 | source | licence | content | status |
 |---|---|---|---|
 | **Art Institute of Chicago, Photography and Media, public domain** (`aic_photographs`) | CC0 (AIC Open Access; `is_public_domain` per record) | 3,777 works with images; museum records of artist, date, process (gelatin silver, albumen, salted paper, platinum, chromogenic ...); mostly 1840s–1920s (Stieglitz, Atget, Emerson, Fenton, Cameron, Talbot, Hine ...) | **acquired 2026-11-08: 593 images, 207 artists (max artist share 1.3 %), 1830s-1920s**, capped 8 per artist via the public API + IIIF 843 px renditions (`scripts/ingest_aic_photographs.py`); the API caps a query at 1,000 results, so the listing is partitioned by decade |
-| The Met, Photographs department | CC0 for public-domain works | similar era; objects endpoint works, search endpoint returned HTTP 410 on 2026-11-07 | deferred (open-access CSV route) |
+| **The Met, Photographs department, public domain** (`met_photographs`, session 7) | CC0 (The Met Open Access; `Is Public Domain` per CSV row, re-checked per object via the API) | MetObjects.csv (open-access release, 503,073 rows) filtered to department Photographs, public domain, classification Photographs, medium recorded: 7,029 candidates, 926 artists, 1840s-1890s dominate (albumen 3,200+, salted paper 1,100+, daguerreotype, cyanotype, gelatin silver, tintype) | **acquired 2026-11-08 as the fresh museum holdout**: 700 selected (cap 6 per artist, 268 artists), `primaryImageSmall` renditions via the objects endpoint (search endpoint still HTTP 410; one request per 0.6 s, Retry-After honoured); split by artist hash; `training_allowed: false` by project policy (held-out only); `scripts/ingest_met_photographs.py` |
 | Smithsonian Open Access | CC0 subset | 2.8 M items incl. photographic collections; bulk S3 metadata | deferred (per-unit filtering) |
 | Wikimedia Commons Featured/Quality pictures | per file CC | community-curated modern photography | deferred: this client is throttled by Wikimedia (HTTP 429) |
 
