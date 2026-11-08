@@ -94,6 +94,10 @@ def main():
     ap.add_argument("--teacher-layers", default="4,8", help="E27: DINOv2 hidden-state layers (mean++std) in the teacher's style features; default L4+L8")
     ap.add_argument("--kd-target", default="supcon", choices=["supcon", "supcon_vic3", "pcaw64"],
                     help="E38: distillation target on the frozen teacher features: synthetic-family SupCon projection (default), the same with VICReg anti-collapse (lambda 3), or a label-free PCA-whitened 64-d head of the L4+L8 statistics fitted on the real distillation inputs")
+    ap.add_argument("--vic-pooled", type=float, default=0.0,
+                    help="E46: VICReg variance + covariance regularisation (this weight on both terms) applied to the 576-d pooled layer itself, so that its rank is kept without any teacher")
+    ap.add_argument("--vic-mode", default="batch", choices=["batch", "source"],
+                    help="E51: 'source' centres the VICReg features on their synthetic source's in-batch mean (batches led by 12 sources x 4 rows), expanding treatment variance only")
     a = ap.parse_args()
     SYN = P.DATA / "synthetic" / a.synth
     torch.manual_seed(a.seed)
@@ -146,13 +150,18 @@ def main():
     paths = [r[0] for r in rows]
     with Pool(16) as pool:
         ex = np.stack(pool.starmap(_explicit_any, [(p, g in ("source", "real")) for p, g in zip(paths, gen)], chunksize=8))
-    dino = X.Dino(dev, layers=teacher_layers)
     ims = [Image.open(p).convert("RGB") if g not in ("source", "real") else X.to_short(load_image(p, max_side=1280)) for p, g in zip(paths, gen)]
-    dg, ds = dino(ims)
-    hyb = np.hstack([ex, ds])
     fs_tr = (gen == "filmsynth") & (split == "train")
     fam_names = np.array([fams[i] if i >= 0 else "none" for i in fam_i])
-    if a.kd_target == "supcon":
+    if a.kd <= 0:                                            # E46: no teacher at all (the DINOv2 pass is skipped; the head trains on nothing)
+        T = np.zeros((len(rows), 64), np.float32); a.kd_target = "none"
+    else:
+        dino = X.Dino(dev, layers=teacher_layers)
+        dg, ds = dino(ims)
+        hyb = np.hstack([ex, ds])
+    if a.kd <= 0:
+        pass
+    elif a.kd_target == "supcon":
         T = X.supcon(hyb[fs_tr], fam_names[fs_tr], dev)(hyb)
     elif a.kd_target == "supcon_vic3":
         from head_anticollapse import train_head
@@ -181,12 +190,23 @@ def main():
     torch.cuda.reset_peak_memory_stats()
     t0 = time.time()
     hist = []
+    vic_src = None
+    if a.vic_mode == "source":                                   # E51: synthetic sources with at least four training rows (the source itself and its treatments)
+        from collections import defaultdict
+        grp = defaultdict(list)
+        for i in tr:
+            if gen[i] in ("filmsynth", "source"):
+                grp[src[i]].append(i)
+        vic_src = [np.array(v) for v in grp.values() if len(v) >= 4]
+        rep["vic_source_groups"] = len(vic_src)
     for ep in range(a.epochs):
         net.train()
         perm = rng.permutation(tr)
         tot = 0.0
         for b in range(0, len(perm), 64):
             bi = perm[b:b + 64]
+            if vic_src is not None:                              # E51: 12 synthetic sources x 4 of their rows lead the batch; 16 random rows follow
+                bi = np.concatenate([*(rng.choice(vic_src[g], 4, replace=False) for g in rng.choice(len(vic_src), 12, replace=False)), perm[b:b + 16]])
             ox, oy = rng.integers(0, 33, 2)
             xb = Xu8[bi][:, oy:oy + 224, ox:ox + 224]
             if rng.random() < 0.5:
@@ -206,12 +226,20 @@ def main():
                 loss = loss + ((lp - Yt[bi_t]) ** 2 * pm).sum() / pm.sum()
             if a.kd > 0:
                 loss = loss + a.kd * (1 - nn.functional.cosine_similarity(kd, Tt[bi_t], dim=1)).mean()
+            if a.vic_pooled > 0 and len(bi) > 1:              # E46: VICReg on the pooled layer (variance hinge at 1, off-diagonal covariance)
+                fc = f.float()
+                if vic_src is not None:                          # E51: centre each row on its source's in-batch mean, so only treatment-induced variance is expanded
+                    g = fc[:48].reshape(12, 4, -1); fc = (g - g.mean(1, keepdim=True)).reshape(48, -1)
+                else:
+                    fc = fc - fc.mean(0)
+                std = torch.sqrt(fc.var(0) + 1e-4); C = (fc.T @ fc) / (len(fc) - 1)
+                loss = loss + a.vic_pooled * (torch.relu(1 - std).mean() + (C - torch.diag(torch.diag(C))).pow(2).sum() / fc.shape[1])
             opt.zero_grad(); loss.backward(); opt.step(); sched.step()
             tot += float(loss) * len(bi)
         hist.append(round(tot / len(tr), 4))
     rep["train"] = {"seconds": round(time.time() - t0, 1), "peak_gpu_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2),
                     "loss_curve": hist, "params": int(sum(p.numel() for p in net.parameters())), "seed": a.seed,
-                    "epochs": a.epochs, "kd_weight": a.kd, "gpu": torch.cuda.get_device_name(0) + " (dev workstation)"}
+                    "epochs": a.epochs, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode, "gpu": torch.cuda.get_device_name(0) + " (dev workstation)"}
 
     net.eval()
 
@@ -313,7 +341,7 @@ def main():
     torch.onnx.export(W(net.cpu().eval()), (torch.zeros(1, 3, 224, 224),), str(out / "model.onnx"), input_names=["pixel_values"],
                       output_names=["treated_logit", "family_logits", "style_embedding", "features_576"], dynamic_axes={"pixel_values": {0: "batch"}},
                       opset_version=17, dynamo=False)
-    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target,
+    (out / "meta.json").write_text(json.dumps({"model_version": f"filmlook-style-student-{a.tag}", "families": fams, "train_generators": gens, "teacher_layers": list(teacher_layers), "kd_target": a.kd_target, "kd_weight": a.kd, "vic_pooled": a.vic_pooled, "vic_mode": a.vic_mode,
                                                "outputs": ["treated_logit", "family_logits", "style_embedding", "features_576"], "input_size": 224,
                                                "label_sources": "synthetic parameter supervision + SupCon teacher distillation; no human labels"}, indent=1))
     import onnxruntime as ort

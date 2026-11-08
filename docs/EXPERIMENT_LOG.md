@@ -678,6 +678,71 @@ with the same matrix.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: the teacher is optional for the lightweight model; next session compares teacher-free and teacher-distilled pooled layers on a fresh holdout; falsified: the pooled signal needs the teacher term, which keeps DINOv2-Small in the training pipeline
 
+### E46_pooled_vicreg — the student's pooled 576-d layer keeps a non-collapsed, content-light film signal with no teacher at all when a VICReg variance/covariance term (weight 1) is applied to the layer itself: for each of three seeds of the E23b recipe with --kd 0 --vic-pooled 1, a PCA-64 of the pooled features (fitted on the CC-BY train originals) has effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5 and synthetic family p@5 within 0.10 of the E43 reference seed-mean; and the VICReg seed-mean museum p@5 is not below the plain no-teacher seed-mean by more than 0.02
+- Status: done; wall 311.1 s; peak GPU 7453.0 MB (total on card).
+- supported [proxy]: 0.0
+- vic_museum_mean [real]: 0.5195
+- nokd_museum_mean [real]: 0.4885
+- ref_museum_mean [real]: 0.5148
+- vic_within_auc_mean [real]: 0.6565
+- vic_own_source_mean [proxy]: 0.6127
+- vic_eff_rank_min [proxy]: 22.36
+- vic_synth_mean [proxy]: 0.5753
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the teacher-free VICReg student becomes the new research candidate, judged only on the analysis halves until a fresh holdout exists (the current test halves were read for the E43 candidate); falsified: the pooled-layer rank cannot be regularised directly, and the teacher-distilled E43 students stay the strongest baseline
+
+### E47_pooled_reductions — the student's pooled-layer film signal survives a 32-dimensional label-free PCA fitted on independent training-allowed real originals: for each of the three E43 seeds PCA-32 has effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance and within-uploader different-day AUC lower CI above 0.5, and its seed-mean museum p@5 and within-uploader AUC are each within 0.02 of the PCA-64 seed-means
+- Status: done; wall 27.1 s; peak GPU 5740.0 MB (total on card).
+- supported [proxy]: 0.0
+- pca32_museum_mean [real]: 0.5067
+- pca64_museum_mean [real]: 0.5148
+- pca32_within_auc_mean [real]: 0.6399
+- pca32_own_source_mean [proxy]: 0.2571
+- pca32_eff_rank_min [proxy]: 7.22
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: 32 floats (or 32 int8 values) per image is the shipping size for the similarity index; falsified: the index stays at 64 dimensions and the loss curve across 8-128 dimensions tells where the signal lives
+
+### E48_frozen_vs_trained — the FilmLook training is necessary for the lightweight extractor: the ImageNet-pretrained MobileNetV3-Small pooled layer with no training (same export, same PCA-64 fitted on the CC-BY train originals) either fails the candidate rule (effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5) or is more than 0.03 below the trained students' seed-mean museum p@5
+- Status: done; wall 20.1 s; peak GPU 5740.0 MB (total on card).
+- supported [proxy]: 1.0
+- init_museum_p5 [real]: 0.5283
+- trained_museum_mean [real]: 0.5148
+- init_within_auc [real]: 0.5504
+- init_own_source [proxy]: 0.9333
+- dino_style_pca64_museum [real]: 0.5455
+- dino_style_pca64_own_source [proxy]: 1.0
+- mobilenet_ms [proxy]: 1.3
+- dinov2_ms [proxy]: 90.1
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: the trained pooled layer stays the candidate and the ImageNet row is its no-training control in the model card; falsified: the product ships the ImageNet backbone plus PCA and the training pipeline is retired
+
+### E49_robustness — the student's pooled PCA-64 is invariant to geometry and compression and sensitive to rendering edits on real photographs it never trained on: for each of the three E43 seeds, own-image rank-1 among the commoncatalog_ccby validation originals is >= 0.9 under centre crop 80 %, horizontal flip, JPEG q50 and 0.5x rescale; edit-type p@5 among originals and their eight manifest-pipeline edits (own family excluded) is >= 0.25 (chance ~0.11); and an edited image retrieves its own original with rank-1 <= 0.5 (chance 1/113)
+- Status: done; wall 35.5 s; peak GPU 7359.0 MB (total on card).
+- supported [proxy]: 0.0
+- student_min_invariant_rank1 [real]: 0.885
+- student_edit_p5_mean [real]: 0.4662
+- student_edited_own_source_mean [real]: 0.417
+- dino_global_pca64_edit_p5 [real]: 0.1318
+- explicit28_std_edit_p5 [real]: 0.5268
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the invariance/sensitivity profile goes into the model card; falsified: the failing perturbation or the content leakage names the next training augmentation
+
+### E50_aesthetic_vs_content — the student's pooled PCA-64 neighbourhoods are rendering neighbourhoods, not scene neighbourhoods: on the commoncatalog_film analysis half (uploader excluded), for each of the three E43 seeds the five nearest neighbours differ from the query in the standardised colour-tone statistics by at most 0.8x, and in the texture statistics by at most 0.9x, what five random candidates do, and the uploader-grouped ridge R^2 of the embedding from the 28 explicit rendering statistics is at least its R^2 from a dimension-matched 28-d PCA of the frozen DINOv2 CLS++mean content embedding
+- Status: done; wall 7.0 s; peak GPU 5740.0 MB (total on card).
+- supported [proxy]: 1.0
+- student_colour_ratio_mean [real]: 0.6506
+- student_texture_ratio_mean [real]: 0.8637
+- student_rendering_r2_mean [real]: 0.0143
+- student_content_r2_mean [real]: -0.0193
+- student_provenance_r2_mean [real]: -0.0316
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: "similar look" retrieval and attribute-based badge suggestions can be built on the pooled PCA-64 (exploratory, no identification claims); falsified: the neighbourhoods are content or provenance and the similarity feature needs an explicit-attribute re-ranking
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
