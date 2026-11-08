@@ -756,6 +756,73 @@ with the same matrix.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: the source-centred VICReg student is the teacher-free candidate for the next fresh holdout; falsified: rank control on the pooled layer is closed in this architecture and the teacher-distilled E43 student stays the baseline
 
+### Session 7 synthesis (2026-11-08, E53-E56): fresh holdouts, frozen candidate, MVP decision
+
+1. **Fresh holdouts acquired (no human labels; licences checked per record).** The Met Open Access CSV (CC0) lists
+   7,029 public-domain photographs of the Photographs department with a recorded medium; 700 were selected (cap 6 per
+   artist, "Unknown" counted as one), the objects endpoint re-checked `isPublicDomain` and supplied `primaryImageSmall`
+   (one request per 0.6 s; the search endpoint still returns HTTP 410); 698 stored (one 404, one near-duplicate), 267
+   artists, max artist share 0.9 %, 1840s-1890s (albumen 374, salted paper 77+, gelatin silver 41, daguerreotype,
+   cyanotype, tintype). Split by artist hash; `training_allowed: false` by policy. A second CommonCatalog film-scan
+   snapshot (`commoncatalog_film_hd`) came from shard ranges never scanned before (2048-4096 px: 400 of 3,610 shards,
+   about two qualifying rows each and one in seven from a new uploader; 768-1024 and 512-768 px: all 474 shards), with
+   the 252 uploaders of the first snapshot and the 602 training uploaders excluded and caps 30 / 10 / 150; 474 rows
+   from 133 uploaders were stored (474 scans, 51 stocks, 324 with a stock line). ARTeFACT's 44 originals (one photographer, owner-recorded emulsions) had never been
+   read by a style embedding and were added, before the read, as a recorded within-photographer reading.
+2. **Frozen before the read.** `scripts/freeze_candidate.py` copied the three E52 students, the three E23b students and
+   the untrained ImageNet control into `checkpoints/frozen_session7/` with the PCA fitted on the 601 CC-BY train
+   originals (mean, 64 nested components, int8 scales for the first 32) and SHA-256s in `freeze.json`
+   (`docs/FROZEN_CANDIDATE_S7.md`); the evaluation script verifies the hashes. PCA-32 int8 = 32 bytes per image.
+3. **The rule was calibrated on the spent halves, not on the holdout.** The same script ran first on the spent AIC and
+   CommonCatalog analysis halves (`reports/e53_self_test.json`). That run moved two thresholds and one domain before any
+   holdout image was read (recorded in the backlog): the explicit-28 statistics lead the student on museum process p@5 by
+   0.10-0.13 (E48 had 0.08), so "not below explicit minus 0.05" became minus 0.15; the artist-share bound 0.10 was
+   replaced by "not above the untrained backbone" (0.14-0.15 vs 0.19-0.21); and the crop/flip/JPEG/rescale rule moved
+   from museum digitisations to film scans, because a 10 % centre crop of a museum digitisation loses the nearest
+   neighbour a third of the time (0.67) while the same crop on film scans keeps it (0.92) - mounts and borders are part
+   of the museum signal. The self-test also read the decisive criterion (e), within-uploader AUC minus ImageNet-init,
+   at +0.078 [-0.025, 0.202] over 92 queries (d = 0.22): not statistically established on the spent half either. One more
+   spent-half finding: the E23b seeds lose 19-31 % of their nearest neighbours under JPEG q50 / 0.5x rescale on real film
+   scans (0.69-0.81), where the E52 seeds keep 96-99 %: the degrade augmentation matters more on real scans than the
+   113 validation originals suggested.
+4. **E54 (falsified).** Seven single-parameter edits at five magnitudes on the 113 validation originals: the candidate
+   decodes contrast (R^2 0.73) and grain (0.57) linearly across scenes, temperature at 0.48, saturation 0.32, lift 0.37,
+   gamma 0.17, blur 0.13; the attribute is named from the displacement at 0.47-0.50 (chance 0.14); every edit moves the
+   embedding monotonically (Spearman 0.77-0.98) and 1.2-10x a centre crop, but the direction depends on the scene (mean
+   cosine between scenes' displacements 0.02-0.50). The 28 statistics decode 4 of 7 (they measure them); ImageNet-init 1,
+   DINOv2 0 (they barely move: 0.1-0.5x a crop). The candidate is a holistic, monotone look signature, not a set of
+   linear attribute axes; the explicit statistics remain the explanation layer.
+5. **E56 (rejected under its rule; informative).** On the spent CommonCatalog analysis half, ridge from stock-line,
+   scanner-family or uploader one-hots explains none of any representation's variance (R^2 <= 0 under CV; uploader
+   -0.05 for the candidate vs -0.10 for ImageNet-init, both at noise level, so the second clause of the rule was
+   ill-posed and failed), content PCs explain 4 % of the candidate vs 13 % of ImageNet-init, 18 % of DINOv2 L4+L8 and
+   45 % of DINOv2-global. Stock-line p@5 with the scanner family forced to differ (0.111-0.116) is not below the
+   unrestricted value (0.092-0.097): the stock signal does not run through the scanner, but it is near chance (0.066)
+   for every representation, including the frozen teacher and the statistics.
+6. **E53 (the single fresh read; rejected under its rule, decisive claim supported).** Met analysis half (378 images,
+   140 artists; 5 strips under 256 px dropped), 324 fresh scans from 91 uploaders, 44 ARTeFACT originals. Candidate
+   PCA-32 int8, three seeds: museum process p@5 0.694-0.700 with lower CIs 0.642-0.648 against a chance of 0.648
+   (albumen is two thirds of the half) - guard (a) failed; explicit-28 reads 0.746 [0.697, 0.794], ImageNet-init 0.678,
+   DINOv2 0.66-0.68; artist share 0.078-0.081 (init 0.105, explicit 0.130). Stock-line p@5 0.141-0.156 [0.10, 0.20]
+   against 0.080 (init 0.142, explicit 0.119); uploader share 0.13-0.14 (init 0.138, explicit 0.181). Within-uploader
+   different-day AUC 0.672-0.715 over 93 queries against init 0.560 and explicit 0.691: the seed-mean paired difference
+   to init is +0.128 [+0.039, +0.232] (d 0.39) - criterion (e) holds on fresh data for the first time; to DINOv2-global
+   +0.187 [+0.029, +0.360]; to explicit -0.013 [-0.083, +0.044], a tie. Robustness on the 324 scans: crop80 0.87-0.88
+   (guard (d) failed against 0.9; init 0.99), flip 1.00, JPEG q50 0.98-0.99, rescale 0.95-0.97, corner 0.63; the E23b
+   seeds read 0.67-0.76 under JPEG and rescale on the same scans. ARTeFACT same-emulsion AUC 0.62 [0.54, 0.70] (init
+   0.73, DINOv2 L4+L8 0.75, explicit 0.61), p@3 0.39-0.43 against 0.21. Per stock, Portra 0.32 and Tri-X 0.29, nine
+   stocks at 0.00; 187 of 311 stock queries had no relevant neighbour. Effect size vs explicit on museum -0.052
+   [-0.084, -0.022]. Decision recorded as rejected by the loop (supported = 0, inconclusive = 0).
+7. **E55 (supported).** Abstention gate (3 of 5 neighbours agree, top-1 cosine above a threshold calibrated on the spent
+   halves), evaluated on the stored E53 records: museum process claims 0.754 [0.686, 0.824] precision at 39 % coverage
+   (chance 0.468, answer-everything 0.747); stock-line claims 0.24-0.27 at 31-36 % coverage (chance 0.08, 0.16 answering
+   everything). The calibration is unstable (seed 0 found no threshold at 3/5; at 4/5 it reaches 0.84 at 66 % coverage).
+   Label claims stay off in the product; the gate is kept as the "similar look" confidence rule.
+8. **Session stop and MVP.** Research stopped on the owner's instruction after E53-E56; the decision, the comparison with
+   the 28 statistics and the untrained backbone, the limits and the serving cost are in `docs/MVP_DECISION.md`
+   (LIMITED GO for an exploratory similar-look embedding; NO-GO for any identification). A CPU service with the frozen
+   model exists in `service/` (stdlib HTTP + ONNX Runtime, 65-135 MB RSS, 21 ms per embedding on one core here).
+
 ### Session 6 synthesis (2026-11-08, E46-E51): the lightweight extractor, judged on what the product needs
 
 All on the analysis halves (E49 on the commoncatalog_ccby validation split); no test half, no BlueNeg; every reduction
@@ -850,6 +917,29 @@ students (`student_style_fs_v2_real_f576{,_s1,_s2}`) are the reference throughou
 - Decision rule: neutral: no credible real-film change
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: the stock-line signal is recorded as scanner-independent (still exploratory, at or near chance across uploaders); falsified: the stock-line reading is attributed to the scanner or the photographer and removed from product claims
+
+### E53_fresh_holdout — on previously unseen real photographs (The Met public-domain prints, analysis half; a second independent CommonCatalog film-scan snapshot from new uploaders), the frozen candidate (PCA-32 int8 of the pooled features of the three degrade-augmented seeds, checkpoints/frozen_session7) keeps the real signal and the content invariance measured on the spent halves: for every seed (a) museum process p@5 lower CI above chance, (b) museum p@5 >= explicit-28 p@5 - 0.15, (c) artist share <= ImageNet-init's artist share, (d) own-image rank-1 >= 0.9 under centre crop, flip, JPEG q50 and 0.5x rescale on the film scans, (f) uploader share <= ImageNet-init + 0.02 (amendments 2026-11-08 15:40-15:45, all before the holdout read, from the self-test of the same script on the spent halves, reports/e53_self_test.json: (b) was written as - 0.05 although E48 already placed the explicit statistics 0.08 above the student and the self-test reads the PCA-32 gap at 0.10-0.13, so 0.15 tests that the gap does not widen out of sample; (c) was 0.10 while the spent half reads 0.14-0.15 against 0.19-0.21 for the untrained backbone, so the leakage guard became "not above the untrained backbone", parallel to (f); (d) moved from the museum digitisations to the film scans because a 10 % crop of a museum digitisation loses the nearest neighbour a third of the time, consistent with mounts and borders being part of the signal; museum robustness is recorded, not ruled; the spent half also reads criterion (e) at +0.078 [-0.025, 0.202] over 92 queries, i.e. the one claimed advantage is not statistically established there either, and (e) is kept unchanged as the decisive criterion; amendment 16:15, before the read: the 44 ARTeFACT originals (one photographer, owner-recorded emulsions, never read by any style embedding) are added as a recorded within-photographer reading - same-emulsion AUC and p@3, CI over queries - outside the rule, because the second CommonCatalog snapshot holds too few multi-stock uploaders for criterion (e)); and (e) the seed-mean within-uploader different-day AUC exceeds the untrained ImageNet backbone with the same PCA by a paired-bootstrap lower CI above 0 (the one claim that distinguishes training from the backbone, E48)
+- Status: done; wall 166.9 s; peak GPU 7363.0 MB (total on card).
+- supported [real]: 0.0
+- inconclusive [real]: 0.0
+- museum_mean [real]: 0.6971
+- explicit_museum [real]: 0.7463
+- within_auc_mean [real]: 0.6882
+- init_within_auc [real]: 0.5601
+- robustness_min [real]: 0.8704
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the frozen candidate is the recommended research representation (still not deployed); falsified: the failing criterion names the limitation and the test halves stay untouched; inconclusive: acquire more film-scan uploaders before any further reading
+
+### E55_abstention — a label claim gated on neighbour agreement (at least 3 of the top 5 share the label) and a top-1 cosine threshold calibrated on the spent halves (smallest tau with answered precision >= 2 x chance) transfers to the fresh museum holdout: for the candidate seeds pooled (PCA-32 int8), coverage >= 0.2, answered precision >= 1.5 x chance with a lower CI above chance, and higher than answering every query with the plurality label
+- Status: done; wall 2.3 s; peak GPU 5743.0 MB (total on card).
+- supported [real]: 1.0
+- museum_coverage [real]: 0.3948
+- museum_precision_answered [real]: 0.7541
+- museum_precision_all [real]: 0.7465
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: the gate becomes the product rule for any label claim (abstain otherwise; "similar look" is always shown); falsified: label claims stay off and only "similar look" with the abstention rule is offered
 
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 

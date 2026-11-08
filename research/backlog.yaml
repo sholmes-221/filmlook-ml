@@ -1864,7 +1864,8 @@ experiments:
   next_step: 'supported: the frozen candidate is the recommended research representation (still not deployed); falsified:
     the failing criterion names the limitation and the test halves stay untouched; inconclusive: acquire more film-scan uploaders
     before any further reading'
-  status: pending
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
 - id: E54_characteristic_probe
   hypothesis: 'the frozen candidate (PCA-32 int8 of each degrade-augmented seed) encodes single-parameter photographic characteristics
     as scene-independent, decodable directions: on the 113 CC-BY validation originals edited at five magnitudes of temperature,
@@ -1959,7 +1960,8 @@ experiments:
       kind: real
   next_step: 'supported: the gate becomes the product rule for any label claim (abstain otherwise; "similar look" is always
     shown); falsified: label claims stay off and only "similar look" with the abstention rule is offered'
-  status: pending
+  status: supported
+  result: 'not falsified: supported=1.0000 >= 1'
 - id: E56_shortcut_audit
   hypothesis: 'the candidate''s film-stock signal on real scans does not run through the scanner or the photographer: on the
     spent commoncatalog_film analysis half, for every candidate seed (PCA-32 int8) the stock-line p@5 restricted to candidates

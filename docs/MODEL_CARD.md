@@ -90,5 +90,13 @@ retrieval (the student is best on synthetic and at the reference on real).
   to 0.98-1.00 and the corner crop to 0.84-0.88 with edit-type p@5 0.45 (vs 0.47) and the real matrix unchanged; that
   variant has analysis-half and validation readings only, no held-out reading. Claims 29-34 in `docs/FINDINGS.md`.
 
+- Fresh-holdout reading (session 7, E53, one read, three seeds, PCA-32 int8 of `checkpoints/frozen_session7/style_fs_v2_real_f576_deg*`):
+  Met process p@5 0.69-0.70 (chance 0.65; statistics 0.75), fresh-uploader stock-line p@5 0.14-0.16 (chance 0.08; every
+  representation alike), within-uploader stock AUC 0.67-0.72 against 0.56 for the untrained backbone (+0.13 [+0.04, +0.23])
+  and 0.69 for the statistics, ARTeFACT same-emulsion AUC 0.62 (untrained 0.73), crop80 0.87-0.88, JPEG/rescale 0.95-0.99.
+  The pre-registered rule was falsified on the museum CI and the crop guard; the within-photographer advantage is the only
+  statistically supported gain over the untrained backbone. Decision: LIMITED GO for an exploratory similar-look embedding
+  with the statistics as explanation, NO-GO for identification (`docs/MVP_DECISION.md`). Nothing deployed.
+
 ## Compute and cost
 Local RTX 4090 only; no paid API or cloud GPU at any point. Session budgets in `docs/RESOURCE_USAGE.md`.

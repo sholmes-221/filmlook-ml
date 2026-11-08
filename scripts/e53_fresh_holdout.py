@@ -228,8 +228,10 @@ def main():
         h = hashlib.sha256((FROZEN / t / "model.onnx").read_bytes()).hexdigest(); assert h == rec["model_sha256"], f"frozen model changed: {t}"
     if a.final:
         rows_m = [r for r in read_jsonl(P.MANIFESTS / "met_photographs_manifest.jsonl") if r["split"] == "analysis"]
+        n_small = sum(1 for r in rows_m if min(r["image_width"], r["image_height"]) < 256)                 # panoramic strips below the runtime's 256 px minimum side
+        rows_m = [r for r in rows_m if min(r["image_width"], r["image_height"]) >= 256]
         rows_s = [r for r in read_jsonl(P.MANIFESTS / "commoncatalog_film_hd_manifest.jsonl") if r.get("film_stock")]   # brand-only rows carry no stock label and are left out
-        label = {"museum": "met_photographs analysis half (test half untouched)", "scans": "commoncatalog_film_hd, all rows with a stock claim"}
+        label = {"museum": f"met_photographs analysis half (test half untouched; {n_small} images with a side below 256 px dropped)", "scans": "commoncatalog_film_hd, all rows with a stock claim"}
     else:
         rows_m = [r for r in read_jsonl(P.MANIFESTS / "aic_photographs_manifest.jsonl") if r["split"] == "analysis"]
         rows_s = [r for r in read_jsonl(P.MANIFESTS / "commoncatalog_film_manifest.jsonl") if r["split"] == "analysis" and r.get("film_stock")]

@@ -61,6 +61,20 @@ cores, 61 GB RAM. The owner's training GPU is an RTX 4070 (12 GB); the productio
   (< 30 MB), reports < 5 MB. `checkpoints` 299 MB, `data/embeddings` 316 MB in total. Nothing deleted.
 - Network: none (no acquisition this session; the Commons retry stays with the orchestrator's backoff).
 
+## Session 7 (2026-11-08, fresh holdouts, frozen candidate, MVP: E53-E56)
+- GPU: no training. DINOv2-Small feature passes only: the E53 self-test on the spent halves (about 650 images), the E53
+  holdout read (746 images, 165 s wall), E54 (4,181 edited validation images, 443.1 s wall). E56 and E55 ran on cached or stored
+  features (CPU). Session total under 3 GPU-minutes; ledger total across sessions 7168 GPU-seconds (119 minutes) of
+  the 4-hour-per-session budget.
+- Disk: The Met open-access CSV 341 MB (`data/candidates/met`, kept for reproducibility) + 698 images 65 MB; the second
+  CommonCatalog snapshot 474 images 283 MB; frozen candidate directory 31 MB (`checkpoints` 413 MB, `data/embeddings`
+  357 MB in total); reports < 5 MB. Nothing deleted.
+- Network: Met objects endpoint 700 requests at one per 0.6 s plus 700 image downloads (no 429 seen); Hugging Face
+  parquet metadata scans 874 shards (8 workers, about 1.5 h) and page-range reads for 474 images; GitHub raw for the CSV.
+  No Wikimedia request (Commons stays `permanent_failure`). Nothing paid.
+- Service benchmark (one pinned core on this host): RSS 65 / 104 / 135 MB (idle / loaded / peak), 21 ms per embedding,
+  113 ms with the 28 statistics (`reports/service_bench.json`).
+
 ## Session 6 (2026-11-08, lightweight extractor E46-E52)
 - GPU: E46 trained five MobileNetV3-Small students (311 s wall, peak 7.5 GB on the card including the 5.7 GB other job;
   the no-teacher runs skip the DINOv2 pass) E51 three (224 s) and E52 three more with the re-encoding augmentation (241 s); E49 ran DINOv2-Small on 1,582 validation images
