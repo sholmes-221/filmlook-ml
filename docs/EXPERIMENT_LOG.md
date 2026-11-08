@@ -410,6 +410,59 @@ generators.
 - Learned: decision rejected: falsified: supported=0.0000 < 1
 - Next: supported: film-process (not stock) becomes the real-film retrieval target for the next benchmark version; falsified: record that these embeddings carry no cross-photographer film-process signal on Flickr scans and move the real-film claim to within-photographer / within-roll structure only
 
+### E32_e29_audit — the hybrid teacher's museum-print process signal (E29: 0.532 vs 0.389) is print rendering rather than format: it survives the removal of stereo cards and the matching of the candidate bank to the query's decade (lower CI above the within-decade prior); and the real-distilled students' loss of it is anisotropy on this out-of-domain set (label-free whitening restores a lower CI above chance) rather than information loss (whitening does not help)
+- Status: done; wall 6.2 s; peak GPU 6257.0 MB (total on card).
+- teacher_survives [proxy]: 1.0
+- teacher_decade_matched [real]: 0.4828
+- teacher_decade_matched_chance [real]: 0.358
+- students_whitened_recover [proxy]: 6.0
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: teacher_survives=1.0000 >= 1
+- Next: teacher survives: the process signal is rendering, not format; next transfer experiment targets the component that carries it (ablation) with a projection head on frozen DINOv2-Small features, judged on commoncatalog_film and the museum set with artist/uploader exclusion; falsified: record E29 as a format/era cue, retire process p@5 as a selection metric and keep aic_photographs for authenticity/robustness checks only
+
+### E33_frozen_head_choice — a label-free whitened PCA-64 of the frozen DINOv2-Small L4+L8 statistics, fitted on independent unlabeled real originals, carries at least as much real-photograph signal as the synthetic-family SupCon projection: museum process p@5 (stereo removed, decade matched) lower CI above chance, commoncatalog_film stock-line p@5 not below the projection's, uploader- and artist-share excess <= 0.02
+- Status: done; wall 8.6 s; peak GPU 6257.0 MB (total on card).
+- supported [proxy]: 0.0
+- candidate_museum_p5 [real]: 0.5646
+- candidate_stock_line_p5 [real]: 0.1029
+- candidate_synth_family_p5 [proxy]: 0.2686
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the whitened head becomes the distillation target candidate for a student retrained with the E23b recipe (E34), judged on the same real metrics plus the synthetic validation cost; falsified: keep the SupCon projection, test a projection head trained with real-photo structure instead (E34 alternative)
+
+### E34_head_anticollapse — the SupCon projection's rank collapse (effective rank ~4) is what loses real-photograph information, and its low photographer leakage is not merely a by-product of that collapse: a SupCon head trained on the same synthetic family labels with VICReg variance/covariance regularisation (lambda 1) reaches effective rank >= 16, museum process p@5 (stereo removed, decade matched) and commoncatalog_film stock-line p@5 both with lower CI above chance, while its uploader share, artist share (<= +0.02) and scanner-probe accuracy (<= +0.05) stay within the guards relative to the current projection
+- Status: done; wall 7.3 s; peak GPU 6277.0 MB (total on card).
+- supported [proxy]: 0.0
+- primary_eff_rank [proxy]: 9.95
+- primary_stock_line_p5 [real]: 0.0799
+- primary_museum_p5 [real]: 0.4869
+- primary_uploader_share [real]: 0.072
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: retrain the real-distil student (E23b recipe) against the anti-collapse head as its distillation target (E35) and judge it on the same real metrics; falsified with leakage: information and photographer invariance trade off in the frozen features, so the next head needs an explicit photographer-invariance term on real data with several images per uploader (feature pass over commoncatalog_ccby); falsified on rank/information: collapse is not the mechanism, revisit the distillation loss
+
+### E35_head_photographer_invariant — photographer identity and real-photograph film/process information occupy separable directions of the frozen DINOv2-Small L4+L8 statistics: removing the top-32 between-uploader LDA directions (estimated on independent training-allowed CC-BY originals with several images per uploader) before a label-free whitened PCA-64 head keeps the stock-line and museum-process lower CIs above chance while bringing uploader and artist share within +0.02 of the current projection and the scanner probe within +0.05
+- Status: done; wall 15.1 s; peak GPU 6259.0 MB (total on card).
+- supported [proxy]: 0.0
+- primary_stock_line_p5 [real]: 0.1
+- primary_museum_p5 [real]: 0.5727
+- primary_uploader_share [real]: 0.1553
+- primary_artist_share [real]: 0.2529
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the removed+whitened head is the new distillation target candidate (student retrain, E36); falsified because leakage stays: photographer identity is entangled with the film signal in frozen features, so the remaining routes are (a) an uploader-adversarial head trained on more multi-image uploaders or (b) accepting photographer sensitivity as a product feature and measuring it content-controlled; falsified because information drops: the stock and process cues live in the same directions as photographer identity on these sources
+
+### E36_student_whitening — the real-distilled student's museum-print failure (E29) is geometry, not missing information: a 64x64 PCA-whitening fitted on its embeddings of independent training-allowed real photographs (commoncatalog_ccby train originals) and applied unchanged restores a museum process p@5 lower CI above chance, does not lower its stock-line p@5, and keeps uploader share, artist share (<= +0.02) and scanner probe (<= +0.05) within the guards relative to the raw student
+- Status: done; wall 8.3 s; peak GPU 5740.0 MB (total on card).
+- supported [proxy]: 0.0
+- primary_whitened_museum_p5 [real]: 0.5273
+- primary_raw_museum_p5 [real]: 0.4192
+- primary_whitened_stock_line_p5 [real]: 0.0787
+- students_recovered_indep [real]: 7.0
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: ship-candidate post-processing (a fixed 64x64 matrix) recorded for the student; verify once on the held-out halves at the end of the session (--final) together with the synthetic benchmark; falsified: the collapse must be fixed at training time (non-collapsed target or anti-collapse term in the student loss, E37)
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The

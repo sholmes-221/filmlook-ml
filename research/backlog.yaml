@@ -537,3 +537,279 @@ experiments:
     to within-photographer / within-roll structure only'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E32_e29_audit
+  hypothesis: 'the hybrid teacher''s museum-print process signal (E29: 0.532 vs 0.389) is print rendering rather than format:
+    it survives the removal of stereo cards and the matching of the candidate bank to the query''s decade (lower CI above
+    the within-decade prior); and the real-distilled students'' loss of it is anisotropy on this out-of-domain set (label-free
+    whitening restores a lower CI above chance) rather than information loss (whitening does not help)'
+  motivation: E29 is the only real-photograph retrieval signal above chance across photographers; 76 of the 306 analysis prints
+    are stereo cards (aspect ~2:1, all albumen) and process correlates with decade, so a format/era cue could produce it.
+    The three real-distilled students (0.445-0.468) sit below the synthetic-only ones; whether they lost the information or
+    only its geometry decides the next transfer experiment.
+  value: 5
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 3
+  disk_gb: 0.01
+  datasets:
+  - aic_photographs
+  - commoncatalog_film
+  metric: 'scripts/e29_audit.py: process p@5 artist-excluded under three regimes (full / no stereo / no stereo + decade matched)
+    with artist bootstrap CI; 2-d format baseline; component ablation; per student: agreement with the teacher in and out
+    of domain, effective rank, mean cosine, grouped ridge R^2 of colour-tone and of the teacher projection, p@5 after PCA
+    whitening; summary.teacher_survives'
+  confounders:
+  - whitening is fitted on the evaluated (analysis) half, label-free; diagnostic only
+  - decade matching shrinks the bank; some processes become unretrievable (skipped queries)
+  - museum digitisation is shared by every print
+  falsified_if: 'summary.teacher_survives == 0: with stereo cards removed or with the decade matched the hybrid teacher''s
+    process p@5 lower CI is not above chance (the E29 signal is a format/era cue)'
+  falsify:
+    metric: teacher_survives
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e29_audit.py
+  result_json: reports/e29_audit.json
+  metrics_of_interest:
+    teacher_survives:
+      path: summary.teacher_survives
+      kind: proxy
+    teacher_decade_matched:
+      path: summary.teacher_decade_matched
+      kind: real
+    teacher_decade_matched_chance:
+      path: summary.teacher_decade_matched_chance
+      kind: real
+    students_whitened_recover:
+      path: summary.students_whitened_recover
+      kind: proxy
+  next_step: 'teacher survives: the process signal is rendering, not format; next transfer experiment targets the component
+    that carries it (ablation) with a projection head on frozen DINOv2-Small features, judged on commoncatalog_film and the
+    museum set with artist/uploader exclusion; falsified: record E29 as a format/era cue, retire process p@5 as a selection
+    metric and keep aic_photographs for authenticity/robustness checks only'
+  status: supported
+  result: 'not falsified: teacher_survives=1.0000 >= 1'
+- id: E33_frozen_head_choice
+  hypothesis: 'a label-free whitened PCA-64 of the frozen DINOv2-Small L4+L8 statistics, fitted on independent unlabeled real
+    originals, carries at least as much real-photograph signal as the synthetic-family SupCon projection: museum process p@5
+    (stereo removed, decade matched) lower CI above chance, commoncatalog_film stock-line p@5 not below the projection''s,
+    uploader- and artist-share excess <= 0.02'
+  motivation: 'E32: the SupCon projection has effective rank ~4 on real photographs and loses process information relative
+    to its inputs (L4+L8 alone 0.489 vs projection 0.410 with stereo removed); whitening restores the students. Before any
+    new distillation the target itself must be chosen on real data, not on synthetic families.'
+  value: 5
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 3
+  disk_gb: 0.01
+  datasets:
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/frozen_head_choice.py: stock-line p@5 uploader-excluded + uploader share (commoncatalog_film analysis);
+    museum process p@5 stereo-removed decade-matched + artist share (aic_photographs analysis); synthetic family p@5 on the
+    filmsynth validation split (cost); effective rank; summary.supported'
+  confounders:
+  - the whitening fit set is Flickr digital originals (modern, colour); museum prints are out of its domain
+  - stock-line labels are uploader claims; near chance for every embedding so far (E27b)
+  - 128-d heads are not deployable as a 64-d student target without another reduction
+  falsified_if: 'summary.supported == 0: the whitened PCA-64 head fails any of (a) museum lower CI above chance, (b) stock-line
+    p@5 >= projection, (c) uploader-share excess <= 0.02, (d) artist-share excess <= 0.02'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/frozen_head_choice.py
+  result_json: reports/frozen_head_choice.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    candidate_museum_p5:
+      path: summary.candidate_museum_p5
+      kind: real
+    candidate_stock_line_p5:
+      path: summary.candidate_stock_line_p5
+      kind: real
+    candidate_synth_family_p5:
+      path: summary.candidate_synth_family_p5
+      kind: proxy
+  next_step: 'supported: the whitened head becomes the distillation target candidate for a student retrained with the E23b
+    recipe (E34), judged on the same real metrics plus the synthetic validation cost; falsified: keep the SupCon projection,
+    test a projection head trained with real-photo structure instead (E34 alternative)'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E34_head_anticollapse
+  hypothesis: 'the SupCon projection''s rank collapse (effective rank ~4) is what loses real-photograph information, and its
+    low photographer leakage is not merely a by-product of that collapse: a SupCon head trained on the same synthetic family
+    labels with VICReg variance/covariance regularisation (lambda 1) reaches effective rank >= 16, museum process p@5 (stereo
+    removed, decade matched) and commoncatalog_film stock-line p@5 both with lower CI above chance, while its uploader share,
+    artist share (<= +0.02) and scanner-probe accuracy (<= +0.05) stay within the guards relative to the current projection'
+  motivation: 'E32: projection rank ~4, whitening restores the students; E33: label-free heads keep the information (stock
+    line 0.103 vs 0.071, museum 0.565 vs 0.483) but leak the photographer (uploader share 0.143 vs 0.060, artist share 0.265
+    vs 0.103). Whether information and photographer invariance can coexist in one 64-d head decides the student target.'
+  value: 5
+  gpu_minutes: 1
+  gpu_mb: 1500
+  cpu_minutes: 4
+  disk_gb: 0.01
+  datasets:
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/head_anticollapse.py: per head stock-line p@5 uploader-excluded, uploader share, scanner probe (commoncatalog_film
+    analysis); museum p@5 stereo-removed decade-matched, artist share (aic_photographs analysis); synthetic family p@5 (filmsynth
+    val, cost); effective rank; summary.supported for the primary candidate supcon_t0.1_vic1.0'
+  confounders:
+  - the synthetic family labels define the positives; real photographs enter only at evaluation
+  - stock-line labels are uploader claims
+  - seeds 1-2 are reported, not averaged into the rule
+  falsified_if: 'summary.supported == 0: the primary head fails the rank, either lower-CI, or any leakage guard'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/head_anticollapse.py
+  result_json: reports/head_anticollapse.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    primary_eff_rank:
+      path: summary.primary_eff_rank
+      kind: proxy
+    primary_stock_line_p5:
+      path: summary.primary_stock_line_p5
+      kind: real
+    primary_museum_p5:
+      path: summary.primary_museum_p5
+      kind: real
+    primary_uploader_share:
+      path: summary.primary_uploader_share
+      kind: real
+  next_step: 'supported: retrain the real-distil student (E23b recipe) against the anti-collapse head as its distillation
+    target (E35) and judge it on the same real metrics; falsified with leakage: information and photographer invariance trade
+    off in the frozen features, so the next head needs an explicit photographer-invariance term on real data with several
+    images per uploader (feature pass over commoncatalog_ccby); falsified on rank/information: collapse is not the mechanism,
+    revisit the distillation loss'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E35_head_photographer_invariant
+  hypothesis: 'photographer identity and real-photograph film/process information occupy separable directions of the frozen
+    DINOv2-Small L4+L8 statistics: removing the top-32 between-uploader LDA directions (estimated on independent training-allowed
+    CC-BY originals with several images per uploader) before a label-free whitened PCA-64 head keeps the stock-line and museum-process
+    lower CIs above chance while bringing uploader and artist share within +0.02 of the current projection and the scanner
+    probe within +0.05'
+  motivation: 'E33/E34: information and photographer invariance traded off monotonically under collapse controls on the same
+    features. A linear photographer subspace estimated on disjoint uploaders is the cheapest test of separability; random
+    and principal-component removal of the same size are the controls.'
+  value: 5
+  gpu_minutes: 1
+  gpu_mb: 1500
+  cpu_minutes: 5
+  disk_gb: 0.02
+  datasets:
+  - aic_photographs
+  - commoncatalog_film
+  - commoncatalog_ccby
+  - bench_features_v1
+  metric: 'scripts/head_photographer_invariant.py: stock-line p@5, uploader share, scanner probe, content-controlled photographer
+    p@5 (commoncatalog_film analysis); museum p@5 stereo-removed decade-matched, artist share (aic_photographs analysis);
+    synthetic family p@5 (cost); effective rank; summary.supported for lda32_pcaw64'
+  confounders:
+  - only 92 uploaders with >= 2 images in the fit set (269 images); the LDA subspace is a rough estimate
+  - the fit set is modern Flickr (mixed film and digital); museum prints are far from it
+  - removing between-photographer directions can remove stock information that is confounded with photographer
+  falsified_if: 'summary.supported == 0: the primary head loses either lower CI or exceeds a leakage guard'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/head_photographer_invariant.py
+  result_json: reports/head_photographer_invariant.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    primary_stock_line_p5:
+      path: summary.primary_stock_line_p5
+      kind: real
+    primary_museum_p5:
+      path: summary.primary_museum_p5
+      kind: real
+    primary_uploader_share:
+      path: summary.primary_uploader_share
+      kind: real
+    primary_artist_share:
+      path: summary.primary_artist_share
+      kind: real
+  next_step: 'supported: the removed+whitened head is the new distillation target candidate (student retrain, E36); falsified
+    because leakage stays: photographer identity is entangled with the film signal in frozen features, so the remaining routes
+    are (a) an uploader-adversarial head trained on more multi-image uploaders or (b) accepting photographer sensitivity as
+    a product feature and measuring it content-controlled; falsified because information drops: the stock and process cues
+    live in the same directions as photographer identity on these sources'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'
+- id: E36_student_whitening
+  hypothesis: 'the real-distilled student''s museum-print failure (E29) is geometry, not missing information: a 64x64 PCA-whitening
+    fitted on its embeddings of independent training-allowed real photographs (commoncatalog_ccby train originals) and applied
+    unchanged restores a museum process p@5 lower CI above chance, does not lower its stock-line p@5, and keeps uploader share,
+    artist share (<= +0.02) and scanner probe (<= +0.05) within the guards relative to the raw student'
+  motivation: 'E32: all six students recover after whitening fitted on the evaluated half (effective rank 2-3, mean cosine
+    0.6-0.8 on monochrome prints); a fit on independent data is the deployable form of that fix (no retraining) and tests
+    whether the recovery transfers across domains.'
+  value: 5
+  gpu_minutes: 0
+  gpu_mb: 0
+  cpu_minutes: 3
+  disk_gb: 0.01
+  datasets:
+  - aic_photographs
+  - commoncatalog_film
+  - commoncatalog_ccby
+  metric: 'scripts/student_whitening.py: per student raw / independent-fit / evaluation-fit whitening: museum p@5 stereo-removed
+    decade-matched + artist share; stock-line p@5 + uploader share + scanner probe; content- and aspect-controlled photographer
+    p@5; effective rank; summary.supported for student_style_fs_v2_real'
+  confounders:
+  - the fit set is modern Flickr; the whitened directions may not match the museum domain
+  - whitening a collapsed embedding amplifies low-variance directions (noise)
+  - the evaluation-fit variant is a ceiling, never a result
+  falsified_if: 'summary.supported == 0: the independently whitened primary student fails the museum lower CI, loses stock-line
+    p@5, or exceeds a leakage guard'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/student_whitening.py
+  result_json: reports/student_whitening.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    primary_whitened_museum_p5:
+      path: summary.primary_whitened_museum_p5
+      kind: real
+    primary_raw_museum_p5:
+      path: summary.primary_raw_museum_p5
+      kind: real
+    primary_whitened_stock_line_p5:
+      path: summary.primary_whitened_stock_line_p5
+      kind: real
+    students_recovered_indep:
+      path: summary.students_recovered_indep
+      kind: real
+  next_step: 'supported: ship-candidate post-processing (a fixed 64x64 matrix) recorded for the student; verify once on the
+    held-out halves at the end of the session (--final) together with the synthetic benchmark; falsified: the collapse must
+    be fixed at training time (non-collapsed target or anti-collapse term in the student loss, E37)'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

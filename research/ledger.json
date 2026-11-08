@@ -1,5 +1,5 @@
 {
- "gpu_seconds": 5113.265970144272,
+ "gpu_seconds": 5135.6801675891875,
  "disk_bytes": 461962768,
  "runs": [
   {
@@ -247,6 +247,46 @@
    "gpu": false,
    "disk_bytes": 0,
    "peak_gpu_mb_total": 6261.0,
+   "returncode": 0
+  },
+  {
+   "id": "E32_e29_audit",
+   "wall_seconds": 6.2,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6257.0,
+   "returncode": 0
+  },
+  {
+   "id": "E33_frozen_head_choice",
+   "wall_seconds": 8.6,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6257.0,
+   "returncode": 0
+  },
+  {
+   "id": "E34_head_anticollapse",
+   "wall_seconds": 7.3,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6277.0,
+   "returncode": 0
+  },
+  {
+   "id": "E35_head_photographer_invariant",
+   "wall_seconds": 15.1,
+   "gpu": true,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 6259.0,
+   "returncode": 0
+  },
+  {
+   "id": "E36_student_whitening",
+   "wall_seconds": 8.3,
+   "gpu": false,
+   "disk_bytes": 0,
+   "peak_gpu_mb_total": 5740.0,
    "returncode": 0
   }
  ],
