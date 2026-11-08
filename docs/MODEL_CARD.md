@@ -59,6 +59,15 @@ retrieval (the student is best on synthetic and at the reference on real).
 - Diffusion-generated treatments at strength 0.35 are indistinguishable from JPEG+rescale nuisance; labels from
   them are meaningless.
 - One real-film source; results may not hold for other photographers, scanners or modern stocks.
+- Scope of the similarity claim (updated 2026-11-08, sessions 4-5): "similar film look" is supported *within* a
+  photographer's own scans (BlueNeg rolls; CommonCatalog within-uploader stock AUC 0.64 [0.56, 0.73] vs a permutation
+  null of 0.45-0.55, largely the monochrome-vs-colour cue) and for the physical print process on museum prints, but
+  *not* across photographers by stock: same-stock retrieval on 905 Flickr scans from 252 uploaders is at chance for
+  every embedding. In the frozen DINOv2-Small statistics, film look and a photographer's look occupy the same
+  directions (claims 23-26 in `docs/FINDINGS.md`), so photographer-style similarity and film-look similarity are one
+  signal, to be shown as "similar look" with the abstention rule, never as a stock or photographer identification.
+- The 64-d students reproduce a collapsed teacher projection (effective rank 2-3 of 64); on out-of-domain monochrome
+  prints their neighbours are noise-dominated unless the target is changed (E38-E39) or the output is whitened.
 
 ## Compute and cost
 Local RTX 4090 only; no paid API or cloud GPU at any point. Session budgets in `docs/RESOURCE_USAGE.md`.
