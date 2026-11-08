@@ -51,6 +51,8 @@ GPU-minutes and 0.5 GB charged across all sessions (`docs/RESOURCE_USAGE.md`). N
   museum lower CIs above chance on three seeds; a label-free PCA-64 keeps it (E42/E43 supported). Its one held-out
   reading confirms the museum gain and no cost on B or BlueNeg, but the within-uploader AUC lower CI failed the
   pre-registered rule, as it did for every comparator on that half (E44 falsified; not promoted).
+- The pooled-layer signal is the same without the teacher term (E45: `--kd 0` pooled museum 0.494 vs 0.517, PCA-64
+  rank 7.99 vs the 8 the rule asked, own-source 0.24): the teacher's contribution lands in the collapsed head only.
 - Infrastructure: `scripts/student_real_matrix.py` (the real-photograph matrix with own-source rank-1 and effective
   rank), `scripts/features_for_manifest.py`, `--kd-target` in the trainer and the 576-d export, nine helper tests
   (208 tests pass), all experiments pre-registered and recorded through the research loop.
@@ -63,7 +65,7 @@ GPU-minutes and 0.5 GB charged across all sessions (`docs/RESOURCE_USAGE.md`). N
 - Datasets ready: commoncatalog_film 905, artefact_film 88, aic_photographs 593, plus the earlier seven. Test halves of
   commoncatalog_film and aic_photographs, the filmsynth test split and BlueNeg were read once (E44) for the session-5
   candidate and its three comparators; they are spent for those representations.
-- Checkpoints added this session (all research, none deployed): `student_style_fs_v2_real_{s1,s2,vic3,vic3_s1,vic3_s2,pcaw,f576,f576_s1,f576_s2}`.
+- Checkpoints added this session (all research, none deployed): `student_style_fs_v2_real_{s1,s2,vic3,vic3_s1,vic3_s2,pcaw,f576,f576_s1,f576_s2,nokd,vic3f}`.
 
 ## Known limitations
 - Stock labels are uploader claims (CommonCatalog) or one photographer's records (BlueNeg, ARTeFACT); "process" on
@@ -75,14 +77,14 @@ GPU-minutes and 0.5 GB charged across all sessions (`docs/RESOURCE_USAGE.md`). N
 
 ## Rejected approaches (do not repeat without a new hypothesis)
 Earlier sessions: E3, E2/E4, E9/E9b, E11, E12, E16, E17, E18, E19, E10, E23c, E25, E26, E28/E27b (L3), E30, E31.
-Session 5: label-free heads on frozen features as a student target (E33), VICReg/temperature rank controls on the
+Session 5: the no-teacher pooled layer as a promotion candidate at rank 7.99 (E45, by 0.01; repeat only with seeds); label-free heads on frozen features as a student target (E33), VICReg/temperature rank controls on the
 projection (E34), LDA photographer-subspace removal (E35), post-hoc whitening of the students (E36), the VICReg
 distillation target as a promotion candidate (E38/E39), treatment-parameter heads with VICReg (E41).
 
 ## Next recommended actions (in order)
-1. Student head that keeps the pooled layer's rank (pre-register before running): train the E23b recipe with the kd
-   target replaced by (a) nothing plus a VICReg term on the pooled layer, or (b) a PCA-64 of a *teacher-free* target,
-   i.e. the pooled features of a first-pass student; judge on the analysis-half matrix (rank >= 8, own-source <= 0.45,
+1. Student head that keeps the pooled layer's rank (pre-register before running): since E45 shows the teacher term adds
+   nothing measurable to the pooled layer, train the recipe with `--kd 0` plus a VICReg term on the pooled layer (or a
+   PCA-64 of a first-pass student's pooled features as the target) over three seeds; judge on the analysis-half matrix (rank >= 8, own-source <= 0.45,
    museum lower CI above chance, within-AUC, synthetic cost); the test halves are spent for the current candidate, so a
    new candidate needs a fresh holdout decision (a third snapshot of commoncatalog_film or a new museum source).
 2. Within-uploader power: the test half carries too few multi-stock uploaders for the AUC rule; acquire more scans per

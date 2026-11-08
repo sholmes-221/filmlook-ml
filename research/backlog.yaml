@@ -1283,3 +1283,62 @@ experiments:
     falsified: recorded as a held-out failure, the analysis-half gains are treated as selection noise'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E45_pooled_without_teacher
+  hypothesis: 'the student''s pooled-layer film signal comes from its end-to-end synthetic supervision, not from the distillation
+    target: a student trained with the same recipe and no teacher term (--kd 0) has a PCA-64 of its pooled features with effective
+    rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above
+    0.5, and synthetic family p@5 within 0.10 of the E43 seed-0 PCA-64'
+  motivation: 'E42/E43: the pooled layer carries what the collapsed head discards. If the teacher is not needed for it, the
+    lightweight model does not depend on DINOv2-Small at training time either, which simplifies the pipeline; if it is needed,
+    the teacher''s role is in the pooled layer, not the head. The vic3 pooled layer is read alongside.'
+  value: 4
+  gpu_minutes: 3
+  gpu_mb: 6000
+  cpu_minutes: 6
+  disk_gb: 0.02
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e45_pooled_without_teacher.py: real-photograph matrix for pooled / PCA-64 / head of two new students next
+    to the E43 seed-0 student; summary.supported'
+  confounders:
+  - one seed per variant (E43 gives the seed spread of the reference: museum 0.50-0.53)
+  - without the kd term the real distillation inputs carry no loss at all (the recipe degenerates to synthetic-only training)
+  falsified_if: 'summary.supported == 0: the no-teacher pooled PCA-64 fails rank, content, a lower CI or the synthetic margin'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e45_pooled_without_teacher.py
+  result_json: reports/e45_pooled_without_teacher.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    nokd_museum_p5:
+      path: summary.nokd_museum_p5
+      kind: real
+    ref_museum_p5:
+      path: summary.ref_museum_p5
+      kind: real
+    nokd_own_source:
+      path: summary.nokd_own_source
+      kind: proxy
+    nokd_eff_rank:
+      path: summary.nokd_eff_rank
+      kind: proxy
+    nokd_synth_family_p5:
+      path: summary.nokd_synth_family_p5
+      kind: proxy
+  next_step: 'supported: the teacher is optional for the lightweight model; next session compares teacher-free and teacher-distilled
+    pooled layers on a fresh holdout; falsified: the pooled signal needs the teacher term, which keeps DINOv2-Small in the
+    training pipeline'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

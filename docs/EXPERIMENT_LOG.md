@@ -650,13 +650,33 @@ rank-1 now sits in the real matrix as a mandatory guard. No student was promoted
    under-powered rather than discriminating. The rule stands as written: the candidate is not promoted. It is recorded
    as the session-5 research candidate with these held-out readings; the test halves are now spent for it.
 
+10. **The pooled-layer signal does not depend on the teacher term (E45, falsified by 0.01 of rank).** The same recipe
+   with `--kd 0` (synthetic supervision only, the real distillation inputs then carry no loss) gives a pooled layer of
+   rank 10.4, own-source 0.31, museum 0.494 [0.408, 0.573], within-AUC 0.673; its PCA-64 reads rank 7.99 (the rule asked
+   >= 8), own-source 0.24, museum 0.492 [0.403, 0.573], within-AUC 0.626, synthetic 0.608. The VICReg-target student's
+   pooled layer reads the same (rank 11.6, museum 0.521). Within seed noise (E43: museum 0.50-0.53), the teacher
+   contributes nothing measurable to the pooled layer; the collapsed kd head is where the distillation lands.
+   `reports/e45_pooled_without_teacher.json`.
+
 Decisions: (i) the representation to carry forward is the student's pooled layer with a label-free PCA, not the
 distilled 64-d head and not any head on frozen features; (ii) own-source rank-1 and effective rank are mandatory
 columns of every real-photograph comparison; (iii) the family SupCon projection stays the teacher baseline on BlueNeg
-(0.248), which no student reaches; (iv) the next session's hypothesis is a student whose *head* is trained to keep the
-pooled layer's rank (a distillation target built from the pooled features themselves, or dropping the collapsed kd
+(0.248), which no student reaches; (iv) the DINOv2-Small teacher is, on current evidence, not needed for the student's real-photograph signal (E45), so
+the next session's hypothesis is a student whose *head* is trained to keep the pooled layer's rank (a distillation target built from the pooled features themselves, or dropping the collapsed kd
 target in favour of the family/parameter heads plus a VICReg term on the pooled layer), judged on the analysis halves
 with the same matrix.
+
+### E45_pooled_without_teacher — the student's pooled-layer film signal comes from its end-to-end synthetic supervision, not from the distillation target: a student trained with the same recipe and no teacher term (--kd 0) has a PCA-64 of its pooled features with effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5, and synthetic family p@5 within 0.10 of the E43 seed-0 PCA-64
+- Status: done; wall 146.3 s; peak GPU 7647.0 MB (total on card).
+- supported [proxy]: 0.0
+- nokd_museum_p5 [real]: 0.4919
+- ref_museum_p5 [real]: 0.499
+- nokd_own_source [proxy]: 0.2381
+- nokd_eff_rank [proxy]: 7.99
+- nokd_synth_family_p5 [proxy]: 0.6076
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the teacher is optional for the lightweight model; next session compares teacher-free and teacher-distilled pooled layers on a fresh holdout; falsified: the pooled signal needs the teacher term, which keeps DINOv2-Small in the training pipeline
 
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
