@@ -1,0 +1,4 @@
+# FilmLook style service: CPU only, no web framework. Pin to the versions tested (Python 3.12).
+onnxruntime==1.31.1
+numpy==2.5.4
+pillow==13.0.0

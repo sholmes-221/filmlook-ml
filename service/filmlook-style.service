@@ -1,0 +1,32 @@
+# systemd unit for the experimental FilmLook style service (Oracle Always Free E2 Micro, ~1 GB RAM).
+# Install: copy the repo's src/filmlook_infer, service/ and the frozen model directory; create the venv from service/requirements.txt.
+[Unit]
+Description=FilmLook photographic-style similarity service (experimental)
+After=network.target
+
+[Service]
+Type=simple
+User=filmlook
+WorkingDirectory=/opt/filmlook-style
+Environment=FLS_MODEL_DIR=/opt/filmlook-style/model/style_fs_v2_real_f576_deg
+Environment=FLS_HOST=127.0.0.1
+Environment=FLS_PORT=8765
+Environment=FLS_MAX_INFLIGHT=2
+Environment=FLS_MAX_BYTES=8388608
+Environment=FLS_THREADS=1
+Environment=OMP_NUM_THREADS=1
+Environment=FLS_PRELOAD=1
+ExecStart=/opt/filmlook-style/.venv/bin/python /opt/filmlook-style/service/filmlook_style_service.py
+Restart=on-failure
+RestartSec=3
+MemoryMax=400M
+MemoryHigh=300M
+TasksMax=64
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/opt/filmlook-style
+
+[Install]
+WantedBy=multi-user.target
