@@ -68,6 +68,12 @@ retrieval (the student is best on synthetic and at the reference on real).
   signal, to be shown as "similar look" with the abstention rule, never as a stock or photographer identification.
 - The 64-d students reproduce a collapsed teacher projection (effective rank 2-3 of 64); on out-of-domain monochrome
   prints their neighbours are noise-dominated unless the target is changed (E38-E39) or the output is whitened.
+- Research candidate after session 5 (not promoted, not deployed): the PCA-64 of the pooled 576-d features of
+  `student_style_fs_v2_real_f576` (same network, 4.4 MB, 1.3 ms; the PCA is a 576x64 matrix fitted on CC-BY train
+  originals). Held-out readings (one pass, E44): museum process p@5 0.593 [0.504, 0.683] vs chance 0.448, BlueNeg
+  same-stock 0.191 [0.126, 0.263] vs 0.117 (teacher 0.248), benchmark B 0.589, own-source rank-1 0.32, effective rank
+  9.0; its within-uploader stock AUC lower CI (0.452) missed the pre-registered bound, as every comparator's did on that
+  half. `reports/final_holdout_e44.json`.
 
 ## Compute and cost
 Local RTX 4090 only; no paid API or cloud GPU at any point. Session budgets in `docs/RESOURCE_USAGE.md`.

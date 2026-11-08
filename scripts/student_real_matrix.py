@@ -90,13 +90,17 @@ def matrix(za, zg, zv, L, zb=None):
             "synth_family_p5": retrieval(Ev, L["fam_v"], L["src_v"]), "own_source_rank1": rank1, "eff_rank": eff_rank(Eg)}
 
 
-def labels():
+def labels(split="analysis"):
+    """Evaluation rows and label structures of one half. `split="test"` is reserved for the single final evaluation
+    (scripts/final_holdout_eval.py --final); every other caller uses the analysis half."""
     from collections import Counter
+    assert split in ("analysis", "test")
     rows_a = json.loads(AIC.with_suffix(".json").read_text())["rows"]; rows_g = json.loads(CCF.with_suffix(".json").read_text())["rows"]
     Fc, rows_c = load_cache(); st = np.array([r["set"] for r in rows_c]); sp = np.array([r["split"] for r in rows_c]); treated = np.array([bool(r.get("treated")) for r in rows_c])
-    fs_val = (st == "filmsynth") & (sp == "val") & treated; rows_v = [r for r, k in zip(rows_c, fs_val) if k]
-    bank = (st == "source") & (sp == "val"); rows_b = [r for r, k in zip(rows_c, bank) if k]
-    ia = np.array([i for i, r in enumerate(rows_a) if r["split"] == "analysis"]); ig = np.array([i for i, r in enumerate(rows_g) if r["split"] == "analysis" and r.get("film_stock")])
+    syn_split = "val" if split == "analysis" else "test"
+    fs_val = (st == "filmsynth") & (sp == syn_split) & treated; rows_v = [r for r, k in zip(rows_c, fs_val) if k]
+    bank = (st == "source") & (sp == syn_split); rows_b = [r for r, k in zip(rows_c, bank) if k]
+    ia = np.array([i for i, r in enumerate(rows_a) if r["split"] == split]); ig = np.array([i for i, r in enumerate(rows_g) if r["split"] == split and r.get("film_stock")])
     ra = [rows_a[i] for i in ia]; rg = [rows_g[i] for i in ig]
     artist = np.array([r["uploader"] for r in ra]); proc = np.array([process_family(r.get("process")) for r in ra]); stereo = np.array(["stereo" in (r.get("process") or "").lower() for r in ra])
     decade = np.array([str((r.get("date_start") // 10) * 10) if r.get("date_start") else "nd" for r in ra]); allowed = (decade[:, None] == decade[None]) & ~stereo[None] & ~stereo[:, None]

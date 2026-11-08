@@ -1164,3 +1164,122 @@ experiments:
     positives on real photographs) rather than the head'
   status: supported
   result: 'not falsified: supported=1.0000 >= 1'
+- id: E43_penultimate_pca
+  hypothesis: 'the student''s penultimate film signal (E42) is seed-robust and survives a deployable label-free reduction:
+    for each of three seeds of the baseline recipe, a PCA-64 of the 576-d pooled features fitted on the student''s own embeddings
+    of the training-allowed CC-BY train originals has effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI
+    above chance, within-uploader different-day AUC lower CI above 0.5, and synthetic family p@5 within 0.10 of that seed''s
+    64-d head'
+  motivation: E42 (one seed) is the first representation with rank above 8, own-source rank-1 below 0.45 and a museum lower
+    CI above chance; a 576-d output is not a product embedding, and one seed is not evidence.
+  value: 5
+  gpu_minutes: 4
+  gpu_mb: 6000
+  cpu_minutes: 8
+  disk_gb: 0.03
+  datasets:
+  - film_synth_v2
+  - commoncatalog_ccby
+  - aic_photographs
+  - commoncatalog_film
+  - bench_features_v1
+  metric: 'scripts/e43_penultimate_pca.py: real-photograph matrix for head / 576-d / PCA-64 of three seeds; summary.supported'
+  confounders:
+  - the PCA fit set is modern Flickr (601 originals); museum prints are far from it
+  - artist and uploader share rise with the 576-d features (E42: 0.06 -> 0.17); photographer clustering is recorded, not guarded
+  - three seeds bound seed noise only coarsely
+  falsified_if: 'summary.supported == 0: any seed''s PCA-64 fails rank, content, a lower CI or the synthetic margin'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/e43_penultimate_pca.py
+  result_json: reports/e43_penultimate_pca.json
+  watched_paths:
+  - checkpoints
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    seeds_passing:
+      path: summary.seeds_passing
+      kind: proxy
+    pca_museum_mean:
+      path: summary.pca_museum_mean
+      kind: real
+    pca_within_auc_mean:
+      path: summary.pca_within_auc_mean
+      kind: real
+    pca_own_source_mean:
+      path: summary.pca_own_source_mean
+      kind: proxy
+    pca_eff_rank_mean:
+      path: summary.pca_eff_rank_mean
+      kind: proxy
+  next_step: 'supported: the PCA-64 of the pooled features is the promotion candidate; one final evaluation on the held-out
+    halves, benchmark v1 test and BlueNeg closes the session, followed by the model card; falsified: the penultimate signal
+    is seed- or reduction-fragile, recorded as such, no promotion'
+  status: supported
+  result: 'not falsified: supported=1.0000 >= 1'
+- id: E44_final_holdout
+  hypothesis: 'on the held-out halves and the benchmark test data (read once), the session-5 candidate (PCA-64 of the pooled
+    576-d features of student_style_fs_v2_real_f576, fitted on CC-BY train originals) keeps what it showed on the analysis
+    halves: museum process p@5 lower CI above chance, within-uploader stock AUC lower CI above 0.5, stock-line p@5 within
+    0.02 of the same student''s 64-d head, own-source rank-1 <= 0.45 on filmsynth test, benchmark B within 0.10 and BlueNeg
+    same-stock p@5 within 0.03 of the head'
+  motivation: E42/E43 selected the candidate on the analysis halves (three seeds). The held-out halves of commoncatalog_film
+    and aic_photographs, the filmsynth test split and BlueNeg have not been read for any session-5 representation; this is
+    the one final evaluation the benchmark reserves.
+  value: 5
+  gpu_minutes: 1
+  gpu_mb: 1500
+  cpu_minutes: 10
+  disk_gb: 0.01
+  datasets:
+  - commoncatalog_film
+  - aic_photographs
+  - bench_features_v1
+  - blueneg
+  - commoncatalog_ccby
+  metric: 'scripts/final_holdout_eval.py --final: real matrix on the test halves + benchmark B (filmsynth test) + BlueNeg
+    D for the candidate, the two 64-d heads and the teacher projection; summary.supported'
+  confounders:
+  - one reading; the script refuses to run twice
+  - photographer clustering (artist share) is recorded, not guarded, as decided after E40
+  - BlueNeg is one photographer''s 1990s stocks; CIs over 27 intact rolls are wide
+  falsified_if: 'summary.supported == 0: a held-out lower CI fails, the candidate lets content in, or it loses more than the
+    margins on stock-line, B or BlueNeg'
+  falsify:
+    metric: supported
+    below: 1
+  falsify_sufficient: true
+  command:
+  - /home/shanmo/misc/filmlook-ml/.venv/bin/python
+  - scripts/final_holdout_eval.py
+  - --final
+  result_json: reports/final_holdout_e44.json
+  metrics_of_interest:
+    supported:
+      path: summary.supported
+      kind: proxy
+    candidate_museum_p5:
+      path: summary.candidate_museum_p5
+      kind: real
+    candidate_within_auc:
+      path: summary.candidate_within_auc
+      kind: real
+    candidate_blueneg:
+      path: summary.candidate_blueneg
+      kind: real
+    candidate_B:
+      path: summary.candidate_B
+      kind: proxy
+    candidate_own_source_rank1:
+      path: summary.candidate_own_source_rank1
+      kind: proxy
+  next_step: 'supported: the candidate is recorded in the model card as the research similarity embedding (not deployed);
+    falsified: recorded as a held-out failure, the analysis-half gains are treated as selection noise'
+  status: rejected
+  result: 'falsified: supported=0.0000 < 1'

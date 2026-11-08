@@ -580,6 +580,84 @@ the collapsed one. A target that raises rank with treatment rather than content 
 more treatment families, or same-source treatment positives on real photographs) is the open hypothesis; own-source
 rank-1 now sits in the real matrix as a mandatory guard. No student was promoted and no held-out half was spent.
 
+### E41_head_treatment_params — a head on the frozen hybrid features that is trained to regress the six continuous synthetic treatment parameters alongside the family SupCon objective, with VICReg, raises the effective rank to >= 8 while keeping scene content out (own-source rank-1 <= 0.35), and is not worse than the collapsed projection on museum process p@5, within 0.02 on the within-uploader stock AUC and within 0.10 on synthetic family p@5
+- Status: done; wall 12.5 s; peak GPU 6291.0 MB (total on card).
+- supported [proxy]: 0.0
+- primary_eff_rank [proxy]: 9.96
+- primary_own_source_rank1 [proxy]: 0.7524
+- primary_museum_p5 [real]: 0.4667
+- primary_within_auc [real]: 0.6013
+- primary_synth_family_p5 [proxy]: 0.5181
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the multi-task head becomes the student target (E42, E38 recipe) and the ridge parameter estimate is evaluated as the explainable treatment layer; falsified: rank and content invariance are not separable with the current synthetic supervision; the next session needs more treatment families or same-source treatment positives on real photographs
+
+### E42_student_penultimate — the end-to-end student's 576-d pooled representation carries a higher-rank, content-invariant film signal than its collapsed 64-d head: effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 and within-uploader stock AUC not below the head's, synthetic family p@5 within 0.10
+- Status: done; wall 68.9 s; peak GPU 7661.0 MB (total on card).
+- supported [proxy]: 1.0
+- f576_eff_rank [proxy]: 10.95
+- f576_own_source_rank1 [proxy]: 0.3238
+- f576_museum_p5 [real]: 0.5172
+- f576_within_auc [real]: 0.6611
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: a label-free reduction of the 576-d features (PCA fitted on training-allowed real photographs) replaces the collapsed head as the student's similarity output, judged on the same matrix; falsified: the student's content invariance is bound to its collapse too, and the next session must change the supervision (more treatment families, same-source treatment positives on real photographs) rather than the head
+
+### E43_penultimate_pca — the student's penultimate film signal (E42) is seed-robust and survives a deployable label-free reduction: for each of three seeds of the baseline recipe, a PCA-64 of the 576-d pooled features fitted on the student's own embeddings of the training-allowed CC-BY train originals has effective rank >= 8, own-source rank-1 <= 0.45, museum p@5 lower CI above chance, within-uploader different-day AUC lower CI above 0.5, and synthetic family p@5 within 0.10 of that seed's 64-d head
+- Status: done; wall 147.3 s; peak GPU 7647.0 MB (total on card).
+- supported [proxy]: 1.0
+- seeds_passing [proxy]: 3.0
+- pca_museum_mean [real]: 0.5148
+- pca_within_auc_mean [real]: 0.6404
+- pca_own_source_mean [proxy]: 0.2762
+- pca_eff_rank_mean [proxy]: 8.79
+- Decision rule: neutral: no credible real-film change
+- Learned: decision supported: not falsified: supported=1.0000 >= 1
+- Next: supported: the PCA-64 of the pooled features is the promotion candidate; one final evaluation on the held-out halves, benchmark v1 test and BlueNeg closes the session, followed by the model card; falsified: the penultimate signal is seed- or reduction-fragile, recorded as such, no promotion
+
+### E44_final_holdout — on the held-out halves and the benchmark test data (read once), the session-5 candidate (PCA-64 of the pooled 576-d features of student_style_fs_v2_real_f576, fitted on CC-BY train originals) keeps what it showed on the analysis halves: museum process p@5 lower CI above chance, within-uploader stock AUC lower CI above 0.5, stock-line p@5 within 0.02 of the same student's 64-d head, own-source rank-1 <= 0.45 on filmsynth test, benchmark B within 0.10 and BlueNeg same-stock p@5 within 0.03 of the head
+- Status: done; wall 26.9 s; peak GPU 6257.0 MB (total on card).
+- supported [proxy]: 0.0
+- candidate_museum_p5 [real]: 0.5934
+- candidate_within_auc [real]: 0.5824
+- candidate_blueneg [real]: 0.1906
+- candidate_B [proxy]: 0.5886
+- candidate_own_source_rank1 [proxy]: 0.3238
+- Decision rule: neutral: no credible real-film change
+- Learned: decision rejected: falsified: supported=0.0000 < 1
+- Next: supported: the candidate is recorded in the model card as the research similarity embedding (not deployed); falsified: recorded as a held-out failure, the analysis-half gains are treated as selection noise
+
+### Session 5 synthesis, part 3 (E41-E44): the end-to-end student's penultimate layer, and the one held-out reading
+
+7. **Treatment-parameter supervision does not raise rank without content on frozen features (E41, falsified).** A head
+   regressing the six continuous synthetic treatment parameters stays at rank 3.8 with own-source rank-1 0.39; adding
+   VICReg lifts the rank to 10 and the own-source rank-1 to 0.75 (0.93 without the family term). The content-free
+   treatment subspace of the frozen DINOv2-Small + explicit statistics is a few dimensions wide.
+8. **The end-to-end student's 576-d pooled features hold a higher-rank, content-light signal (E42 supported, E43
+   supported on three seeds).** Baseline recipe (E23b), seeds 0-2, re-exported with the pooled features: effective rank
+   10.8-11.2 (head 3.1-3.2), own-source rank-1 0.31-0.32 (head 0.11-0.16), museum p@5 0.517-0.539 with lower CIs above
+   chance (head 0.40-0.43), within-uploader AUC 0.64-0.66, synthetic family p@5 within 0.02 of the head, artist share
+   0.17 (head 0.06). A plain PCA-64 fitted on the student's embeddings of the 601 CC-BY train originals keeps it on
+   every seed: rank 8.6-8.9, own-source 0.26-0.30, museum 0.499-0.528 (all lower CIs above chance), within-AUC
+   0.625-0.670, synthetic 0.627-0.629. Reports `reports/e42_student_penultimate.json`, `e43_penultimate_pca.json`.
+9. **One held-out reading (E44, falsified on one sub-rule; nothing promoted).** Read once, on the test halves, the
+   filmsynth test split and BlueNeg (`reports/final_holdout_e44.json`): the PCA-64 candidate has museum p@5 0.593
+   [0.504, 0.683] vs chance 0.448 (head 0.516, teacher 0.535), stock-line 0.103 (head 0.090, teacher 0.106), own-source
+   rank-1 0.32, benchmark B 0.589 (head 0.596, teacher 0.491), BlueNeg same-stock 0.191 [0.126, 0.263] (head 0.182,
+   teacher 0.248, chance 0.117), effective rank 9.0, artist share 0.12. The within-uploader AUC is 0.582 [0.452,
+   0.713]: its lower CI is below 0.5, which fails the pre-registered rule; on the test half every comparator, the
+   teacher included, has a lower CI of 0.43-0.47 on this metric (fewer multi-stock uploaders), so the sub-rule was
+   under-powered rather than discriminating. The rule stands as written: the candidate is not promoted. It is recorded
+   as the session-5 research candidate with these held-out readings; the test halves are now spent for it.
+
+Decisions: (i) the representation to carry forward is the student's pooled layer with a label-free PCA, not the
+distilled 64-d head and not any head on frozen features; (ii) own-source rank-1 and effective rank are mandatory
+columns of every real-photograph comparison; (iii) the family SupCon projection stays the teacher baseline on BlueNeg
+(0.248), which no student reaches; (iv) the next session's hypothesis is a student whose *head* is trained to keep the
+pooled layer's rank (a distillation target built from the pooled features themselves, or dropping the collapsed kd
+target in favour of the family/parameter heads plus a VICReg term on the pooled layer), judged on the analysis halves
+with the same matrix.
+
 ## Decisions taken from these runs (autonomous session 2026-11-07, E8-E18) and session 2 (E19, B1, E10)
 
 9. Benchmark v1 (`docs/BENCHMARK.md`) is the selection instrument: val for selection, test spent once (B1). The
