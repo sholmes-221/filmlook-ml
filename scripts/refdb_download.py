@@ -69,6 +69,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--cap", type=int, default=300); ap.add_argument("--only", default="")
     ap.add_argument("--max-minutes", type=float, default=180); ap.add_argument("--spacing", type=float, default=1.0)
+    ap.add_argument("--facts-only", action="store_true", help="only record file facts and duplicates for files already downloaded")
     a = ap.parse_args()
     only = set(filter(None, a.only.split(",")))
     with manifest.connect() as c:
@@ -87,14 +88,16 @@ def main() -> None:
         tmp.parent.mkdir(parents=True, exist_ok=True)
         img.convert("RGB").save(tmp, "JPEG", quality=92)  # The downloader moves it into place atomically.
 
-    dl = Downloader(P.DATA / "refdb" / "download_state.jsonl", headers={"User-Agent": UA["User-Agent"]}, spacing=a.spacing,
+    status = "facts-only"
+    if not a.facts_only:
+      dl = Downloader(P.DATA / "refdb" / "download_state.jsonl", headers={"User-Agent": UA["User-Agent"]}, spacing=a.spacing,
                     max_seconds=a.max_minutes * 60, log_path=P.REPORTS / "refdb" / "download.log")
-    status = dl.run(items, validate)
+      status = dl.run(items, validate)
 
     # Record file facts and deduplicate.
     with manifest.connect() as c:
         seen: list[tuple[str, str, str]] = []  # (phash, photographer, work_id)
-        for r in chosen:
+        for r in sorted(chosen, key=lambda r: r["work_id"]):  # Stable order: the same file is the kept one on every run.
             path = manifest.image_path(r["work_id"])
             if not path.exists():
                 continue

@@ -1,63 +1,646 @@
 {
- "id": "masahisa_fukase", "website_id": "masahisa_fukase",
- "name": {"en": "Masahisa Fukase", "zh": "深濑昌久", "ja": "深瀬昌久"},
- "born": "1934-02-25", "died": "2012-06-09", "life_src": ["W"],
- "image_rights": {"status": "restricted", "note": "In copyright; estate managed by Masahisa Fukase Archives. No images enter the pipeline; knowledge only."},
- "sources": {
-  "W": {"url": "https://en.wikipedia.org/wiki/Masahisa_Fukase", "kind": "secondary", "retrieved": "2026-11-09"},
-  "AUD": {"url": "https://www.audubon.org/magazine/ravens-one-20th-centurys-best-photography-books-back-shelves", "kind": "secondary", "retrieved": "2026-11-09"},
-  "WP": {"url": "https://wallpaper.com/art/masahisa-fukase-solitude-of-ravens-michael-hoppen-gallery", "kind": "secondary", "retrieved": "2026-11-09", "note": "exhibition review with gallery captions (Michael Hoppen Gallery)"}
+ "id": "masahisa_fukase",
+ "website_id": "masahisa_fukase",
+ "name": {
+  "en": "Masahisa Fukase",
+  "zh": "深濑昌久",
+  "ja": "深瀬昌久"
  },
- "unreachable_sources": ["https://asia.si.edu/?p=19069 (403)", "https://us.mackbooks.co.uk/products/ravens-br-masahisa-fukase (429)"],
+ "born": "1934-02-25",
+ "died": "2012-06-09",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "In copyright; estate managed by Masahisa Fukase Archives. No images enter the pipeline; knowledge only."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Masahisa_Fukase",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "AUD": {
+   "url": "https://www.audubon.org/magazine/ravens-one-20th-centurys-best-photography-books-back-shelves",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "WP": {
+   "url": "https://wallpaper.com/art/masahisa-fukase-solitude-of-ravens-michael-hoppen-gallery",
+   "kind": "secondary",
+   "retrieved": "2026-11-09",
+   "note": "exhibition review with gallery captions (Michael Hoppen Gallery)"
+  },
+  "MFA": {
+   "url": "https://masahisafukase.com/",
+   "kind": "archive",
+   "retrieved": "2026-11-09"
+  },
+  "JAW": {
+   "url": "https://ja.wikipedia.org/wiki/深瀬昌久",
+   "kind": "secondary",
+   "retrieved": "2026-11-09",
+   "language": "ja"
+  }
+ },
+ "unreachable_sources": [
+  "https://asia.si.edu/?p=19069 (403)",
+  "https://us.mackbooks.co.uk/products/ravens-br-masahisa-fukase (429)"
+ ],
  "photobooks": [
-  {"id": "ravens", "title_original": "鴉", "title_romaji": "Karasu", "title_en": "Ravens", "title_zh": "鸦", "title_zh_basis": "simplified form of the Japanese title", "year": 1986, "publisher": "Sōkyūsha, Yokohama",
-   "editions": [{"year": 1991, "publisher": "Bedford Arts, San Francisco", "note": "The Solitude of Ravens: A Photographic Narrative; English only", "isbn": "0-938491-23-7", "isbn_src": "W"},
-                {"year": 2008, "publisher": "Rat Hole Gallery, Tokyo", "note": "reprint with afterword"},
-                {"year": 2017, "publisher": "Mack, London", "note": "afterword by Akira Hasegawa, new text by Tomo Kosuga", "isbn": "978-1-910164-83-9", "isbn_src": "W"}],
-   "themes": ["solitude", "loss", "the aftermath of his divorce"], "subjects": ["ravens", "Hokkaido", "snow"], "visual": ["grainy monochrome", "silhouetted flocks against the sky", "very dark subjects in low light"],
-   "career": "Selected by the British Journal of Photography as the best photobook published 1986-2009.", "src": ["W", "AUD", "WP"]},
-  {"id": "yugi", "title_original": "遊戯", "title_romaji": "Yūgi", "title_en": "Homo Ludence", "year": 1971, "publisher": "Chūōkōronsha, Tokyo", "themes": ["self-representation", "his wives"], "career": "His first photobook.", "src": ["W"]},
-  {"id": "yoko", "title_original": "洋子", "title_romaji": "Yōko", "title_en": "Yohko", "year": 1978, "publisher": "Asahi Sonorama, Tokyo", "themes": ["his wife Yōko Wanibe"], "src": ["W"]},
-  {"id": "sasuke_books", "title_original": "ビバ！ サスケ / サスケ、いとしき猫よ / 猫の麦わら帽子", "title_en": "three cat books", "year": 1979, "publisher": "Pet-Life-sha; Seinen-shokan; Bunka Shuppankyoku", "subjects": ["cat"], "src": ["W"]},
-  {"id": "kazoku", "title_original": "家族", "title_romaji": "Kazoku", "title_en": "Family", "year": 1991, "publisher": "IPC, Tokyo", "isbn": "4-87198-832-5", "isbn_src": "W", "subjects": ["family portraits in the family photo studio, Bifuka"], "visual": ["large-format group portraits"], "src": ["W"]},
-  {"id": "chichi", "title_original": "父の記憶", "title_romaji": "Chichi no Kioku", "title_en": "Memories of Father", "year": 1991, "publisher": "IPC, Tokyo", "isbn": "4-87198-833-3", "isbn_src": "W", "src": ["W"]},
-  {"id": "bukubuku", "title_original": "ブクブク", "title_en": "Bukubuku", "year": 2004, "publisher": "Hysteric Glamour, Tokyo", "subjects": ["self-portrait in a bathtub"], "visual": ["underwater camera"], "src": ["W", "WP"]},
-  {"id": "hibi", "title_en": "Hibi", "year": 2016, "publisher": "Mack, London", "isbn": "9781910164457", "isbn_src": "W", "subjects": ["cracks in the street surface"], "visual": ["prints painted over"], "src": ["W"]}
+  {
+   "id": "ravens",
+   "title_original": "鴉",
+   "title_romaji": "Karasu",
+   "title_en": "Ravens",
+   "title_zh": "鸦",
+   "title_zh_basis": "simplified form of the Japanese title",
+   "year": 1986,
+   "publisher": "Sōkyūsha, Yokohama",
+   "editions": [
+    {
+     "year": 1991,
+     "publisher": "Bedford Arts, San Francisco",
+     "note": "The Solitude of Ravens: A Photographic Narrative; English only",
+     "isbn": "0-938491-23-7",
+     "isbn_src": "W"
+    },
+    {
+     "year": 2008,
+     "publisher": "Rat Hole Gallery, Tokyo",
+     "note": "reprint with afterword"
+    },
+    {
+     "year": 2017,
+     "publisher": "Mack, London",
+     "note": "afterword by Akira Hasegawa, new text by Tomo Kosuga",
+     "isbn": "978-1-910164-83-9",
+     "isbn_src": "W"
+    }
+   ],
+   "themes": [
+    "solitude",
+    "loss",
+    "the aftermath of his divorce"
+   ],
+   "subjects": [
+    "ravens",
+    "Hokkaido",
+    "snow"
+   ],
+   "visual": [
+    "grainy monochrome",
+    "silhouetted flocks against the sky",
+    "very dark subjects in low light"
+   ],
+   "career": "Selected by the British Journal of Photography as the best photobook published 1986-2009.",
+   "src": [
+    "W",
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "id": "yugi",
+   "title_original": "遊戯",
+   "title_romaji": "Yūgi",
+   "title_en": "Homo Ludence",
+   "year": 1971,
+   "publisher": "Chūōkōronsha, Tokyo",
+   "themes": [
+    "self-representation",
+    "his wives"
+   ],
+   "career": "His first photobook.",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "yoko",
+   "title_original": "洋子",
+   "title_romaji": "Yōko",
+   "title_en": "Yohko",
+   "year": 1978,
+   "publisher": "Asahi Sonorama, Tokyo",
+   "themes": [
+    "his wife Yōko Wanibe"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "sasuke_books",
+   "title_original": "ビバ！ サスケ / サスケ、いとしき猫よ / 猫の麦わら帽子",
+   "title_en": "three cat books",
+   "year": 1979,
+   "publisher": "Pet-Life-sha; Seinen-shokan; Bunka Shuppankyoku",
+   "subjects": [
+    "cat"
+   ],
+   "src": [
+    "JAW",
+    "W"
+   ]
+  },
+  {
+   "id": "kazoku",
+   "title_original": "家族",
+   "title_romaji": "Kazoku",
+   "title_en": "Family",
+   "year": 1991,
+   "publisher": "IPC, Tokyo",
+   "isbn": "4-87198-832-5",
+   "isbn_src": "W",
+   "subjects": [
+    "family portraits in the family photo studio, Bifuka"
+   ],
+   "visual": [
+    "large-format group portraits"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "chichi",
+   "title_original": "父の記憶",
+   "title_romaji": "Chichi no Kioku",
+   "title_en": "Memories of Father",
+   "year": 1991,
+   "publisher": "IPC, Tokyo",
+   "isbn": "4-87198-833-3",
+   "isbn_src": "W",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "bukubuku",
+   "title_original": "ブクブク",
+   "title_en": "Bukubuku",
+   "year": 2004,
+   "publisher": "Hysteric Glamour, Tokyo",
+   "subjects": [
+    "self-portrait in a bathtub"
+   ],
+   "visual": [
+    "underwater camera"
+   ],
+   "src": [
+    "W",
+    "WP"
+   ]
+  },
+  {
+   "id": "hibi",
+   "title_en": "Hibi",
+   "year": 2016,
+   "publisher": "Mack, London",
+   "isbn": "9781910164457",
+   "isbn_src": "W",
+   "subjects": [
+    "cracks in the street surface"
+   ],
+   "visual": [
+    "prints painted over"
+   ],
+   "src": [
+    "W"
+   ]
+  }
  ],
  "series": [
-  {"id": "ravens", "title": "Karasu / Ravens", "period": [1976, 1982], "period_note": "Wikipedia gives 1976-1982; Wallpaper's captions run 1975-1985 and its text says six or eight years", "photobooks": ["ravens"],
-   "subjects": ["ravens", "Hokkaido", "Kanazawa", "Tokyo", "snow"], "visual": ["grainy, monochromatic", "silhouettes against the sky", "small black subjects in near darkness", "burning and dodging in printing", "experiments with colour film and multiple exposure printing"],
-   "context": "Made in the wake of his divorce from Yōko Wanibe; ravens are an ill omen in Japanese lore.", "src": ["W", "AUD", "WP"]},
-  {"id": "family", "title": "Kazoku / Family", "period": [1971, 1989], "period_note": "the 1970s and 1980s", "photobooks": ["kazoku"], "subjects": ["his family", "the family photo studio in Bifuka"], "visual": ["large-format group portraits"], "src": ["W"]},
-  {"id": "kill_the_pigs", "title": "Kill the Pigs", "period": [1961, 1961], "subjects": ["Shibaura slaughterhouse, Tokyo"], "visual": ["dark and often gruesome"], "src": ["W"]},
-  {"id": "bukubuku", "title": "Bukubuku", "photobooks": ["bukubuku"], "subjects": ["self-portrait"], "visual": ["made in a bathtub with an underwater camera"], "src": ["W"]}
+  {
+   "id": "ravens",
+   "title": "Karasu / Ravens",
+   "period": [
+    1976,
+    1982
+   ],
+   "period_note": "Wikipedia gives 1976-1982; Wallpaper's captions run 1975-1985 and its text says six or eight years",
+   "photobooks": [
+    "ravens"
+   ],
+   "subjects": [
+    "ravens",
+    "Hokkaido",
+    "Kanazawa",
+    "Tokyo",
+    "snow"
+   ],
+   "visual": [
+    "grainy, monochromatic",
+    "silhouettes against the sky",
+    "small black subjects in near darkness",
+    "burning and dodging in printing",
+    "experiments with colour film and multiple exposure printing"
+   ],
+   "context": "Made in the wake of his divorce from Yōko Wanibe; ravens are an ill omen in Japanese lore.",
+   "src": [
+    "W",
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "id": "family",
+   "title": "Kazoku / Family",
+   "period": [
+    1971,
+    1989
+   ],
+   "period_note": "the 1970s and 1980s",
+   "photobooks": [
+    "kazoku"
+   ],
+   "subjects": [
+    "his family",
+    "the family photo studio in Bifuka"
+   ],
+   "visual": [
+    "large-format group portraits"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "kill_the_pigs",
+   "title": "Kill the Pigs",
+   "period": [
+    1961,
+    1961
+   ],
+   "subjects": [
+    "Shibaura slaughterhouse, Tokyo"
+   ],
+   "visual": [
+    "dark and often gruesome"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "bukubuku",
+   "title": "Bukubuku",
+   "photobooks": [
+    "bukubuku"
+   ],
+   "subjects": [
+    "self-portrait"
+   ],
+   "visual": [
+    "made in a bathtub with an underwater camera"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "sasuke",
+   "title": "Sasuke (cats Sasuke and Momoe)",
+   "period": [
+    1977,
+    1979
+   ],
+   "photobooks": [
+    "sasuke_books"
+   ],
+   "subjects": [
+    "cats"
+   ],
+   "src": [
+    "MFA",
+    "JAW"
+   ]
+  },
+  {
+   "id": "hibi",
+   "title": "Hibi (road surfaces)",
+   "period": [
+    1992,
+    1992
+   ],
+   "photobooks": [
+    "hibi"
+   ],
+   "subjects": [
+    "worn road markings",
+    "asphalt cracks"
+   ],
+   "visual": [
+    "black and white prints, painted over"
+   ],
+   "src": [
+    "MFA",
+    "W"
+   ]
+  }
  ],
  "photographs": [
-  {"id": "erimo_1976", "title": "Erimo Cape", "title_given": true, "year": 1976, "series": "ravens", "src": ["WP"], "rights": "restricted"},
-  {"id": "nayoro_1977", "title": "Nayoro", "title_given": true, "year": 1977, "series": "ravens", "subjects": ["ravens on a telegraph pole"], "src": ["WP"], "rights": "restricted"},
-  {"id": "kanazawa_1977", "title": "Kanazawa", "title_given": true, "year": 1977, "series": "ravens", "subjects": ["ravens gathered in a tree"], "src": ["WP"], "rights": "restricted"},
-  {"id": "otaru_1975", "title": "Otaru", "title_given": true, "year": 1975, "series": "ravens", "subjects": ["ravens on a snow-covered boat"], "src": ["WP"], "rights": "restricted"},
-  {"id": "seikan_1976", "title": "Seikan Ferryboat", "title_given": true, "year": 1976, "series": "ravens", "subjects": ["girls with windswept hair on a beach"], "src": ["WP"], "rights": "restricted"}
+  {
+   "id": "erimo_1976",
+   "title": "Erimo Cape",
+   "title_given": true,
+   "year": 1976,
+   "series": "ravens",
+   "src": [
+    "WP"
+   ],
+   "rights": "restricted"
+  },
+  {
+   "id": "nayoro_1977",
+   "title": "Nayoro",
+   "title_given": true,
+   "year": 1977,
+   "series": "ravens",
+   "subjects": [
+    "ravens on a telegraph pole"
+   ],
+   "src": [
+    "WP"
+   ],
+   "rights": "restricted"
+  },
+  {
+   "id": "kanazawa_1977",
+   "title": "Kanazawa",
+   "title_given": true,
+   "year": 1977,
+   "series": "ravens",
+   "subjects": [
+    "ravens gathered in a tree"
+   ],
+   "src": [
+    "WP"
+   ],
+   "rights": "restricted"
+  },
+  {
+   "id": "otaru_1975",
+   "title": "Otaru",
+   "title_given": true,
+   "year": 1975,
+   "series": "ravens",
+   "subjects": [
+    "ravens on a snow-covered boat"
+   ],
+   "src": [
+    "WP"
+   ],
+   "rights": "restricted"
+  },
+  {
+   "id": "seikan_1976",
+   "title": "Seikan Ferryboat",
+   "title_given": true,
+   "year": 1976,
+   "series": "ravens",
+   "subjects": [
+    "girls with windswept hair on a beach"
+   ],
+   "src": [
+    "WP"
+   ],
+   "rights": "restricted"
+  }
  ],
  "motifs": [
-  {"element": "ravens and dark bird silhouettes", "tags": ["crow", "bird", "silhouette", "sky"], "level": "signature", "series": ["ravens"], "representative": ["nayoro_1977", "kanazawa_1977", "otaru_1975"],
-   "context": "flocks against the sky, birds on poles, wires, trees and boats", "frequency_evidence": "the subject of a six-to-eight-year series and the 1986 book", "distinctiveness": "high", "confidence": "high", "src": ["W", "AUD", "WP"]},
-  {"element": "snow and winter Hokkaido", "tags": ["snow"], "level": "series_specific", "series": ["ravens"], "context": "tracks in the snow; heavy snowfall", "confidence": "medium", "src": ["AUD", "WP"]},
-  {"element": "cats", "tags": ["cat"], "level": "repeated", "context": "his cat Sasuke; three cat books in 1979 and a cat series", "frequency_evidence": "three books and a series named by Audubon", "distinctiveness": "low", "confidence": "medium", "src": ["W", "AUD"]},
-  {"element": "self-portrait and his wife", "tags": ["posed portrait"], "level": "repeated", "series": ["bukubuku"], "context": "Yūgi, Yōko, Bukubuku", "distinctiveness": "low", "confidence": "medium", "src": ["W", "AUD", "WP"]},
-  {"element": "family group portraits", "tags": ["posed portrait"], "level": "series_specific", "series": ["family"], "confidence": "medium", "src": ["W"]}
+  {
+   "element": "ravens and dark bird silhouettes",
+   "tags": [
+    "crow",
+    "bird",
+    "silhouette",
+    "sky"
+   ],
+   "level": "signature",
+   "series": [
+    "ravens"
+   ],
+   "representative": [
+    "nayoro_1977",
+    "kanazawa_1977",
+    "otaru_1975"
+   ],
+   "context": "flocks against the sky, birds on poles, wires, trees and boats",
+   "frequency_evidence": "the subject of a six-to-eight-year series and the 1986 book",
+   "distinctiveness": "high",
+   "confidence": "high",
+   "src": [
+    "AUD",
+    "JAW",
+    "MFA",
+    "W",
+    "WP"
+   ]
+  },
+  {
+   "element": "snow and winter Hokkaido",
+   "tags": [
+    "snow"
+   ],
+   "level": "series_specific",
+   "series": [
+    "ravens"
+   ],
+   "context": "tracks in the snow; heavy snowfall",
+   "confidence": "medium",
+   "src": [
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "element": "cats",
+   "tags": [
+    "cat"
+   ],
+   "level": "signature",
+   "context": "his cats Sasuke and Momoe; three 1979 books and a 2021 book",
+   "frequency_evidence": "the archive calls it an emblematic series",
+   "distinctiveness": "low",
+   "confidence": "high",
+   "src": [
+    "W",
+    "AUD",
+    "MFA",
+    "JAW"
+   ],
+   "series": [
+    "sasuke"
+   ]
+  },
+  {
+   "element": "self-portrait and his wife",
+   "tags": [
+    "posed portrait"
+   ],
+   "level": "repeated",
+   "series": [
+    "bukubuku"
+   ],
+   "context": "Yūgi, Yōko, Bukubuku",
+   "distinctiveness": "low",
+   "confidence": "medium",
+   "src": [
+    "W",
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "element": "family group portraits",
+   "tags": [
+    "posed portrait"
+   ],
+   "level": "series_specific",
+   "series": [
+    "family"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "road surfaces, markings and cracks",
+   "tags": [
+    "street",
+    "close-up"
+   ],
+   "level": "series_specific",
+   "series": [
+    "hibi"
+   ],
+   "confidence": "medium",
+   "src": [
+    "MFA"
+   ]
+  }
  ],
  "style": [
-  {"dimension": "bw_tonality", "value": "black and white for Ravens; grainy and monochromatic", "kind": "observable", "scope": "series:ravens", "tags": ["monochrome", "visible grain"], "src": ["AUD", "WP"]},
-  {"dimension": "light", "value": "small black subjects in near darkness; exposures were difficult", "kind": "observable", "scope": "series:ravens", "tags": ["dark tones", "night"], "src": ["W"]},
-  {"dimension": "composition", "value": "silhouetted flocks against an angry sky", "kind": "observable", "scope": "series:ravens", "tags": ["silhouette", "sky", "negative space"], "src": ["AUD"]},
-  {"dimension": "technique", "value": "complicated burning and dodging; multiple-exposure printing; some colour film", "kind": "observable", "scope": "series:ravens", "src": ["W"]},
-  {"dimension": "atmosphere", "value": "between foreboding and meditative; sorrow, solitude", "kind": "interpretive", "scope": "series:ravens", "src": ["AUD", "WP"]}
+  {
+   "dimension": "bw_tonality",
+   "value": "black and white for Ravens; grainy and monochromatic",
+   "kind": "observable",
+   "scope": "series:ravens",
+   "tags": [
+    "monochrome",
+    "visible grain"
+   ],
+   "src": [
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "dimension": "light",
+   "value": "small black subjects in near darkness; exposures were difficult",
+   "kind": "observable",
+   "scope": "series:ravens",
+   "tags": [
+    "dark tones",
+    "night"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "composition",
+   "value": "silhouetted flocks against an angry sky",
+   "kind": "observable",
+   "scope": "series:ravens",
+   "tags": [
+    "silhouette",
+    "sky",
+    "negative space"
+   ],
+   "src": [
+    "AUD"
+   ]
+  },
+  {
+   "dimension": "technique",
+   "value": "complicated burning and dodging; multiple-exposure printing; some colour film",
+   "kind": "observable",
+   "scope": "series:ravens",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "atmosphere",
+   "value": "between foreboding and meditative; sorrow, solitude",
+   "kind": "interpretive",
+   "scope": "series:ravens",
+   "src": [
+    "AUD",
+    "WP"
+   ]
+  },
+  {
+   "dimension": "atmosphere",
+   "value": "profoundly dark and impressionistic",
+   "kind": "interpretive",
+   "scope": "series:ravens",
+   "tags": [
+    "dark tones"
+   ],
+   "src": [
+    "MFA"
+   ]
+  },
+  {
+   "dimension": "technique",
+   "value": "pursued 'the personal' (私性) and 'play' (遊戯) through photography",
+   "kind": "interpretive",
+   "scope": "career",
+   "src": [
+    "JAW"
+   ]
+  }
  ],
  "periods": [
-  {"label": "1960s-early 1970s: slaughterhouse and domestic photo essays", "range": [1961, 1975], "src": ["W"]},
-  {"label": "1976-1982: Ravens", "range": [1976, 1982], "src": ["W"]},
-  {"label": "late work: Family, Bukubuku, Hibi; career ended by a 1992 fall", "range": [1983, 1992], "src": ["W"]}
+  {
+   "label": "1960s-early 1970s: slaughterhouse and domestic photo essays",
+   "range": [
+    1961,
+    1975
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "1976-1982: Ravens",
+   "range": [
+    1976,
+    1982
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "late work: Family, Bukubuku, Hibi; career ended by a 1992 fall",
+   "range": [
+    1983,
+    1992
+   ],
+   "src": [
+    "W"
+   ]
+  }
  ],
- "uncertain": ["Exact Ravens period differs between sources.", "No museum or archive page was readable; Masahisa Fukase Archives not consulted directly."]
+ "uncertain": [
+  "Exact Ravens period differs between sources.",
+  "Japanese Wikipedia dates Viva! Sasuke to 1978; English Wikipedia to 1979."
+ ]
 }

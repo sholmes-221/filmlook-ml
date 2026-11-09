@@ -1,57 +1,513 @@
 {
- "id": "rinko_kawauchi", "website_id": "rinko_kawauchi",
- "name": {"en": "Rinko Kawauchi", "zh": "川内伦子", "ja": "川内倫子"},
- "born": "1972-04-06", "died": null, "life_src": ["W"],
- "image_rights": {"status": "restricted", "note": "Living artist; no open licence. Knowledge only."},
- "sources": {
-  "W": {"url": "https://en.wikipedia.org/wiki/Rinko_Kawauchi", "kind": "secondary", "retrieved": "2026-11-09"},
-  "AP": {"url": "https://aperture.org/editorial/reprint-illuminance-rinko-kawauchi/", "kind": "publisher", "retrieved": "2026-11-09"},
-  "JC": {"url": "https://josefchladek.com/artist/951/kawauchi_rinko", "kind": "secondary", "retrieved": "2026-11-09"},
-  "EL": {"url": "https://elephant.art/the-light-fantastic-rinko-kawauchis-illuminance-still-shines-on-its-10th-anniversary-21112021", "kind": "secondary", "retrieved": "2026-11-09"}
+ "id": "rinko_kawauchi",
+ "website_id": "rinko_kawauchi",
+ "name": {
+  "en": "Rinko Kawauchi",
+  "zh": "川内伦子",
+  "ja": "川内倫子"
  },
- "unreachable_sources": ["https://www.lensculture.com/books/6743-rinko-kawauchi-illuminance (403)"],
+ "born": "1972-04-06",
+ "died": null,
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "Living artist; no open licence. Knowledge only."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Rinko_Kawauchi",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "AP": {
+   "url": "https://aperture.org/editorial/reprint-illuminance-rinko-kawauchi/",
+   "kind": "publisher",
+   "retrieved": "2026-11-09"
+  },
+  "JC": {
+   "url": "https://josefchladek.com/artist/951/kawauchi_rinko",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "EL": {
+   "url": "https://elephant.art/the-light-fantastic-rinko-kawauchis-illuminance-still-shines-on-its-10th-anniversary-21112021",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "RK": {
+   "url": "https://rinkokawauchi.com/en/biography/",
+   "kind": "artist",
+   "retrieved": "2026-11-09",
+   "note": "official biography: books, exhibitions, awards; no motif or style text"
+  }
+ },
+ "unreachable_sources": [
+  "https://www.lensculture.com/books/6743-rinko-kawauchi-illuminance (403)"
+ ],
  "photobooks": [
-  {"id": "utatane", "title_original": "うたたね", "title_en": "Utatane", "title_gloss": "catnap / siesta (sources differ)", "year": 2001, "publisher": "Little More, Tokyo", "isbn": "4-89815-052-7", "isbn_src": "W", "career": "One of three books published together in 2001, her breakthrough.", "src": ["W"]},
-  {"id": "hanabi", "title_original": "花火", "title_en": "Hanabi", "title_gloss": "fireworks", "year": 2001, "publisher": "Little More, Tokyo", "isbn": "4-89815-053-5", "isbn_src": "W", "subjects": ["fireworks"], "src": ["W"]},
-  {"id": "hanako", "title_original": "花子", "title_en": "Hanako", "year": 2001, "publisher": "Little More, Tokyo", "isbn": "4-89815-054-3", "isbn_src": "W", "subjects": ["a young woman named Hanako"], "src": ["W", "EL"]},
-  {"id": "aila", "title_en": "Aila", "year": 2004, "publisher": "Little More, Tokyo", "isbn": "4-89815-116-7", "isbn_src": "W", "src": ["W"]},
-  {"id": "cui_cui", "title_en": "Cui Cui", "year": 2005, "publisher": "Foil, Tokyo; Actes Sud / Fondation Cartier, Paris", "themes": ["her family over more than a decade", "birth and death"], "src": ["W"]},
-  {"id": "illuminance", "title_en": "Illuminance", "year": 2011, "publisher": "Aperture, New York", "isbn": "978-1-59711-144-7", "isbn_src": "W", "editions": [{"year": 2021, "publisher": "Aperture", "note": "tenth anniversary edition", "isbn": "978-1-59711-514-8", "isbn_src": "W"}],
-   "themes": ["light and darkness", "the fine and fleeting"], "subjects": ["sunlight on the sea", "a water droplet on a leaf", "a lit cigarette", "an eclipse"], "visual": ["close-up and cropped", "careful sequencing and juxtaposition"],
-   "career": "Her first book published outside Japan.", "src": ["W", "AP", "EL"]},
-  {"id": "ametsuchi", "title_en": "Ametsuchi", "year": 2013, "publisher": "Aperture, New York", "isbn": "978-1-59711-216-1", "isbn_src": "W", "subjects": ["Mount Aso", "the yakihata ritual burning of farmland"], "src": ["W"]},
-  {"id": "halo", "title_en": "Halo", "year": 2017, "publisher": "Aperture, New York", "isbn": "978-1-59711-411-0", "isbn_src": "W", "subjects": ["sacred flames at Izumo", "molten iron thrown at city walls in Hebei"], "src": ["W"]},
-  {"id": "des_oiseaux", "title_en": "Des Oiseaux (On Birds)", "year": 2021, "publisher": "Éditions Xavier Barral, Paris", "isbn": "978-2-36511-277-2", "isbn_src": "W", "subjects": ["birds"], "src": ["W"]}
+  {
+   "id": "utatane",
+   "title_original": "うたたね",
+   "title_en": "Utatane",
+   "title_gloss": "catnap / siesta (sources differ)",
+   "year": 2001,
+   "publisher": "Little More, Tokyo",
+   "isbn": "4-89815-052-7",
+   "isbn_src": "W",
+   "career": "One of three books published together in 2001, her breakthrough.",
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "hanabi",
+   "title_original": "花火",
+   "title_en": "Hanabi",
+   "title_gloss": "fireworks",
+   "year": 2001,
+   "publisher": "Little More, Tokyo",
+   "isbn": "4-89815-053-5",
+   "isbn_src": "W",
+   "subjects": [
+    "fireworks"
+   ],
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "hanako",
+   "title_original": "花子",
+   "title_en": "Hanako",
+   "year": 2001,
+   "publisher": "Little More, Tokyo",
+   "isbn": "4-89815-054-3",
+   "isbn_src": "W",
+   "subjects": [
+    "a young woman named Hanako"
+   ],
+   "src": [
+    "EL",
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "aila",
+   "title_en": "Aila",
+   "year": 2004,
+   "publisher": "Little More, Tokyo",
+   "isbn": "4-89815-116-7",
+   "isbn_src": "W",
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "cui_cui",
+   "title_en": "Cui Cui",
+   "year": 2005,
+   "publisher": "Foil, Tokyo; Actes Sud / Fondation Cartier, Paris",
+   "themes": [
+    "her family over more than a decade",
+    "birth and death"
+   ],
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "illuminance",
+   "title_en": "Illuminance",
+   "year": 2011,
+   "publisher": "Aperture, New York",
+   "isbn": "978-1-59711-144-7",
+   "isbn_src": "W",
+   "editions": [
+    {
+     "year": 2021,
+     "publisher": "Aperture",
+     "note": "tenth anniversary edition",
+     "isbn": "978-1-59711-514-8",
+     "isbn_src": "W"
+    }
+   ],
+   "themes": [
+    "light and darkness",
+    "the fine and fleeting"
+   ],
+   "subjects": [
+    "sunlight on the sea",
+    "a water droplet on a leaf",
+    "a lit cigarette",
+    "an eclipse"
+   ],
+   "visual": [
+    "close-up and cropped",
+    "careful sequencing and juxtaposition"
+   ],
+   "career": "Her first book published outside Japan.",
+   "src": [
+    "AP",
+    "EL",
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "ametsuchi",
+   "title_en": "Ametsuchi",
+   "year": 2013,
+   "publisher": "Aperture, New York",
+   "isbn": "978-1-59711-216-1",
+   "isbn_src": "W",
+   "subjects": [
+    "Mount Aso",
+    "the yakihata ritual burning of farmland"
+   ],
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "halo",
+   "title_en": "Halo",
+   "year": 2017,
+   "publisher": "Aperture, New York",
+   "isbn": "978-1-59711-411-0",
+   "isbn_src": "W",
+   "subjects": [
+    "sacred flames at Izumo",
+    "molten iron thrown at city walls in Hebei"
+   ],
+   "src": [
+    "RK",
+    "W"
+   ]
+  },
+  {
+   "id": "des_oiseaux",
+   "title_en": "Des Oiseaux (On Birds)",
+   "year": 2021,
+   "publisher": "Éditions Xavier Barral, Paris",
+   "isbn": "978-2-36511-277-2",
+   "isbn_src": "W",
+   "subjects": [
+    "birds"
+   ],
+   "src": [
+    "RK",
+    "W"
+   ]
+  }
  ],
  "series": [
-  {"id": "cui_cui", "title": "Cui Cui", "photobooks": ["cui_cui"], "subjects": ["her family"], "context": "photographed over more than a decade", "src": ["W"]},
-  {"id": "illuminance", "title": "Illuminance", "photobooks": ["illuminance"], "subjects": ["light", "small everyday details", "the sea", "an eclipse"], "src": ["AP", "EL"]},
-  {"id": "ametsuchi", "title": "Ametsuchi", "photobooks": ["ametsuchi"], "subjects": ["fire", "volcanic landscape", "ritual"], "src": ["W"]},
-  {"id": "halo", "title": "Halo", "photobooks": ["halo"], "subjects": ["ritual fire and sparks"], "src": ["W"]},
-  {"id": "murmuration", "title": "Murmuration", "period": [2010, 2010], "subjects": ["Brighton Pier"], "visual": ["her first digital, non-square photographs"], "src": ["W"]}
+  {
+   "id": "cui_cui",
+   "title": "Cui Cui",
+   "photobooks": [
+    "cui_cui"
+   ],
+   "subjects": [
+    "her family"
+   ],
+   "context": "photographed over more than a decade",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "illuminance",
+   "title": "Illuminance",
+   "photobooks": [
+    "illuminance"
+   ],
+   "subjects": [
+    "light",
+    "small everyday details",
+    "the sea",
+    "an eclipse"
+   ],
+   "src": [
+    "AP",
+    "EL"
+   ]
+  },
+  {
+   "id": "ametsuchi",
+   "title": "Ametsuchi",
+   "photobooks": [
+    "ametsuchi"
+   ],
+   "subjects": [
+    "fire",
+    "volcanic landscape",
+    "ritual"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "halo",
+   "title": "Halo",
+   "photobooks": [
+    "halo"
+   ],
+   "subjects": [
+    "ritual fire and sparks"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "murmuration",
+   "title": "Murmuration",
+   "period": [
+    2010,
+    2010
+   ],
+   "subjects": [
+    "Brighton Pier"
+   ],
+   "visual": [
+    "her first digital, non-square photographs"
+   ],
+   "src": [
+    "W"
+   ]
+  }
  ],
  "photographs": [],
  "motifs": [
-  {"element": "radiant light, glare and glow", "tags": ["backlight", "bright airy exposure", "soft light"], "level": "signature", "series": ["illuminance"], "context": "sunlight on water, haloes, glow", "frequency_evidence": "described as characteristic of her work and the subject of Illuminance", "distinctiveness": "medium", "confidence": "high", "src": ["W", "EL", "JC"]},
-  {"element": "small everyday details and gestures", "tags": ["close-up"], "level": "signature", "context": "no subject too small or mundane; incidental details of her everyday environment", "distinctiveness": "medium", "confidence": "high", "src": ["W", "AP"]},
-  {"element": "fire and ritual flames", "tags": ["fire", "fireworks"], "level": "repeated", "series": ["ametsuchi", "halo"], "context": "burning farmland, sacred flames, fireworks", "confidence": "medium", "src": ["W"]},
-  {"element": "water drops, leaves and plants", "tags": ["leaf", "flower"], "level": "weak", "series": ["illuminance"], "context": "one described image of a droplet on a leaf; a green shoot in an exhibition review", "confidence": "low", "src": ["EL", "W"]},
-  {"element": "insects", "tags": ["insect"], "level": "weak", "context": "only a 2006 headline title cited on Wikipedia", "confidence": "low", "src": ["W"]},
-  {"element": "birds", "tags": ["bird"], "level": "weak", "context": "the 2021 book title only", "confidence": "low", "src": ["W"]},
-  {"element": "birth, family, death", "tags": ["child"], "level": "series_specific", "series": ["cui_cui"], "confidence": "medium", "src": ["W"]}
+  {
+   "element": "radiant light, glare and glow",
+   "tags": [
+    "backlight",
+    "bright airy exposure",
+    "soft light"
+   ],
+   "level": "signature",
+   "series": [
+    "illuminance"
+   ],
+   "context": "sunlight on water, haloes, glow",
+   "frequency_evidence": "described as characteristic of her work and the subject of Illuminance",
+   "distinctiveness": "medium",
+   "confidence": "high",
+   "src": [
+    "W",
+    "EL",
+    "JC"
+   ]
+  },
+  {
+   "element": "small everyday details and gestures",
+   "tags": [
+    "close-up"
+   ],
+   "level": "signature",
+   "context": "no subject too small or mundane; incidental details of her everyday environment",
+   "distinctiveness": "medium",
+   "confidence": "high",
+   "src": [
+    "W",
+    "AP"
+   ]
+  },
+  {
+   "element": "fire and ritual flames",
+   "tags": [
+    "fire",
+    "fireworks"
+   ],
+   "level": "repeated",
+   "series": [
+    "ametsuchi",
+    "halo"
+   ],
+   "context": "burning farmland, sacred flames, fireworks",
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "water drops, leaves and plants",
+   "tags": [
+    "leaf",
+    "flower"
+   ],
+   "level": "weak",
+   "series": [
+    "illuminance"
+   ],
+   "context": "one described image of a droplet on a leaf; a green shoot in an exhibition review",
+   "confidence": "low",
+   "src": [
+    "EL",
+    "W"
+   ]
+  },
+  {
+   "element": "insects",
+   "tags": [
+    "insect"
+   ],
+   "level": "weak",
+   "context": "only a 2006 headline title cited on Wikipedia",
+   "confidence": "low",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "birds",
+   "tags": [
+    "bird"
+   ],
+   "level": "weak",
+   "context": "the 2021 book title only",
+   "confidence": "low",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "birth, family, death",
+   "tags": [
+    "child"
+   ],
+   "level": "series_specific",
+   "series": [
+    "cui_cui"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
  ],
  "style": [
-  {"dimension": "palette", "value": "soft colours; nuanced palette", "kind": "observable", "scope": "career", "tags": ["soft pastel colour", "colour"], "src": ["W", "AP"]},
-  {"dimension": "light", "value": "radiant light with a dream-like quality", "kind": "interpretive", "scope": "career", "tags": ["bright airy exposure", "backlight"], "src": ["W"]},
-  {"dimension": "framing", "value": "mostly 6 x 6 square (Rolleiflex) until 2010; then also digital non-square", "kind": "observable", "scope": "period:to_2010", "tags": ["square format"], "src": ["W", "JC", "EL"]},
-  {"dimension": "framing", "value": "close-up and cropped", "kind": "observable", "scope": "series:illuminance", "tags": ["close-up"], "src": ["EL"]},
-  {"dimension": "technique", "value": "sequencing and juxtaposition across a book matter more than single images", "kind": "observable", "scope": "career", "src": ["W", "JC", "EL"]},
-  {"dimension": "atmosphere", "value": "serene, poetic; impermanence; beauty in the banal", "kind": "interpretive", "scope": "career", "src": ["W", "JC", "EL"]}
+  {
+   "dimension": "palette",
+   "value": "soft colours; nuanced palette",
+   "kind": "observable",
+   "scope": "career",
+   "tags": [
+    "soft pastel colour",
+    "colour"
+   ],
+   "src": [
+    "W",
+    "AP"
+   ]
+  },
+  {
+   "dimension": "light",
+   "value": "radiant light with a dream-like quality",
+   "kind": "interpretive",
+   "scope": "career",
+   "tags": [
+    "bright airy exposure",
+    "backlight"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "framing",
+   "value": "mostly 6 x 6 square (Rolleiflex) until 2010; then also digital non-square",
+   "kind": "observable",
+   "scope": "period:to_2010",
+   "tags": [
+    "square format"
+   ],
+   "src": [
+    "W",
+    "JC",
+    "EL"
+   ]
+  },
+  {
+   "dimension": "framing",
+   "value": "close-up and cropped",
+   "kind": "observable",
+   "scope": "series:illuminance",
+   "tags": [
+    "close-up"
+   ],
+   "src": [
+    "EL"
+   ]
+  },
+  {
+   "dimension": "technique",
+   "value": "sequencing and juxtaposition across a book matter more than single images",
+   "kind": "observable",
+   "scope": "career",
+   "src": [
+    "W",
+    "JC",
+    "EL"
+   ]
+  },
+  {
+   "dimension": "atmosphere",
+   "value": "serene, poetic; impermanence; beauty in the banal",
+   "kind": "interpretive",
+   "scope": "career",
+   "src": [
+    "W",
+    "JC",
+    "EL"
+   ]
+  }
  ],
  "periods": [
-  {"label": "2001 debut: Utatane, Hanabi, Hanako", "range": [2001, 2004], "src": ["W"]},
-  {"label": "light and ritual: Illuminance, Ametsuchi, Halo", "range": [2011, 2017], "src": ["W"]},
-  {"label": "from 2010 also digital and non-square", "range": [2010, null], "src": ["W"]}
+  {
+   "label": "2001 debut: Utatane, Hanabi, Hanako",
+   "range": [
+    2001,
+    2004
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "light and ritual: Illuminance, Ametsuchi, Halo",
+   "range": [
+    2011,
+    2017
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "from 2010 also digital and non-square",
+   "range": [
+    2010,
+    null
+   ],
+   "src": [
+    "W"
+   ]
+  }
  ],
- "uncertain": ["Watermelon, named in the owner's brief, was not found in any source read; it is not recorded as a motif.", "No individual photograph titles were found on the pages read."]
+ "uncertain": [
+  "Watermelon, named in the owner's brief, was not found in any source read; it is not recorded as a motif.",
+  "No individual photograph titles were found on the pages read.",
+  "The official biography names no individual photographs and states no motifs."
+ ]
 }

@@ -131,7 +131,7 @@ def completeness(profile: dict) -> dict:
         "claims_supported_by_sources": True,  # validate() fails the build otherwise
         "copyright_status_recorded": bool(profile.get("image_rights", {}).get("status")),
         "uncertain_claims_flagged": "uncertain" in profile,
-        "primary_source_consulted": any(s.get("kind") in ("foundation", "museum", "archive", "publisher", "institution") for s in profile.get("sources", {}).values()),
+        "primary_source_consulted": any(s.get("kind") in ("foundation", "museum", "archive", "publisher", "institution", "artist") for s in profile.get("sources", {}).values()),
     }
     status = "complete" if all(checks.values()) else "incomplete"
     return {"status": status, "checks": checks, "missing": [k for k, v in checks.items() if not v]}
