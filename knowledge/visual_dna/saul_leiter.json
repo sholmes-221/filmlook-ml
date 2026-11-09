@@ -1,0 +1,55 @@
+{
+ "id": "saul_leiter", "website_id": "saul_leiter",
+ "name": {"en": "Saul Leiter", "zh": "索尔·雷特", "ja": "ソール・ライター"},
+ "born": "1923-12-03", "died": "2013-11-26", "life_src": ["SLF_C", "W"],
+ "image_rights": {"status": "restricted", "note": "In copyright; Saul Leiter Foundation. Knowledge only."},
+ "sources": {
+  "SLF_C": {"url": "https://www.saulleiterfoundation.org/chronology", "kind": "foundation", "retrieved": "2026-11-09"},
+  "SLF_B": {"url": "https://www.saulleiterfoundation.org/biography", "kind": "foundation", "retrieved": "2026-11-09"},
+  "W": {"url": "https://en.wikipedia.org/wiki/Saul_Leiter", "kind": "secondary", "retrieved": "2026-11-09"},
+  "ST": {"url": "https://steidl.de/Artists/Saul-Leiter-1628404161.html", "kind": "publisher", "retrieved": "2026-11-09"}
+ },
+ "unreachable_sources": ["https://www.lensculture.com/sleiter (403)"],
+ "photobooks": [
+  {"id": "early_color", "title_original": "Early Color", "title_en": "Early Color", "year": 2006, "publisher": "Steidl, Göttingen", "isbn": "978-3865211392", "isbn_src": "W",
+   "editions": [{"year": 2013, "publisher": "Steidl", "isbn": "978-3869303529", "isbn_src": "W"}],
+   "themes": ["a quieter, more mysterious New York"], "visual": ["muted colour palette", "wet windows, snow scenes, umbrellas"], "career": "His first monograph; brought him wide attention in his eighties.", "src": ["SLF_B", "SLF_C", "W"]},
+  {"id": "early_bw", "title_en": "Early Black and White", "year": 2014, "publisher": "Steidl", "isbn": "978-3865214133", "isbn_src": "W", "edition_note": "two volumes", "src": ["SLF_C", "W"]},
+  {"id": "saul_leiter_2008", "title_en": "Saul Leiter", "year": 2008, "publisher": "Steidl", "isbn": "9783865216625", "isbn_src": "W", "edition_note": "with the Fondation Henri Cartier-Bresson exhibition", "src": ["SLF_C", "W"]},
+  {"id": "painted_nudes", "title_en": "Painted Nudes", "year": 2015, "publisher": "Sylph Editions, London", "isbn": "978-1909631069", "isbn_src": "W", "subjects": ["nudes"], "visual": ["photographs painted over with water-based paint"], "src": ["SLF_B", "W"]},
+  {"id": "in_my_room", "title_en": "In My Room", "year": 2018, "publisher": "Steidl", "isbn": "978-3958291034", "isbn_src": "W", "subjects": ["nudes and intimate portraits"], "visual": ["black and white"], "src": ["SLF_B", "SLF_C"]},
+  {"id": "all_about", "title_en": "All About Saul Leiter", "year": 2017, "publisher": "Seigensha, Kyoto", "isbn": "978-4861526169", "isbn_src": "W", "src": ["SLF_C", "W"]},
+  {"id": "unseen", "title_en": "The Unseen Saul Leiter", "year": 2022, "publisher": "Thames & Hudson", "isbn": "9780500545560", "isbn_src": "W", "subjects": ["unseen colour slides from the archive"], "src": ["SLF_C", "SLF_B", "W"]}
+ ],
+ "series": [
+  {"id": "street_colour", "title": "New York street colour (slides)", "title_given": false, "period": [1948, 1960], "period_note": "colour slide work begins c. 1948 (Kodachrome, Anscochrome); exact end not given", "photobooks": ["early_color", "unseen"],
+   "subjects": ["New York streets", "umbrellas", "snow", "wet windows"], "visual": ["muted colour", "photographing through things", "fields of solid colour", "ambiguity"], "src": ["SLF_C", "SLF_B"]},
+  {"id": "wedding_funeral", "title": "The Wedding as a Funeral", "period": [1951, 1951], "visual": ["black and white"], "context": "Life, 3 September 1951", "src": ["SLF_C", "SLF_B"]},
+  {"id": "shoeshine", "title": "Shoes of the Shoeshine Man", "period": [1951, 1951], "subjects": ["shoes"], "visual": ["black and white"], "context": "Life, 26 November 1951", "src": ["SLF_C", "SLF_B"]},
+  {"id": "painted_nudes", "title": "Painted Nudes", "photobooks": ["painted_nudes"], "subjects": ["nudes"], "visual": ["water-based paint on prints"], "src": ["SLF_B"]}
+ ],
+ "photographs": [
+  {"id": "through_boards_1958", "title": "Through Boards", "title_given": true, "year": 1958, "series": "street_colour", "why": "cover image of Early Color", "subjects": [], "src": ["SLF_B"], "rights": "restricted"},
+  {"id": "package_1960", "title": "Package", "title_given": true, "year": "c. 1960", "why": "cover of New York magazine, December 2013", "src": ["SLF_C", "SLF_B"], "rights": "restricted"}
+ ],
+ "motifs": [
+  {"element": "umbrellas disembodied from those who hold them", "tags": ["umbrella", "rain", "street"], "level": "signature", "series": ["street_colour"], "context": "street scenes in rain", "frequency_evidence": "named by the foundation as a recurring motif", "distinctiveness": "medium", "confidence": "high", "src": ["SLF_B", "W"]},
+  {"element": "snow scenes", "tags": ["snow", "street"], "level": "signature", "series": ["street_colour"], "frequency_evidence": "named by the foundation as a recurring motif", "distinctiveness": "medium", "confidence": "high", "src": ["SLF_B", "W"]},
+  {"element": "wet windows; photographing through glass", "tags": ["through glass", "rain", "reflection", "layered frame"], "level": "signature", "series": ["street_colour"], "frequency_evidence": "named by the foundation as a recurring motif; Leiter: 'I like photographing through things'", "distinctiveness": "high", "confidence": "high", "src": ["SLF_B", "SLF_C"]},
+  {"element": "fields of solid colour dominating the frame", "tags": ["layered frame", "negative space", "colour"], "level": "tendency", "confidence": "medium", "src": ["SLF_B"]},
+  {"element": "reflections", "tags": ["reflection"], "level": "repeated", "context": "clever and sometimes disorienting reflections in the fashion work", "confidence": "medium", "src": ["SLF_B", "W"]}
+ ],
+ "style": [
+  {"dimension": "palette", "value": "muted colour palette; colour slide film (Kodachrome, Anscochrome) from c. 1948", "kind": "observable", "scope": "series:street_colour", "tags": ["muted colour", "colour"], "src": ["SLF_B", "SLF_C"]},
+  {"dimension": "framing", "value": "through boards, glass and mist; things lost in a fuzz", "kind": "observable", "scope": "career", "tags": ["through glass", "layered frame", "out of focus"], "src": ["SLF_B"]},
+  {"dimension": "composition", "value": "dramatic compositions; solid colour fields before details emerge", "kind": "observable", "scope": "career", "src": ["SLF_B"]},
+  {"dimension": "atmosphere", "value": "ambiguity; a meditative, quieter New York", "kind": "interpretive", "scope": "career", "src": ["SLF_B", "W"]},
+  {"dimension": "technique", "value": "also a painter; influenced by Bonnard, Vuillard and Degas; painted over prints", "kind": "observable", "scope": "career", "src": ["SLF_B"]}
+ ],
+ "periods": [
+  {"label": "1940s-1950s black and white (Life features)", "range": [1946, 1955], "src": ["SLF_C"]},
+  {"label": "colour street slides from c. 1948", "range": [1948, null], "src": ["SLF_C"]},
+  {"label": "fashion work and painting; rediscovery from 2006", "range": [1958, 2013], "src": ["SLF_C", "SLF_B"]}
+ ],
+ "uncertain": ["'Red umbrella' as a specific photograph title was not found; only the umbrella motif is recorded.", "The street-colour series has no title of its own; its name here is descriptive."]
+}

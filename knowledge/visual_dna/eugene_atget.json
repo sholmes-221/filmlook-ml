@@ -1,0 +1,38 @@
+{
+ "id": "eugene_atget", "website_id": null,
+ "name": {"en": "Eugène Atget", "zh": "尤金·阿杰", "ja": "ウジェーヌ・アジェ"},
+ "born": "1857-02-12", "died": "1927-08-04", "life_src": ["W"],
+ "image_rights": {"status": "public_domain", "note": "Author died 1927; works public domain in France and the US (Commons PD-old-70 / PD-US per file; AIC CC0 where flagged)."},
+ "sources": {"W": {"url": "https://en.wikipedia.org/wiki/Eug%C3%A8ne_Atget", "kind": "secondary", "retrieved": "2026-11-09", "note": "first ~40k characters verbatim"}},
+ "unreachable_sources": ["https://www.metmuseum.org/essays/eugene-atget-1857-1927 (403)", "https://www.moma.org/artists/229 (429)"],
+ "photobooks": [
+  {"id": "photographe_de_paris", "title_original": "Atget, Photographe de Paris", "year": 1930, "publisher": null, "editor": "Berenice Abbott", "career": "the first overview of his work, after his death", "src": ["W"]},
+  {"id": "world_of_atget", "title_en": "The World of Atget", "year": 1964, "editor": "Berenice Abbott", "note": "prints Abbott made from his negatives", "src": ["W"]}
+ ],
+ "series": [
+  {"id": "picturesque_paris", "title": "Paris pittoresque (Picturesque Paris)", "subjects": ["picturesque views of Paris", "small trades"], "src": ["W"]},
+  {"id": "petits_metiers", "title": "Petits métiers", "subjects": ["street trades"], "src": ["W"]},
+  {"id": "art_old_paris", "title": "L'Art dans le vieux Paris (Art in Old Paris)", "period": [1898, 1927], "period_note": "begun early in the 1900s", "subjects": ["pre-Revolution buildings in their streets"], "visual": ["winding streets framed to show buildings in context"], "src": ["W"]},
+  {"id": "interieurs", "title": "Intérieurs parisiens", "subjects": ["domestic interiors"], "src": ["W"]},
+  {"id": "parks", "title": "Parks of Versailles, Saint-Cloud and Sceaux", "period": [1901, 1927], "subjects": ["gardens", "statues", "trees", "water"], "src": ["W"]}
+ ],
+ "photographs": [
+  {"id": "eclipse_1912", "title": "Pendant l'éclipse", "title_given": true, "year": 1912, "location": "Colonne de Juillet, Paris", "subjects": ["a crowd watching the eclipse"], "src": ["W"], "rights": "public_domain"},
+  {"id": "gobelins_1927", "title": "Avenue des Gobelins", "title_given": true, "year": 1927, "subjects": ["shop window reflection"], "src": ["W"], "rights": "public_domain"},
+  {"id": "organ_1898", "title": "Organ Grinder", "title_given": true, "year": 1898, "series": "petits_metiers", "src": ["W"], "rights": "public_domain"}
+ ],
+ "motifs": [
+  {"element": "old Paris streets and buildings", "tags": ["old building", "street", "empty scene"], "level": "repeated", "series": ["art_old_paris", "picturesque_paris"], "frequency_evidence": "thirteen concurrent series, most of Paris", "distinctiveness": "medium", "confidence": "high", "src": ["W"]},
+  {"element": "parks and gardens", "tags": ["park", "garden", "tree"], "level": "series_specific", "series": ["parks"], "confidence": "medium", "src": ["W"]},
+  {"element": "shop windows, mannequins and reflections", "tags": ["shop window", "mannequin", "reflection"], "level": "weak", "context": "Man Ray's account of the pictures that appealed to the Surrealists", "confidence": "low", "src": ["W"]},
+  {"element": "staircases and doorways", "tags": ["staircase", "doorway"], "level": "weak", "context": "Man Ray's account", "confidence": "low", "src": ["W"]},
+  {"element": "street trades", "tags": ["worker", "street"], "level": "series_specific", "series": ["petits_metiers"], "confidence": "medium", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "technique", "value": "large-format wooden bellows camera; 18 x 24 cm glass plates; contact prints on albumen and printing-out papers", "kind": "observable", "scope": "career", "tags": ["sharp detail"], "src": ["W"]},
+  {"dimension": "motion", "value": "slow emulsion and long exposures blur moving subjects", "kind": "observable", "scope": "career", "tags": ["motion blur", "empty scene"], "src": ["W"]},
+  {"dimension": "framing", "value": "optical vignetting in some corners from shifting the lens", "kind": "observable", "scope": "career", "src": ["W"]}
+ ],
+ "periods": [{"label": "documents for artists, 1890s onward; Old Paris; parks after 1920", "range": [1890, 1927], "src": ["W"]}],
+ "uncertain": ["Early-morning light and emptiness are common descriptions but not in the text read."]
+}

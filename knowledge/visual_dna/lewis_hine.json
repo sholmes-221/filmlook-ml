@@ -1,0 +1,36 @@
+{
+ "id": "lewis_hine", "website_id": "lewis_hine",
+ "name": {"en": "Lewis Hine", "zh": "刘易斯·海因", "ja": "ルイス・ハイン"},
+ "born": "1874-09-26", "died": "1940-11-03", "life_src": ["W"],
+ "image_rights": {"status": "public_domain", "note": "Author died 1940; NCLC and Red Cross work is public domain in the US (Commons templates per file)."},
+ "sources": {"W": {"url": "https://en.wikipedia.org/wiki/Lewis_Hine", "kind": "secondary", "retrieved": "2026-11-09"}},
+ "unreachable_sources": ["https://www.metmuseum.org/essays/lewis-hine-1874-1940 (429)"],
+ "photobooks": [],
+ "series": [
+  {"id": "ellis_island", "title": "Ellis Island immigrants", "period": [1904, 1909], "subjects": ["immigrants arriving"], "src": ["W"]},
+  {"id": "pittsburgh", "title": "The Pittsburgh Survey", "period": [1907, 1908], "subjects": ["steel districts and their people"], "src": ["W"]},
+  {"id": "nclc", "title": "National Child Labor Committee", "period": [1908, 1918], "subjects": ["children in mills, mines, factories and streets"], "context": "helped pass the first US child labour laws", "refdb": "Commons: Photographs by Lewis Hine", "src": ["W"]},
+  {"id": "red_cross", "title": "American Red Cross relief", "period": [1917, 1920], "subjects": ["relief work in Europe"], "src": ["W"]},
+  {"id": "work_portraits", "title": "Work portraits", "period": [1920, 1932], "subjects": ["men and machines in modern industry"], "src": ["W"]},
+  {"id": "empire_state", "title": "Empire State Building construction", "period": [1930, 1931], "subjects": ["ironworkers on the steel frame high above the city"], "src": ["W"]}
+ ],
+ "photographs": [
+  {"id": "doffers_1910", "title": "Young Doffers in the Elk Cotton Mills, Fayetteville, Tennessee", "title_given": true, "year": 1910, "series": "nclc", "src": ["W"], "rights": "public_domain"},
+  {"id": "newsies_1910", "title": "Newsies at Skeeter's Branch", "title_given": true, "year": 1910, "series": "nclc", "location": "St. Louis", "src": ["W"], "rights": "public_domain"},
+  {"id": "spinner_1908", "title": "A Little Spinner, Mollohan Mills, S.C.", "title_given": true, "year": 1908, "series": "nclc", "src": ["W"], "rights": "public_domain"},
+  {"id": "steam_fitter_1920", "title": "Steam Fitter", "title_given": true, "year": 1920, "series": "work_portraits", "src": ["W"], "rights": "public_domain"},
+  {"id": "mast_1932", "title": "Raising the Mast, Empire State Building", "title_given": true, "year": 1932, "series": "empire_state", "src": ["W"], "rights": "unverified"}
+ ],
+ "motifs": [
+  {"element": "child workers", "tags": ["child", "worker", "mill", "factory", "street"], "level": "repeated", "series": ["nclc"], "frequency_evidence": "a decade of NCLC work", "distinctiveness": "high", "confidence": "high", "src": ["W"]},
+  {"element": "mills, mines and machines", "tags": ["mill", "mine", "machine", "factory"], "level": "repeated", "series": ["nclc", "work_portraits"], "confidence": "medium", "src": ["W"]},
+  {"element": "immigrants", "tags": ["crowd"], "level": "series_specific", "series": ["ellis_island"], "confidence": "medium", "src": ["W"]},
+  {"element": "ironworkers high on steel frames", "tags": ["worker", "construction site", "sky"], "level": "series_specific", "series": ["empire_state"], "confidence": "medium", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "subject_background", "value": "workers and children shown at their place of work", "kind": "observable", "scope": "series:nclc", "tags": ["posed portrait", "monochrome"], "src": ["W"]},
+  {"dimension": "technique", "value": "composite portraits of mill children (1913); disguises to gain entry", "kind": "observable", "scope": "series:nclc", "src": ["W"]}
+ ],
+ "periods": [{"label": "social documentary 1904-1918", "range": [1904, 1918], "src": ["W"]}, {"label": "work portraits and Empire State", "range": [1920, 1932], "src": ["W"]}],
+ "uncertain": ["No photobook by Hine was named in the sources read (Men at Work, 1932, is commonly cited but was not verified here).", "Camera, flash and lighting are not described in the sources read."]
+}

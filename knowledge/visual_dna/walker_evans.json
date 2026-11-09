@@ -1,0 +1,46 @@
+{
+ "id": "walker_evans", "website_id": "walker_evans",
+ "name": {"en": "Walker Evans", "zh": "沃克·埃文斯", "ja": "ウォーカー・エヴァンス"},
+ "born": "1903-11-03", "died": "1975-04-10", "life_src": ["W"],
+ "image_rights": {"status": "public_domain_subset", "note": "About 1,000 RA/FSA negatives at the Library of Congress are public domain; the Met holds copyright to the rest. Only federal works enter the pipeline."},
+ "sources": {
+  "W": {"url": "https://en.wikipedia.org/wiki/Walker_Evans", "kind": "secondary", "retrieved": "2026-11-09", "note": "first ~40k characters verbatim"},
+  "WL": {"url": "https://en.wikipedia.org/wiki/Let_Us_Now_Praise_Famous_Men", "kind": "secondary", "retrieved": "2026-11-09"}
+ },
+ "unreachable_sources": ["https://www.metmuseum.org/essays/walker-evans-1903-1975 (429)", "https://en.wikipedia.org/wiki/American_Photographs (404)"],
+ "photobooks": [
+  {"id": "american_photographs", "title_en": "American Photographs", "year": 1938, "publisher": null, "career": "with the 1938 MoMA exhibition", "src": ["W"]},
+  {"id": "famous_men", "title_en": "Let Us Now Praise Famous Men", "year": 1941, "publisher": "Houghton Mifflin", "coauthor": "James Agee (text)", "subjects": ["three tenant-farming families in Hale County, Alabama"], "themes": ["rural poverty in the Depression"], "src": ["WL", "W"]},
+  {"id": "many_are_called", "title_en": "Many Are Called", "year": 1966, "publisher": null, "subjects": ["New York subway passengers, 1938"], "visual": ["camera hidden in his coat"], "src": ["W"]}
+ ],
+ "series": [
+  {"id": "victorian_houses", "title": "Victorian houses near Boston", "period": [1931, 1931], "subjects": ["Victorian houses"], "src": ["W"]},
+  {"id": "cuba", "title": "Cuba", "period": [1933, 1933], "subjects": ["street life", "police", "beggars", "dockworkers"], "src": ["W"]},
+  {"id": "fsa", "title": "Resettlement / Farm Security Administration photographs", "period": [1935, 1938], "subjects": ["the American South", "vernacular buildings", "towns"], "visual": ["mostly 8 x 10 inch view camera"], "refdb": "Commons: Photographs by Walker Evans", "src": ["W"]},
+  {"id": "hale_county", "title": "Hale County, Alabama", "period": [1936, 1936], "photobooks": ["famous_men"], "subjects": ["sharecropper families", "their houses"], "src": ["W", "WL"]},
+  {"id": "subway", "title": "Subway portraits", "period": [1938, 1941], "photobooks": ["many_are_called"], "subjects": ["subway passengers"], "src": ["W"]},
+  {"id": "sx70", "title": "Polaroid SX-70", "period": [1973, 1974], "src": ["W"]}
+ ],
+ "photographs": [
+  {"id": "bethlehem_1935", "title": "Bethlehem Graveyard and Steel Mill", "title_given": true, "year": 1935, "series": "fsa", "location": "Bethlehem, Pennsylvania", "subjects": ["cemetery crosses in front of steel-mill smokestacks"], "src": ["W"], "rights": "public_domain"},
+  {"id": "frame_house_1936", "title": "Frame house. Charleston, South Carolina", "title_given": true, "year": 1936, "series": "fsa", "subjects": ["a wooden house"], "src": ["W"], "rights": "public_domain"},
+  {"id": "burroughs_1936", "title": "Allie Mae Burroughs", "title_given": false, "year": 1936, "series": "hale_county", "subjects": ["frontal portrait of a tenant farmer's wife"], "why": "a symbol of the Great Depression", "src": ["W"], "rights": "public_domain"}
+ ],
+ "motifs": [
+  {"element": "vernacular houses and buildings", "tags": ["vernacular house", "old building", "frontal view"], "level": "repeated", "series": ["victorian_houses", "fsa"], "frequency_evidence": "a 1931 series and many FSA titles", "distinctiveness": "medium", "confidence": "medium", "src": ["W"]},
+  {"element": "sharecropper families", "tags": ["posed portrait", "farm"], "level": "series_specific", "series": ["hale_county"], "confidence": "high", "src": ["W", "WL"]},
+  {"element": "subway passengers", "tags": ["subway", "face close-up"], "level": "series_specific", "series": ["subway"], "confidence": "high", "src": ["W"]},
+  {"element": "shop signs", "tags": ["sign", "storefront"], "level": "weak", "context": "one title only, from the unread half of the article", "confidence": "low", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "technique", "value": "large-format 8 x 10 inch view camera for most New Deal work", "kind": "observable", "scope": "series:fsa", "tags": ["sharp detail", "frontal view"], "src": ["W"]},
+  {"dimension": "atmosphere", "value": "'lyric documentary' (his own phrase); 'quiet, magisterial beauty' (Janet Malcolm)", "kind": "interpretive", "scope": "career", "src": ["W"]},
+  {"dimension": "bw_tonality", "value": "black and white through the 1930s-60s; colour Polaroids at the end", "kind": "observable", "scope": "career", "tags": ["monochrome"], "src": ["W"]}
+ ],
+ "periods": [
+  {"label": "early New York and Victorian houses", "range": [1928, 1934], "src": ["W"]},
+  {"label": "RA/FSA and Hale County", "range": [1935, 1938], "src": ["W"]},
+  {"label": "subway, Fortune, Yale; SX-70", "range": [1938, 1974], "src": ["W"]}
+ ],
+ "uncertain": ["Frontal, 'deadpan' viewpoint is a common description but not in the text read; the frontal_view tag rests on the view camera practice and is low weight.", "American Photographs publisher not read."]
+}

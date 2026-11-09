@@ -1,0 +1,41 @@
+{
+ "id": "henri_cartier_bresson", "website_id": "henri_cartier_bresson",
+ "name": {"en": "Henri Cartier-Bresson", "zh": "亨利·卡蒂埃-布列松", "ja": "アンリ・カルティエ＝ブレッソン"},
+ "born": "1908-08-22", "died": "2004-08-03", "life_src": ["W"],
+ "image_rights": {"status": "restricted", "note": "In copyright; Fondation Henri Cartier-Bresson and Magnum. Knowledge only."},
+ "sources": {
+  "ICP": {"url": "https://icp.org/exhibitions/henri-cartier-bresson-the-decisive-moment", "kind": "museum", "retrieved": "2026-11-09"},
+  "FHCB": {"url": "https://www.henricartierbresson.org/en/hcb/", "kind": "foundation", "retrieved": "2026-11-09"},
+  "W": {"url": "https://en.wikipedia.org/wiki/Henri_Cartier-Bresson", "kind": "secondary", "retrieved": "2026-11-09", "note": "first ~40k characters read verbatim; later facts marked summary are not used"}
+ },
+ "unreachable_sources": ["https://www.moma.org/artists/1055 (403)", "Fondation HCB press kit PDF (binary, not extracted)"],
+ "photobooks": [
+  {"id": "images_a_la_sauvette", "title_original": "Images à la sauvette", "title_en": "The Decisive Moment", "title_zh": "决定性瞬间", "title_zh_basis": "established Chinese title of the English edition", "year": 1952, "publisher": "Éditions Verve (Tériade), Paris; Simon & Schuster, New York",
+   "visual": ["cover by Henri Matisse"], "themes": ["the single photograph as its own narrative form"], "career": "Its English title became the motto of his work; Capa called it a bible for photographers.", "src": ["ICP"]},
+  {"id": "photographs_1947", "title_en": "The Photographs of Henri Cartier-Bresson", "year": 1947, "publisher": "Museum of Modern Art", "note": "first book, with texts by Lincoln Kirstein and Beaumont Newhall", "src": ["W"]}
+ ],
+ "series": [
+  {"id": "decisive_moment_plates", "title": "Plates of The Decisive Moment (1932-1952)", "title_given": false, "period": [1932, 1952], "photobooks": ["images_a_la_sauvette"], "subjects": ["Europe", "Mexico", "the United States", "India", "everyday life", "portraits of artists"], "src": ["ICP"]}
+ ],
+ "photographs": [
+  {"id": "seine_1938", "title": "Sunday on the Banks of the Seine, France", "title_given": true, "year": 1938, "location": "Banks of the Seine", "photobook": "images_a_la_sauvette", "src": ["ICP"], "rights": "restricted"},
+  {"id": "italy_1933", "title": "Italy, 1933", "title_given": true, "year": 1933, "photobook": "images_a_la_sauvette", "subjects": ["an almost abandoned plaza"], "src": ["ICP"], "rights": "restricted"},
+  {"id": "tehuantepec_1934", "title": "Tehuantepec, Mexico", "title_given": true, "year": 1934, "photobook": "images_a_la_sauvette", "subjects": ["two girls in front of a brick wall"], "src": ["ICP"], "rights": "restricted"},
+  {"id": "manhattan_1947", "title": "Downtown, Manhattan, New York, United States", "title_given": true, "year": 1947, "photobook": "images_a_la_sauvette", "subjects": ["a man at the mouth of an alley staring at a cat"], "src": ["ICP"], "rights": "restricted"},
+  {"id": "kurukshetra_1947", "title": "A Refugee Camp, Kurukshetra, India", "title_given": true, "year": 1947, "photobook": "images_a_la_sauvette", "subjects": ["a vast expanse of tents"], "src": ["ICP"], "rights": "restricted"},
+  {"id": "matisse_1944", "title": "Henri Matisse and His Model Micaela Avogadro, Vence, France", "title_given": true, "year": 1944, "photobook": "images_a_la_sauvette", "subjects": ["artist portrait"], "src": ["ICP"], "rights": "restricted"}
+ ],
+ "motifs": [
+  {"element": "geometry in the frame", "tags": ["geometry"], "level": "tendency", "context": "a sense of geometry required when framing", "confidence": "high", "src": ["FHCB", "W"]},
+  {"element": "candid gesture at the decisive instant", "tags": ["candid gesture", "street"], "level": "signature", "context": "the decisive moment as the essence of the best pictures", "frequency_evidence": "his stated method across the career", "distinctiveness": "medium", "confidence": "high", "src": ["W", "FHCB", "ICP"]},
+  {"element": "portraits of artists and writers", "tags": ["posed portrait"], "level": "repeated", "representative": ["matisse_1944"], "confidence": "medium", "src": ["ICP"]}
+ ],
+ "style": [
+  {"dimension": "composition", "value": "geometry; economy of means; head, eye and heart on one axis", "kind": "observable", "scope": "career", "tags": ["geometry"], "src": ["FHCB"]},
+  {"dimension": "technique", "value": "35 mm Leica with a 50 mm lens; anonymity of the small camera", "kind": "observable", "scope": "career", "src": ["W"]},
+  {"dimension": "motion", "value": "the instant that decides the picture", "kind": "interpretive", "scope": "career", "tags": ["candid gesture"], "src": ["W", "FHCB"]},
+  {"dimension": "bw_tonality", "value": "black and white", "kind": "observable", "scope": "career", "tags": ["monochrome"], "src": ["W"], "note": "only the early, verbatim part of the article was used; it establishes the 35 mm black-and-white practice through the 1930s-40s"}
+ ],
+ "periods": [{"label": "1930s surrealist-influenced street work; 1947 Magnum; reportage to the 1970s", "range": [1932, 1974], "src": ["W"]}],
+ "uncertain": ["Puddles, staircases and cyclists are often associated with him but were not found on the pages read; they are not recorded.", "Book list beyond 1952 comes from an unread part of Wikipedia and is omitted."]
+}

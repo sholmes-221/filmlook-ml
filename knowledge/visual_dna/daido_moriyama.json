@@ -1,0 +1,51 @@
+{
+ "id": "daido_moriyama", "website_id": "daido_moriyama",
+ "name": {"en": "Daido Moriyama", "zh": "森山大道", "ja": "森山大道"},
+ "born": "1938-10-10", "died": null, "life_src": ["W", "TATE"],
+ "image_rights": {"status": "restricted", "note": "Living artist; no open licence. Knowledge only."},
+ "sources": {
+  "W": {"url": "https://en.wikipedia.org/wiki/Daid%C5%8D_Moriyama", "kind": "secondary", "retrieved": "2026-11-09", "note": "read to about the middle of the article"},
+  "GROL": {"url": "https://grolierclub.omeka.net/items/show/1466", "kind": "institution", "retrieved": "2026-11-09"},
+  "TATE": {"url": "https://www.tate.org.uk/whats-on/tate-modern/william-klein-daido-moriyama", "kind": "museum", "retrieved": "2026-11-09"}
+ },
+ "unreachable_sources": ["https://elysee.ch/wp-content/uploads/2024/08/Daido_Moriyama_Textes_EN.pdf (binary PDF, not extracted)"],
+ "photobooks": [
+  {"id": "photo_theater", "title_original": "にっぽん劇場写真帖", "title_romaji": "Nippon gekijō shashinchō", "title_en": "Japan: A Photo Theater", "title_zh": "日本剧场写真帖", "title_zh_basis": "simplified form of the Japanese title", "year": 1968, "publisher": "Muromachi Shobo, Tokyo",
+   "subjects": ["Tokyo street scenes", "portraits", "avant-garde and Kabuki performers", "nightlife", "garish signage"], "visual": ["grainy, blurry, out of focus"], "career": "His first book.", "src": ["W", "GROL"]},
+  {"id": "farewell", "title_original": "写真よさようなら", "title_romaji": "Shashin yo sayōnara", "title_en": "Farewell Photography", "year": 1972, "publisher": null,
+   "themes": ["the incidental nature of photography"], "visual": ["film edges, dust, light leaks, sprocket holes"], "src": ["W"]},
+  {"id": "hunter", "title_original": "狩人", "title_romaji": "Karyūdo", "title_en": "A Hunter", "year": 1972, "publisher": null, "edition_note": "tenth volume of the series Gendai no me; reissued 2011", "subjects": ["a road trip across Japan", "US military base towns"], "visual": ["skewed angles", "blurred moving figures"], "src": ["W"]},
+  {"id": "another_country", "title_en": "Another Country", "year": 1974, "edition_note": "photocopied, shuffled and staple-bound at the Printing Show", "src": ["W"]},
+  {"id": "memories_dog", "title_romaji": "Inu no kioku", "title_en": "Memories of a Dog", "year": null, "edition_note": "from a series in Asahi Camera begun in 1983", "src": ["W"]}
+ ],
+ "series": [
+  {"id": "provoke", "title": "Provoke (magazine contributions)", "period": [1969, 1969], "context": "joined from the second issue; the magazine popularised are, bure, boke", "visual": ["grainy", "blurry", "out of focus"], "src": ["W"]},
+  {"id": "accident", "title": "Akushidento (Accident)", "period": [1969, 1969], "subjects": ["images re-photographed from mass media"], "src": ["W"]},
+  {"id": "fifth_quadrant", "title": "Dai go shōgen (The Fifth Quadrant)", "period": [1970, 1970], "visual": ["colour", "white balance and exposure distortions"], "src": ["W"]},
+  {"id": "tokyo_colour", "title": "Tokyo Colour", "period": [2008, 2015], "subjects": ["Shinjuku"], "visual": ["colour"], "src": ["W"]},
+  {"id": "dog_tights", "title": "Dog and Mesh Tights", "period": [2014, 2015], "visual": ["black and white"], "src": ["W"]}
+ ],
+ "photographs": [
+  {"id": "stray_dog_1971", "title": "Stray Dog, Misawa", "title_given": true, "year": 1971, "location": "Misawa, Aomori", "photobook": "hunter", "subjects": ["a growling, haggard dog turning toward the camera"], "why": "one of the best-known images of A Hunter; gave its name to a 1999 SFMOMA retrospective", "src": ["W"], "rights": "restricted"},
+  {"id": "eros_1969", "title": "Eros", "title_given": true, "year": 1969, "series": "provoke", "subjects": ["a nude woman smoking on a hotel bed"], "visual": ["grainy, skewed, dense shadows"], "src": ["W"], "rights": "restricted"}
+ ],
+ "motifs": [
+  {"element": "stray dogs", "tags": ["dog", "street"], "level": "repeated", "representative": ["stray_dog_1971"], "context": "Stray Dog, Misawa; dog in book and series titles", "frequency_evidence": "one celebrated photograph plus titles (Memories of a Dog, Dog and Mesh Tights)", "distinctiveness": "medium", "confidence": "medium", "src": ["W"]},
+  {"element": "Shinjuku streets and alleys", "tags": ["street", "alley", "city street at night"], "level": "signature", "series": ["tokyo_colour"], "frequency_evidence": "described as a frequent setting", "distinctiveness": "medium", "confidence": "medium", "src": ["W", "GROL"]},
+  {"element": "signage and nightlife", "tags": ["sign", "city street at night"], "level": "repeated", "series": [], "confidence": "medium", "src": ["W"]},
+  {"element": "US military base towns", "tags": [], "level": "repeated", "confidence": "medium", "src": ["W"]},
+  {"element": "tights and legs", "tags": [], "level": "weak", "context": "titles only", "confidence": "low", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "grain_texture", "value": "are, bure, boke: grainy or rough, blurry, out of focus", "kind": "observable", "scope": "period:1968_1972", "tags": ["visible grain", "motion blur", "out of focus"], "src": ["W", "GROL", "TATE"]},
+  {"dimension": "contrast", "value": "harsh contrast", "kind": "observable", "scope": "period:1968_1972", "tags": ["high contrast", "monochrome"], "src": ["W"]},
+  {"dimension": "framing", "value": "sharply tilted angles; often shot without the viewfinder; often 4:5 crops", "kind": "observable", "scope": "career", "tags": ["tilted frame"], "src": ["W"]},
+  {"dimension": "bw_tonality", "value": "best known for black-and-white street photography; colour since the 1970s", "kind": "observable", "scope": "career", "tags": ["monochrome"], "src": ["W"]},
+  {"dimension": "atmosphere", "value": "tension, anxiety, uncertainty", "kind": "interpretive", "scope": "period:1968_1972", "src": ["W"]}
+ ],
+ "periods": [
+  {"label": "1968-1972: Photo Theater, Provoke, A Hunter, Farewell Photography", "range": [1968, 1972], "src": ["W"]},
+  {"label": "colour work and compact digital from the late 2000s", "range": [2008, null], "src": ["W"]}
+ ],
+ "uncertain": ["Publishers of Farewell Photography and A Hunter were not stated on the pages read.", "The second half of the Wikipedia article (full bibliography) was not read."]
+}

@@ -1,0 +1,42 @@
+{
+ "id": "dorothea_lange", "website_id": "dorothea_lange",
+ "name": {"en": "Dorothea Lange", "zh": "多萝西娅·兰格", "ja": "ドロシア・ラング"},
+ "born": "1895-05-26", "died": "1965-10-11", "life_src": ["W"],
+ "image_rights": {"status": "public_domain_subset", "note": "Her RA/FSA, BAE and WRA photographs are US federal works (Commons: PD-USGov); other work is in copyright. Only federal works enter the pipeline."},
+ "sources": {
+  "W": {"url": "https://en.wikipedia.org/wiki/Dorothea_Lange", "kind": "secondary", "retrieved": "2026-11-09"},
+  "WMM": {"url": "https://en.wikipedia.org/wiki/Migrant_Mother", "kind": "secondary", "retrieved": "2026-11-09"}
+ },
+ "unreachable_sources": ["https://www.moma.org/calendar/exhibitions/3944 (404)", "https://museumca.org/on-view/dorothea-lange-collection (403)"],
+ "photobooks": [
+  {"id": "american_exodus", "title_en": "An American Exodus: A Record of Human Erosion", "year": 1939, "publisher": null, "coauthor": "Paul Schuster Taylor", "editions": [{"year": 1999, "publisher": "Jean Michel Place", "isbn": "978-2-85893-513-0", "isbn_src": "W"}], "themes": ["Depression-era migration"], "src": ["W"]}
+ ],
+ "series": [
+  {"id": "fsa", "title": "Resettlement / Farm Security Administration photographs", "period": [1935, 1939], "subjects": ["sharecroppers", "displaced farm families", "migrant workers", "roads of California"], "refdb": "Commons: Farm Security Administration photographs by Dorothea Lange", "src": ["W"]},
+  {"id": "wra", "title": "War Relocation Authority photographs (Japanese American incarceration)", "period": [1942, 1942], "subjects": ["families awaiting removal", "assembly centres", "Manzanar", "luggage and identification tags"], "context": "much of the work focuses on waiting and anxiety", "refdb": "Commons: War Relocation Authority photographs by Dorothea Lange", "src": ["W"]},
+  {"id": "death_valley", "title": "Death of a Valley", "period": [1956, 1960], "subjects": ["Monticello, California before the Putah Creek dam"], "src": ["W"]}
+ ],
+ "photographs": [
+  {"id": "migrant_mother", "title": "Migrant Mother, Nipomo, California", "title_given": true, "year": 1936, "series": "fsa", "location": "Nipomo, California",
+   "subjects": ["a mother gazing into the distance", "an infant in her lap", "two children with faces turned away"], "composition": "tightened vertical frame after several exposures", "why": "the best-known image of the FSA project", "src": ["WMM"], "rights": "public_domain"},
+  {"id": "white_angel_1933", "title": "White Angel Breadline", "title_given": true, "year": 1933, "subjects": ["a lone man facing away from a crowd at a soup kitchen"], "src": ["W"], "rights": "unverified"},
+  {"id": "mochida_1942", "title": "Hayward, California, Two Children of the Mochida Family who, with Their Parents, Are Awaiting Evacuation", "title_given": true, "year": 1942, "series": "wra", "src": ["W"], "rights": "public_domain"}
+ ],
+ "motifs": [
+  {"element": "migrant and displaced farm workers", "tags": ["worker", "farm", "rural road", "camp"], "level": "signature", "series": ["fsa"], "frequency_evidence": "the focus of her RA/FSA work", "distinctiveness": "low", "confidence": "high", "src": ["W", "WMM"]},
+  {"element": "mothers with children", "tags": ["mother and child", "child"], "level": "weak", "representative": ["migrant_mother"], "context": "rests on one famous photograph", "confidence": "low", "src": ["WMM"]},
+  {"element": "waiting people, luggage and tags", "tags": ["crowd", "child"], "level": "series_specific", "series": ["wra"], "confidence": "medium", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "subject_background", "value": "documentary portraits of people in hardship, often close", "kind": "observable", "scope": "series:fsa", "tags": ["face close-up", "posed portrait", "monochrome"], "src": ["W", "WMM"]},
+  {"dimension": "technique", "value": "field notes and captions with the subjects' words", "kind": "observable", "scope": "career", "src": ["W"]},
+  {"dimension": "composition", "value": "reframed and directed subjects for Migrant Mother", "kind": "observable", "scope": "photograph:migrant_mother", "src": ["WMM"]}
+ ],
+ "periods": [
+  {"label": "studio portraits in San Francisco", "range": [1919, 1932], "src": ["W"]},
+  {"label": "Depression street and RA/FSA work", "range": [1933, 1939], "src": ["W"]},
+  {"label": "WRA incarceration photographs", "range": [1942, 1942], "src": ["W"]},
+  {"label": "Life essays and Death of a Valley", "range": [1954, 1960], "src": ["W"]}
+ ],
+ "uncertain": ["Light and tonality are not described in the sources read.", "Most books listed by Wikipedia are monographs about her, not her own photobooks; they are not recorded as photobooks."]
+}

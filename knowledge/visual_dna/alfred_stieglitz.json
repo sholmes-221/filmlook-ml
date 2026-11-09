@@ -1,0 +1,40 @@
+{
+ "id": "alfred_stieglitz", "website_id": null,
+ "name": {"en": "Alfred Stieglitz", "zh": "阿尔弗雷德·斯蒂格利茨", "ja": "アルフレッド・スティーグリッツ"},
+ "born": "1864-01-01", "died": "1946-07-13", "life_src": ["W"],
+ "image_rights": {"status": "public_domain_subset", "note": "Works published before 1930 are public domain in the US; AIC flags 188 prints CC0. Per-image status from the source."},
+ "sources": {
+  "W": {"url": "https://en.wikipedia.org/wiki/Alfred_Stieglitz", "kind": "secondary", "retrieved": "2026-11-09"},
+  "WS": {"url": "https://en.wikipedia.org/wiki/The_Steerage", "kind": "secondary", "retrieved": "2026-11-09"},
+  "WE": {"url": "https://en.wikipedia.org/wiki/Equivalents", "kind": "secondary", "retrieved": "2026-11-09"}
+ },
+ "unreachable_sources": ["https://www.metmuseum.org/essays/alfred-stieglitz-1864-1946-and-his-circle (429)"],
+ "photobooks": [
+  {"id": "picturesque_bits", "title_en": "Picturesque Bits of New York and Other Studies", "year": 1897, "kind": "portfolio", "src": ["W"]},
+  {"id": "camera_work", "title_en": "Camera Work", "year": 1902, "kind": "magazine he edited and published (1902/03-1917)", "visual": ["hand-pulled photogravures"], "src": ["W", "WS"]}
+ ],
+ "series": [
+  {"id": "new_york", "title": "New York views", "period": [1892, 1915], "subjects": ["Fifth Avenue in winter", "street scenes", "buildings"], "src": ["W", "WE"]},
+  {"id": "equivalents", "title": "Equivalents", "period": [1925, 1934], "subjects": ["clouds", "sky"], "visual": ["printed very dark, sky often near black", "no horizon in most prints", "abstract"], "src": ["WE"]}
+ ],
+ "photographs": [
+  {"id": "steerage_1907", "title": "The Steerage", "title_given": true, "year": 1907, "location": "aboard the Kaiser Wilhelm II", "subjects": ["passengers on two decks", "gangway", "funnel"], "why": "his signature image; published in Camera Work 1911", "src": ["WS"], "rights": "public_domain"},
+  {"id": "winter_fifth_1893", "title": "Winter – Fifth Avenue", "title_given": true, "year": 1893, "series": "new_york", "subjects": ["a coach in a snowstorm"], "src": ["W"], "rights": "public_domain"},
+  {"id": "terminal_1893", "title": "The Terminal", "title_given": true, "year": 1893, "series": "new_york", "src": ["W"], "rights": "public_domain"},
+  {"id": "last_joke_1887", "title": "The Last Joke, Bellagio", "title_given": true, "year": 1887, "src": ["W"], "rights": "public_domain"}
+ ],
+ "motifs": [
+  {"element": "clouds and open sky without horizon", "tags": ["cloud", "sky", "dark tones", "negative space"], "level": "series_specific", "series": ["equivalents"], "frequency_evidence": "a nine-year series", "distinctiveness": "high", "confidence": "high", "src": ["WE"]},
+  {"element": "New York streets in weather", "tags": ["street", "snow", "city street at night"], "level": "repeated", "series": ["new_york"], "confidence": "medium", "src": ["W"]}
+ ],
+ "style": [
+  {"dimension": "technique", "value": "pictorialist in the 1890s-1900s; later straight photography", "kind": "observable", "scope": "career", "src": ["WS", "WE"]},
+  {"dimension": "bw_tonality", "value": "Equivalents printed very darkly; gelatin silver", "kind": "observable", "scope": "series:equivalents", "tags": ["dark tones", "monochrome"], "src": ["WE"]},
+  {"dimension": "composition", "value": "some of the first completely abstract photographs", "kind": "interpretive", "scope": "series:equivalents", "src": ["WE"]}
+ ],
+ "periods": [
+  {"label": "pictorialism and Camera Notes / Camera Work", "range": [1887, 1910], "src": ["W"]},
+  {"label": "straight photography; O'Keeffe portraits; Equivalents", "range": [1907, 1934], "src": ["WS", "WE"]}
+ ],
+ "uncertain": ["The O'Keeffe portrait series appears only in an unread part of the article and is not recorded."]
+}

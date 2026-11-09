@@ -249,3 +249,19 @@ datasets:
     authenticity_class: A       # museum records of the physical print; digitised prints, not negatives; mostly 1840s-1920s
     risks: historic processes only (no modern editorial photography); museum digitisation pipeline is a shared nuisance; editorial/curatorial selection is not a quality ground truth
     verified_on: 2026-11-07
+
+  - id: photographer_refdb
+    name: Photographer reference database (public-domain and CC0 photographs by named historical photographers)
+    source_url: https://commons.wikimedia.org/ (Category:Photographs by <photographer>) and https://api.artic.edu/ (is_public_domain)
+    license: PDM-1.0            # per record: Commons public-domain templates (PD-USGov-FSA, PD-old-70, PD-US-expired ...) or CC0 (AIC / Commons CC0); data/refdb/manifest.sqlite rights_class
+    commercial_use: true
+    ml_training: true
+    num_images: pilot cap 300 per photographer, 14 photographers (FSA/OWI photographers, Hine, Atget, Stieglitz, Käsebier, Clarence H. White)
+    labels: [photographer (source attribution), title, year, source series/category, licence + evidence URL]
+    download_method: Commons API categorymembers + imageinfo (one request at a time, maxlag, Retry-After); scaled renditions (1024 px Commons thumbnails, AIC IIIF 843 px) via research.downloader (scripts/refdb_discover.py, scripts/refdb_download.py)
+    attribution: kept per record (artist text, credit line, source page)
+    redistribution: not done; only embeddings and metadata may ship
+    training_allowed: true      # owner's brief of 2026-11-09: lightweight photographer classifier trained only on legally usable images; no model-generated labels
+    authenticity_class: A
+    risks: attribution comes from the source record (Commons community / museum); several scans of one negative (phash dedup); FSA subject matter shared across photographers (intended as a subject-bias control); Library of Congress itself refused scripted access (Cloudflare challenge) so LoC scans arrive only via Commons copies
+    verified_on: 2026-11-09
