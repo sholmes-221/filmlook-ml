@@ -1,0 +1,139 @@
+{
+ "n": 90,
+ "uploaders": 29,
+ "class_counts": {
+  "warm_negative": 12,
+  "vivid_negative": 12,
+  "cool_negative": 42,
+  "bw": 24
+ },
+ "majority_baseline": 0.467,
+ "stats": {
+  "accuracy": 0.678,
+  "macro_f1": 0.617,
+  "labels": [
+   "bw",
+   "cool_negative",
+   "vivid_negative",
+   "warm_negative"
+  ],
+  "confusion": [
+   [
+    24,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    25,
+    10,
+    7
+   ],
+   [
+    0,
+    3,
+    8,
+    1
+   ],
+   [
+    1,
+    3,
+    4,
+    4
+   ]
+  ]
+ },
+ "dinov2": {
+  "accuracy": 0.533,
+  "macro_f1": 0.354,
+  "labels": [
+   "bw",
+   "cool_negative",
+   "vivid_negative",
+   "warm_negative"
+  ],
+  "confusion": [
+   [
+    17,
+    3,
+    1,
+    3
+   ],
+   [
+    5,
+    30,
+    2,
+    5
+   ],
+   [
+    5,
+    4,
+    0,
+    3
+   ],
+   [
+    4,
+    5,
+    2,
+    1
+   ]
+  ]
+ },
+ "both": {
+  "accuracy": 0.611,
+  "macro_f1": 0.42,
+  "labels": [
+   "bw",
+   "cool_negative",
+   "vivid_negative",
+   "warm_negative"
+  ],
+  "confusion": [
+   [
+    21,
+    1,
+    0,
+    2
+   ],
+   [
+    1,
+    33,
+    2,
+    6
+   ],
+   [
+    2,
+    6,
+    1,
+    3
+   ],
+   [
+    3,
+    8,
+    1,
+    0
+   ]
+  ]
+ },
+ "physics_zero_shot": {
+  "n": 66,
+  "families": [
+   "warm_negative",
+   "cool_negative",
+   "vivid_negative"
+  ],
+  "accuracy": 0.258,
+  "chance": 0.333,
+  "majority": 0.636,
+  "pred_counts": {
+   "warm_negative": 45,
+   "cool_negative": 11,
+   "vivid_negative": 10
+  }
+ },
+ "physics_topk_family_hit": {
+  "1": 0.242,
+  "3": 0.424
+ }
+}

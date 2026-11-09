@@ -61,3 +61,8 @@ research/tasks.json
 research/tasks.lock
 research/.gpu.lock
 research/tasks.json.part
+
+# film_physics: third-party GPL code and its venv stay out of the repository
+film_physics/third_party/
+film_physics/.venv/
+film_physics/experiments/out/

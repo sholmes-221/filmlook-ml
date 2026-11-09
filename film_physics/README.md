@@ -57,3 +57,28 @@ above simple baselines (0.61 to 0.62) but miscalibrated (every digital photo ≥
 2. Recalibrate the film-likeness estimate on an uploader-disjoint split and test on a third set before any UI use.
 3. Manufacturer data-sheet database (`datasheets/`): official PDFs' values with units and provenance, unknowns left
    unknown; only facts the profiles cannot already give.
+
+## 6. spektrafilm installed and run; film-family recognition on real scans (2026-11-09, night)
+
+spektrafilm (commit 3bb2c2d) runs locally in `film_physics/.venv` (Python 3.13, OpenImageIO wheel; RAW/EXIF/lens modules
+stubbed in `third_party/stubs`, not used). `simulator/run_spektrafilm.py` rendered the 91 Commons digital photographs
+through Gold 200, UltraMax 400, Superia X-TRA 400, C200, Ektar 100 and Portra 400 (negative → Portra Endura print → scan,
+grain off), about 0.4 s per 320 px image on CPU, no errors. SpektraLab's Linux/Vulkan engine needs Ninja and
+glslangValidator (`apt install ninja-build glslang-tools`, sudo); not installed, not built. spektralab-engine is Metal-only.
+
+`evaluation/family_eval.py`, results `evaluation/family_results.json`: 90 real Commons scans with uploader-declared stocks,
+29 uploaders, leave-one-uploader-out; families warm (Gold), cool (Superia ×4), vivid (Ektar), B&W (HP5, Tri-X).
+
+| Method | Accuracy | Macro-F1 | Note |
+|---|---|---|---|
+| majority baseline | 0.467 | – | |
+| colour / tone statistics (26) | **0.678** | **0.617** | B&W 24/24; cool 25/42; vivid 8/12; warm 4/12 |
+| DINOv2-small CLS, frozen | 0.533 | 0.354 | worse than statistics |
+| both | 0.611 | 0.420 | |
+| physics zero-shot (spektrafilm prototypes from digital photos, colour families) | 0.258 | – | chance 0.333; predicts "warm" for 45 of 66; top-3 family hit 0.42 |
+
+Reading: on real scans, simple colour/tone statistics carry most of the family signal; DINOv2 does not help here; the
+simulation-built prototypes do not transfer (lab scanning and printing choices differ from spektrafilm's default chain).
+Nothing here is good enough to show a family label to users beyond monochrome vs colour. The defensible product feature
+remains resemblance wording with abstention; a family classifier would need many more labelled scans per family
+(at least ~50 per family from ≥ 10 uploaders) and a calibrated abstain threshold before any UI use.
