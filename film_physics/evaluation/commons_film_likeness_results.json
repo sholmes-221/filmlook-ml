@@ -1,0 +1,116 @@
+{
+ "n": 183,
+ "film": 92,
+ "digital": 91,
+ "mvp_estimate": {
+  "auroc": 0.783,
+  "ci95": [
+   0.717,
+   0.849
+  ]
+ },
+ "baseline_monochrome": {
+  "auroc": 0.62,
+  "ci95": [
+   0.575,
+   0.668
+  ]
+ },
+ "baseline_fine_noise": {
+  "auroc": 0.613,
+  "ci95": [
+   0.535,
+   0.69
+  ]
+ },
+ "colour_only": {
+  "n": 159,
+  "film": 69,
+  "mvp_auroc": 0.729,
+  "ci95": [
+   0.652,
+   0.807
+  ],
+  "noise_auroc": 0.661
+ },
+ "mean_estimate": {
+  "film": 0.859,
+  "digital": 0.746
+ },
+ "digital_rated_ge_0.6": 1.0,
+ "film_rated_ge_0.6": 1.0,
+ "per_group": {
+  "Photographs taken on Kodak Ektar 100 film": {
+   "n": 12,
+   "mean": 0.758
+  },
+  "Photographs taken on Kodak Gold 200 film": {
+   "n": 12,
+   "mean": 0.826
+  },
+  "Photographs taken on Kodak Portra 160": {
+   "n": 1,
+   "mean": 0.695
+  },
+  "Photographs taken on Kodak Portra 400": {
+   "n": 1,
+   "mean": 0.917
+  },
+  "Photographs taken on Kodak TRI-X film": {
+   "n": 12,
+   "mean": 0.95
+  },
+  "Taken on Fuji Superia 200": {
+   "n": 12,
+   "mean": 0.855
+  },
+  "Taken on Fuji Superia Reala": {
+   "n": 11,
+   "mean": 0.889
+  },
+  "Taken on Fuji Superia X-TRA 400": {
+   "n": 12,
+   "mean": 0.839
+  },
+  "Taken on Fuji Superia X-TRA 800": {
+   "n": 7,
+   "mean": 0.803
+  },
+  "Taken on Ilford HP5 plus 400": {
+   "n": 12,
+   "mean": 0.941
+  },
+  "Taken with Canon EOS 5D Mark IV": {
+   "n": 10,
+   "mean": 0.743
+  },
+  "Taken with Canon EOS 80D": {
+   "n": 12,
+   "mean": 0.711
+  },
+  "Taken with Canon EOS R5": {
+   "n": 12,
+   "mean": 0.719
+  },
+  "Taken with Google Pixel 6": {
+   "n": 12,
+   "mean": 0.722
+  },
+  "Taken with Nikon D750": {
+   "n": 12,
+   "mean": 0.789
+  },
+  "Taken with Nikon Z 6": {
+   "n": 9,
+   "mean": 0.758
+  },
+  "Taken with Sony ILCE-6000": {
+   "n": 12,
+   "mean": 0.756
+  },
+  "Taken with Sony ILCE-7M3": {
+   "n": 12,
+   "mean": 0.773
+  }
+ }
+}
