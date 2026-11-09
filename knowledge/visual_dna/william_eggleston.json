@@ -1,0 +1,187 @@
+{
+ "id": "william_eggleston",
+ "website_id": "william_eggleston",
+ "name": {
+  "en": "William Eggleston",
+  "zh": "威廉·埃格尔斯顿",
+  "ja": "ウィリアム・エグルストン"
+ },
+ "born": "1939-07-27",
+ "died": null,
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "Living artist; Eggleston Artistic Trust. Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/William_Eggleston",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [
+  "https://egglestontrust.com/ (no readable content)"
+ ],
+ "photobooks": [
+  {
+   "id": "guide",
+   "title_en": "William Eggleston's Guide",
+   "year": 1976,
+   "publisher": null,
+   "career": "with the 1976 MoMA exhibition, called a watershed for colour photography",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "democratic_forest",
+   "title_en": "The Democratic Forest",
+   "year": 1989,
+   "publisher": null,
+   "note": "introduction by Eudora Welty",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "colour",
+   "title": "Colour work of the late 1960s-1970s (dye transfer)",
+   "title_given": false,
+   "period": [
+    1965,
+    1976
+   ],
+   "photobooks": [
+    "guide"
+   ],
+   "subjects": [
+    "ordinary scenes of the American South"
+   ],
+   "visual": [
+    "colour",
+    "dye-transfer prints"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "nightclub",
+   "title": "Nightclub Portraits",
+   "period": [
+    1973,
+    1973
+   ],
+   "subjects": [
+    "bars and clubs around Memphis"
+   ],
+   "visual": [
+    "large black-and-white portraits"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "los_alamos",
+   "title": "Los Alamos",
+   "subjects": [
+    "road trips toward the West Coast"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "red_ceiling",
+   "title": "The Red Ceiling",
+   "title_given": true,
+   "year": 1973,
+   "series": "colour",
+   "subjects": [
+    "a red ceiling"
+   ],
+   "visual": "dye-transfer print",
+   "src": [
+    "W"
+   ],
+   "rights": "restricted"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "ordinary objects of the vernacular South (tires, vending machines, gas stations, diners, parking lots)",
+   "tags": [
+    "gas station",
+    "car",
+    "sign"
+   ],
+   "level": "repeated",
+   "series": [
+    "colour"
+   ],
+   "context": "mature work characterised by ordinary subject matter",
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "palette",
+   "value": "colour as an artistic medium; saturated dye-transfer colour",
+   "kind": "observable",
+   "scope": "series:colour",
+   "tags": [
+    "colour",
+    "saturated colour"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "atmosphere",
+   "value": "a sense of lurking danger behind normal scenes (Holborn)",
+   "kind": "interpretive",
+   "scope": "career",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "black and white",
+   "range": [
+    1959,
+    1965
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "colour, dye transfer, MoMA 1976",
+   "range": [
+    1965,
+    1976
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "Publishers of the Guide and The Democratic Forest only in the unread part of the article.",
+  "'Saturated colour' rests on dye transfer and The Red Ceiling, not on a source sentence about saturation."
+ ]
+}

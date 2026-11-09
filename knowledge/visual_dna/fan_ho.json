@@ -1,0 +1,205 @@
+{
+ "id": "fan_ho",
+ "website_id": "fan_ho",
+ "name": {
+  "en": "Fan Ho",
+  "zh": "何藩",
+  "ja": null
+ },
+ "born": "1931-10-08",
+ "died": "2016-06-19",
+ "life_src": [
+  "W",
+  "ZHW"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "In copyright; estate. Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Fan_Ho",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "ZHW": {
+   "url": "https://zh.wikipedia.org/wiki/何藩",
+   "kind": "secondary",
+   "retrieved": "2026-11-09",
+   "language": "zh"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [
+  {
+   "id": "hk_yesterday",
+   "title_original": "香港追憶",
+   "title_en": "Hong Kong Yesterday",
+   "year": 2006,
+   "publisher": "Modernbook Editions",
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  },
+  {
+   "id": "hk_memoir",
+   "title_original": "香港‧往日情懷",
+   "title_en": "A Hong Kong Memoir",
+   "year": 2014,
+   "publisher": "Modernbook Editions",
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  },
+  {
+   "id": "portrait_hk",
+   "title_original": "念香港人的舊",
+   "title_en": "Portrait of Hong Kong",
+   "year": 2017,
+   "publisher": "WE Press",
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "hk_streets",
+   "title": "Hong Kong streets, 1950s-60s",
+   "title_given": false,
+   "period": [
+    1950,
+    1969
+   ],
+   "photobooks": [
+    "hk_yesterday",
+    "hk_memoir",
+    "portrait_hk"
+   ],
+   "subjects": [
+    "alleys",
+    "slums",
+    "markets",
+    "street vendors",
+    "children"
+   ],
+   "visual": [
+    "black and white"
+   ],
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "approaching_shadow",
+   "title": "Approaching Shadow (陰影)",
+   "title_given": true,
+   "year": 1954,
+   "series": "hk_streets",
+   "location": "Queen's College, Causeway Bay",
+   "subjects": [
+    "a woman by a wall",
+    "a diagonal shadow added in the darkroom"
+   ],
+   "why": "record auction price 2015",
+   "src": [
+    "W",
+    "ZHW"
+   ],
+   "rights": "restricted"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "Hong Kong alleys, markets and street vendors",
+   "tags": [
+    "alley",
+    "street",
+    "crowd"
+   ],
+   "level": "signature",
+   "series": [
+    "hk_streets"
+   ],
+   "frequency_evidence": "main subject of 1950s-60s work (both articles)",
+   "distinctiveness": "medium",
+   "confidence": "high",
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  },
+  {
+   "element": "shadow as a compositional element",
+   "tags": [
+    "shadow",
+    "geometry"
+   ],
+   "level": "weak",
+   "representative": [
+    "approaching_shadow"
+   ],
+   "context": "described for one famous photograph",
+   "confidence": "low",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "bw_tonality",
+   "value": "black and white",
+   "kind": "observable",
+   "scope": "series:hk_streets",
+   "tags": [
+    "monochrome"
+   ],
+   "src": [
+    "ZHW"
+   ]
+  },
+  {
+   "dimension": "composition",
+   "value": "compared to Bauhaus work, abstract and humanistic (Laurence Miller); called the 'Oriental Cartier-Bresson'",
+   "kind": "interpretive",
+   "scope": "series:hk_streets",
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "street photography",
+   "range": [
+    1949,
+    1969
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "film director; later prints from old negatives",
+   "range": [
+    1961,
+    2016
+   ],
+   "src": [
+    "W",
+    "ZHW"
+   ]
+  }
+ ],
+ "uncertain": [
+  "Light beams and shafts of light are commonly associated with him but were not found on the pages read."
+ ]
+}

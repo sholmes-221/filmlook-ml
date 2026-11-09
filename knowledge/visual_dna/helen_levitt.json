@@ -1,0 +1,172 @@
+{
+ "id": "helen_levitt",
+ "website_id": "helen_levitt",
+ "name": {
+  "en": "Helen Levitt",
+  "zh": "海伦·莱维特",
+  "ja": "ヘレン・レヴィット"
+ },
+ "born": "1913-08-31",
+ "died": "2009-03-29",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "In copyright (d. 2009). Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Helen_Levitt",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [
+  "https://www.helenlevitt.org/ (empty)"
+ ],
+ "photobooks": [
+  {
+   "id": "way_of_seeing",
+   "title_en": "A Way of Seeing",
+   "year": 1965,
+   "publisher": "Horizon Press, New York",
+   "note": "with James Agee",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "in_the_street",
+   "title_en": "In the Street: Chalk Drawings and Messages, New York City, 1938-1948",
+   "year": 1987,
+   "publisher": "Duke University Press",
+   "isbn": "0-8223-0771-5",
+   "isbn_src": "W",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "chalk",
+   "title": "Children's chalk drawings and street play, New York",
+   "period": [
+    1937,
+    1948
+   ],
+   "photobooks": [
+    "in_the_street",
+    "way_of_seeing"
+   ],
+   "subjects": [
+    "children playing",
+    "street games",
+    "chalk drawings"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "colour",
+   "title": "Colour work",
+   "period": [
+    1959,
+    1960
+   ],
+   "visual": [
+    "colour"
+   ],
+   "context": "much stolen in a 1970 burglary",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [],
+ "motifs": [
+  {
+   "element": "children playing street games",
+   "tags": [
+    "child",
+    "street",
+    "candid gesture"
+   ],
+   "level": "repeated",
+   "series": [
+    "chalk"
+   ],
+   "frequency_evidence": "'a constant motif of children playing games'",
+   "distinctiveness": "medium",
+   "confidence": "high",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "chalk drawings on walls and pavements",
+   "tags": [
+    "chalk drawing",
+    "street"
+   ],
+   "level": "series_specific",
+   "series": [
+    "chalk"
+   ],
+   "confidence": "high",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "palette",
+   "value": "pioneering colour work (Guggenheim grants)",
+   "kind": "observable",
+   "scope": "series:colour",
+   "tags": [
+    "colour"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "subject_background",
+   "value": "the world from the perspective of children",
+   "kind": "interpretive",
+   "scope": "series:chalk",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "chalk drawings and street play",
+   "range": [
+    1937,
+    1948
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "colour",
+   "range": [
+    1959,
+    1960
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "No individually titled photograph in the verbatim text; the foundation site returned no content."
+ ]
+}

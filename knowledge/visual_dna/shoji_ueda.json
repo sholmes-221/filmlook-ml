@@ -1,0 +1,258 @@
+{
+ "id": "shoji_ueda",
+ "website_id": "shoji_ueda",
+ "name": {
+  "en": "Shoji Ueda",
+  "zh": "植田正治",
+  "ja": "植田正治"
+ },
+ "born": "1913-03-27",
+ "died": "2000-07-04",
+ "life_src": [
+  "W",
+  "JAW"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "In copyright (d. 2000). Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Sh%C5%8Dji_Ueda",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "JAW": {
+   "url": "https://ja.wikipedia.org/wiki/植田正治",
+   "kind": "secondary",
+   "retrieved": "2026-11-09",
+   "language": "ja"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [
+  {
+   "id": "doreki",
+   "title_original": "童暦",
+   "title_en": "Children the Year Around (Warabe Goyomi)",
+   "year": 1971,
+   "publisher": "Chūōkōronsha",
+   "subjects": [
+    "children of the San'in region by season"
+   ],
+   "visual": [
+    "black and white"
+   ],
+   "src": [
+    "W",
+    "JAW"
+   ]
+  },
+  {
+   "id": "sakyu_1986",
+   "title_original": "砂丘",
+   "title_en": "Dunes",
+   "year": 1986,
+   "publisher": "PARCO",
+   "src": [
+    "W",
+    "JAW"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "dunes",
+   "title": "砂丘シリーズ (Sand Dune series)",
+   "period": [
+    1949,
+    1995
+   ],
+   "photobooks": [
+    "sakyu_1986"
+   ],
+   "subjects": [
+    "staged figures and objects on the Tottori sand dunes",
+    "his family"
+   ],
+   "visual": [
+    "dreamlike black and white",
+    "staged"
+   ],
+   "src": [
+    "W",
+    "JAW"
+   ]
+  },
+  {
+   "id": "warabe",
+   "title": "Warabe Goyomi",
+   "period": [
+    1959,
+    1970
+   ],
+   "photobooks": [
+    "doreki"
+   ],
+   "subjects": [
+    "children in daily life"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "shiroi_kaze",
+   "title": "Shiroi Kaze (Brilliant Scenes)",
+   "period": [
+    1980,
+    1981
+   ],
+   "visual": [
+    "colour",
+    "soft pastel hues",
+    "soft focus"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "papa_mama",
+   "title": "Papa, Mama and the Children (パパとママとコドモたち)",
+   "title_given": true,
+   "year": 1949,
+   "series": "dunes",
+   "subjects": [
+    "his family posed on the dunes"
+   ],
+   "src": [
+    "W"
+   ],
+   "rights": "restricted"
+  },
+  {
+   "id": "four_girls",
+   "title": "Shōjo shi tai (少女四態)",
+   "title_given": true,
+   "year": 1939,
+   "subjects": [
+    "four girls on a sandbank, each facing a different way"
+   ],
+   "src": [
+    "W"
+   ],
+   "rights": "restricted"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "staged figures on the Tottori sand dunes",
+   "tags": [
+    "sand dune",
+    "posed portrait",
+    "negative space"
+   ],
+   "level": "signature",
+   "series": [
+    "dunes"
+   ],
+   "frequency_evidence": "decades-long series, best-known work (both articles)",
+   "distinctiveness": "high",
+   "confidence": "high",
+   "src": [
+    "W",
+    "JAW"
+   ]
+  },
+  {
+   "element": "children",
+   "tags": [
+    "child"
+   ],
+   "level": "series_specific",
+   "series": [
+    "warabe"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "composition",
+   "value": "people arranged like objects, things personified; staging built on 'ma' (pause) and humour",
+   "kind": "interpretive",
+   "scope": "career",
+   "tags": [
+    "negative space"
+   ],
+   "src": [
+    "JAW"
+   ]
+  },
+  {
+   "dimension": "bw_tonality",
+   "value": "dreamlike black-and-white images (Ueda-chō: cool, mysterious)",
+   "kind": "interpretive",
+   "scope": "series:dunes",
+   "tags": [
+    "monochrome"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "palette",
+   "value": "soft pastel hues and soft focus (Shiroi Kaze)",
+   "kind": "observable",
+   "scope": "series:shiroi_kaze",
+   "tags": [
+    "soft pastel colour",
+    "out of focus"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "pictorialist amateur, portrait studio",
+   "range": [
+    1931,
+    1938
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "staged dune photographs",
+   "range": [
+    1939,
+    1995
+   ],
+   "src": [
+    "W",
+    "JAW"
+   ]
+  },
+  {
+   "label": "colour experiments",
+   "range": [
+    1980,
+    1992
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": []
+}

@@ -1,0 +1,228 @@
+{
+ "id": "vivian_maier",
+ "website_id": "vivian_maier",
+ "name": {
+  "en": "Vivian Maier",
+  "zh": "薇薇安·迈尔",
+  "ja": "ヴィヴィアン・マイヤー"
+ },
+ "born": "1926-02-01",
+ "died": "2009-04-21",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "Estate and archive hold rights. Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Vivian_Maier",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "VM": {
+   "url": "https://www.vivianmaier.com/about-vivian-maier/",
+   "kind": "archive",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [
+  {
+   "id": "street_photographer",
+   "title_en": "Vivian Maier: Street Photographer",
+   "year": 2011,
+   "publisher": "powerHouse, Brooklyn",
+   "isbn": "978-1-57687-577-3",
+   "isbn_src": "W",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "self_portraits",
+   "title_en": "Vivian Maier: Self-Portraits",
+   "year": 2013,
+   "publisher": "powerHouse",
+   "isbn": "978-1-57687-662-6",
+   "isbn_src": "W",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "color_work",
+   "title_en": "The Color Work",
+   "year": 2014,
+   "publisher": "Harper Design",
+   "isbn": "978-0062795571",
+   "isbn_src": "W",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "street",
+   "title": "Street (Chicago and New York, 1950s-60s)",
+   "title_given": false,
+   "period": [
+    1952,
+    1969
+   ],
+   "photobooks": [
+    "street_photographer"
+   ],
+   "subjects": [
+    "street scenes",
+    "people on the margins",
+    "children"
+   ],
+   "visual": [
+    "black and white",
+    "square format (Rolleiflex)"
+   ],
+   "src": [
+    "W",
+    "VM"
+   ]
+  },
+  {
+   "id": "self_portraits",
+   "title": "Self-portraits",
+   "photobooks": [
+    "self_portraits"
+   ],
+   "subjects": [
+    "her own shadow and reflection"
+   ],
+   "src": [
+    "W",
+    "VM"
+   ]
+  },
+  {
+   "id": "colour",
+   "title": "Colour (Ektachrome, from c. 1973)",
+   "period": [
+    1973,
+    1999
+   ],
+   "photobooks": [
+    "color_work"
+   ],
+   "subjects": [
+    "found objects",
+    "newspapers",
+    "graffiti"
+   ],
+   "src": [
+    "VM",
+    "W"
+   ]
+  }
+ ],
+ "photographs": [],
+ "motifs": [
+  {
+   "element": "her own shadow and reflection (self-portraits)",
+   "tags": [
+    "shadow",
+    "reflection"
+   ],
+   "level": "signature",
+   "series": [
+    "self_portraits"
+   ],
+   "frequency_evidence": "a portfolio and a book of self-portraits; 'often photographed her own shadow'",
+   "distinctiveness": "high",
+   "confidence": "high",
+   "src": [
+    "W",
+    "VM"
+   ]
+  },
+  {
+   "element": "street scenes, children and people on the margins",
+   "tags": [
+    "street",
+    "child",
+    "candid gesture"
+   ],
+   "level": "repeated",
+   "series": [
+    "street"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "framing",
+   "value": "square format from 1952 (Rolleiflex, medium format)",
+   "kind": "observable",
+   "scope": "series:street",
+   "tags": [
+    "square format"
+   ],
+   "src": [
+    "W",
+    "VM"
+   ]
+  },
+  {
+   "dimension": "bw_tonality",
+   "value": "most photographs black and white; colour transparencies in the 1980s-90s",
+   "kind": "observable",
+   "scope": "career",
+   "tags": [
+    "monochrome"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "composition",
+   "value": "clarity of composition and a gentleness (Roberta Smith)",
+   "kind": "interpretive",
+   "scope": "career",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "Rolleiflex street work",
+   "range": [
+    1952,
+    1970
+   ],
+   "src": [
+    "VM",
+    "W"
+   ]
+  },
+  {
+   "label": "colour and objects",
+   "range": [
+    1973,
+    1999
+   ],
+   "src": [
+    "VM",
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "No individually titled photograph on the pages read.",
+  "Sources differ on the number of negatives (100,000 vs 150,000) and on when the colour period began."
+ ]
+}

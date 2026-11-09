@@ -93,7 +93,12 @@
   "candid gesture": "composition",
   "posed portrait": "composition",
   "dust storm": "scene",
-  "railway yard": "scene"
+  "railway yard": "scene",
+  "shadow": "composition",
+  "flag": "object",
+  "sand dune": "scene",
+  "gas station": "scene",
+  "chalk drawing": "object"
  },
  "levels": {
   "signature": "described as central or recurring across a body of work by at least two independent sources",
@@ -195,6 +200,11 @@
   "candid gesture": "抓拍姿态",
   "posed portrait": "摆拍肖像",
   "dust storm": "沙尘暴",
-  "railway yard": "铁路调车场"
+  "railway yard": "铁路调车场",
+  "shadow": "阴影",
+  "flag": "旗帜",
+  "sand dune": "沙丘",
+  "gas station": "加油站",
+  "chalk drawing": "粉笔涂鸦"
  }
 }

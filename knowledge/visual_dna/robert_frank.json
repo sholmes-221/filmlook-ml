@@ -1,0 +1,204 @@
+{
+ "id": "robert_frank",
+ "website_id": "robert_frank",
+ "name": {
+  "en": "Robert Frank",
+  "zh": "罗伯特·弗兰克",
+  "ja": "ロバート・フランク"
+ },
+ "born": "1924-11-09",
+ "died": "2019-09-09",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "restricted",
+  "note": "In copyright (d. 2019). Knowledge only; no images enter the pipeline."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Robert_Frank",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  },
+  "WA": {
+   "url": "https://en.wikipedia.org/wiki/The_Americans_(photography)",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [
+  "https://www.nga.gov/features/robert-frank-the-americans.html (403)"
+ ],
+ "photobooks": [
+  {
+   "id": "americans",
+   "title_original": "Les Américains",
+   "title_en": "The Americans",
+   "year": 1958,
+   "publisher": "Robert Delpire, Paris",
+   "editions": [
+    {
+     "year": 1959,
+     "publisher": "Grove Press, New York",
+     "note": "introduction by Jack Kerouac"
+    },
+    {
+     "year": 2008,
+     "publisher": "Steidl",
+     "isbn": "978-3-86521-584-0",
+     "isbn_src": "W"
+    }
+   ],
+   "subjects": [
+    "the flag",
+    "automobiles",
+    "race",
+    "restaurants",
+    "roads"
+   ],
+   "src": [
+    "W",
+    "WA"
+   ]
+  },
+  {
+   "id": "lines_hand",
+   "title_en": "The Lines of My Hand",
+   "year": 1972,
+   "publisher": "Lustrum Press",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "americans",
+   "title": "The Americans (road trips)",
+   "period": [
+    1955,
+    1957
+   ],
+   "photobooks": [
+    "americans"
+   ],
+   "subjects": [
+    "all strata of US society",
+    "flag",
+    "car",
+    "restaurants"
+   ],
+   "visual": [
+    "unusual focus",
+    "low light",
+    "unconventional cropping"
+   ],
+   "src": [
+    "W",
+    "WA"
+   ]
+  }
+ ],
+ "photographs": [],
+ "motifs": [
+  {
+   "element": "the flag, the automobile, race and restaurants as symbols of American culture",
+   "tags": [
+    "flag",
+    "car",
+    "bar"
+   ],
+   "level": "signature",
+   "series": [
+    "americans"
+   ],
+   "frequency_evidence": "'returning again and again' (Becker, quoted in both articles' accounts)",
+   "distinctiveness": "medium",
+   "confidence": "medium",
+   "src": [
+    "W",
+    "WA"
+   ]
+  },
+  {
+   "element": "roads and road trips",
+   "tags": [
+    "rural road",
+    "car"
+   ],
+   "level": "series_specific",
+   "series": [
+    "americans"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W",
+    "WA"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "framing",
+   "value": "unusual focus, low lighting and cropping outside accepted technique; hand-held immediacy",
+   "kind": "observable",
+   "scope": "series:americans",
+   "tags": [
+    "tilted frame",
+    "visible grain",
+    "out of focus"
+   ],
+   "src": [
+    "W",
+    "WA"
+   ]
+  },
+  {
+   "dimension": "atmosphere",
+   "value": "a distanced view of high and low strata of American society",
+   "kind": "interpretive",
+   "scope": "series:americans",
+   "src": [
+    "WA"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "early hand-made books, fashion work",
+   "range": [
+    1946,
+    1953
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "The Americans",
+   "range": [
+    1955,
+    1959
+   ],
+   "src": [
+    "W",
+    "WA"
+   ]
+  },
+  {
+   "label": "film, then constructed images and collage",
+   "range": [
+    1959,
+    2019
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "No individually titled photograph in the verbatim text; famous titles (e.g. Trolley, New Orleans) are not recorded until a source is read.",
+  "'Grain' and 'tilted horizons' come from a hostile 1959 review quoted on the page."
+ ]
+}
