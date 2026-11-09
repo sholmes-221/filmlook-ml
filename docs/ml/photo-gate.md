@@ -13,8 +13,8 @@ DINOv2-small (frozen, `facebook/dinov2-small` rev ed25f3a31f01), 224 px with the
 preprocessing; features = [CLS, mean of patch tokens], each L2-normalised (768); logistic regression (C=3, balanced),
 chosen on validation among logistic regression and Platt-calibrated linear SVMs (C grids) and CLS-only vs CLS+patch
 features. Artifact: `photo-gate-20261109-6b8b875b.json` (768 weights, bias, thresholds) + `dinov2_small_cls_patch.onnx`
-(fp32, 88 MB; int8 failed the 0.99-cosine gate). Thresholds from validation: REJECT below t_lo = 0.0158 (at most 0.2 %
-of validation photographs), ACCEPT at or above t_hi; UNCERTAIN between continues to the provider.
+(fp32, 88 MB; int8 failed the 0.99-cosine gate). Thresholds from validation: REJECT below t_lo = 0.362 (at most 0.2 %
+of validation photographs), ACCEPT at or above t_hi = 0.768 (at most 2 % of validation non-photographs); UNCERTAIN between continues to the provider.
 
 ## Data (all legally usable; labels by construction or catalogue record, never a model's opinion)
 
