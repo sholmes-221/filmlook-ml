@@ -38,8 +38,8 @@ of validation photographs), ACCEPT at or above t_hi = 0.768 (at most 2 % of vali
 Per kind: documents, charts, posters, UI (unseen families) and real site screenshots 100 % rejected; AIC drawings
 90 % rejected (9 % uncertain); AIC posters 95 %; illustrations family b 90 % (10 % uncertain). Hard photos: rejected
 0 % (blur, grain, motion, monochrome, captions), 0.8 % (very dark). UIs containing a photo 97.5 % rejected; posters
-over a photo 67 % rejected, 17 % uncertain, 17 % accepted (the weakest case). Photorealistic generated images are
-mostly accepted or uncertain: the gate does not and cannot claim to detect AI generation.
+over a photo 67 % rejected, 17 % uncertain, 17 % accepted (the weakest case). Photorealistic generated images (60): 58 % accepted, 42 % uncertain, none rejected: the gate does not and cannot claim
+to detect AI generation.
 
 CLS-only features were clearly worse (photographs rejected 1.4 %, uncertain 17 %): the patch mean carries the texture
 that separates paintings and drawings from photographs.
@@ -55,3 +55,9 @@ reproduces these outcomes on held-out images through the API's own `prepare_imag
 Synthetic negatives dominate the non-photo classes; real-world screenshots are represented only by FilmAnalysis's own
 pages; anime illustrations are generated, not collected; photos of paintings are treated as non-photographs (museum
 reproductions); posters built on photographs remain the weakest case.
+
+## Production
+
+Deployed 2026-11-09 04:00 UTC with `FILMLOOK_PHOTO_GATE=on` (website commits d1e9c83, 583302d). Verified inside the
+running container with a temporary database and local mode: a UI screenshot answered 422 `not_photo` before any
+analysis; a film photograph was analysed (200). Lazy load: the encoder is loaded on the first analysis.
