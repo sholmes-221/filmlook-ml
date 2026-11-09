@@ -1,0 +1,136 @@
+{
+ "id": "john_vachon",
+ "website_id": null,
+ "name": {
+  "en": "John Vachon",
+  "zh": "约翰·瓦雄",
+  "ja": null
+ },
+ "born": "1914-05-19",
+ "died": "1975-04-20",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "public_domain_subset",
+  "note": "FSA/OWI work is a US federal work (Commons PD-USGov-FSA per file); later magazine work is in copyright."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/John_Vachon",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [
+  {
+   "id": "vachons_america",
+   "title_en": "John Vachon's America: Photographs and Letters from the Depression to World War II",
+   "year": 2003,
+   "publisher": "University of California Press",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "fsa",
+   "title": "Farm Security Administration / OWI photographs",
+   "period": [
+    1936,
+    1943
+   ],
+   "subjects": [
+    "rural poverty",
+    "farm life",
+    "grain elevators",
+    "mills"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "grain_1942",
+   "title": "Grain elevator in Amarillo, Texas",
+   "title_given": true,
+   "year": 1942,
+   "series": "fsa",
+   "src": [
+    "W"
+   ],
+   "rights": "public_domain"
+  },
+  {
+   "id": "mills_1939",
+   "title": "Flour mills and railroad cars, Minneapolis, Minnesota",
+   "title_given": true,
+   "year": 1939,
+   "series": "fsa",
+   "src": [
+    "W"
+   ],
+   "rights": "public_domain"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "rural poverty and farm life",
+   "tags": [
+    "farm",
+    "rural road"
+   ],
+   "level": "repeated",
+   "series": [
+    "fsa"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "mills, elevators and railroad cars",
+   "tags": [
+    "mill",
+    "train"
+   ],
+   "level": "weak",
+   "context": "gallery captions only",
+   "confidence": "low",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [],
+ "periods": [
+  {
+   "label": "FSA/OWI",
+   "range": [
+    1936,
+    1943
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "Standard Oil, Life, Look",
+   "range": [
+    1943,
+    1971
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "No style statements on the page read."
+ ]
+}

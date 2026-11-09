@@ -91,7 +91,9 @@
   "square format": "composition",
   "empty scene": "composition",
   "candid gesture": "composition",
-  "posed portrait": "composition"
+  "posed portrait": "composition",
+  "dust storm": "scene",
+  "railway yard": "scene"
  },
  "levels": {
   "signature": "described as central or recurring across a body of work by at least two independent sources",
@@ -191,6 +193,8 @@
   "square format": "方画幅",
   "empty scene": "空无一人",
   "candid gesture": "抓拍姿态",
-  "posed portrait": "摆拍肖像"
+  "posed portrait": "摆拍肖像",
+  "dust storm": "沙尘暴",
+  "railway yard": "铁路调车场"
  }
 }

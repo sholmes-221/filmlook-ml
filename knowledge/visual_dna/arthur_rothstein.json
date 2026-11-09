@@ -1,0 +1,156 @@
+{
+ "id": "arthur_rothstein",
+ "website_id": null,
+ "name": {
+  "en": "Arthur Rothstein",
+  "zh": "阿瑟·罗思坦",
+  "ja": null
+ },
+ "born": "1915-07-17",
+ "died": "1985-11-11",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "public_domain_subset",
+  "note": "FSA/OWI work is a US federal work (Commons PD-USGov-FSA per file); later magazine work is in copyright."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Arthur_Rothstein",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [],
+ "series": [
+  {
+   "id": "fsa",
+   "title": "Resettlement / Farm Security Administration photographs",
+   "period": [
+    1935,
+    1940
+   ],
+   "subjects": [
+    "rural poor",
+    "Dust Bowl",
+    "displaced Virginia farmers"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "gees_bend",
+   "title": "Gee's Bend, Alabama",
+   "period": [
+    1937,
+    1937
+   ],
+   "subjects": [
+    "tenant community",
+    "log cabins"
+   ],
+   "visual": [
+    "deliberate, balanced compositions"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "dust_storm_1936",
+   "title": "Farmer and Sons Walking in the Face of a Dust Storm",
+   "title_given": true,
+   "year": 1936,
+   "series": "fsa",
+   "location": "Cimarron County, Oklahoma",
+   "why": "an iconic Dust Bowl image",
+   "src": [
+    "W"
+   ],
+   "rights": "public_domain"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "Dust Bowl and dust storms",
+   "tags": [
+    "dust storm",
+    "farm"
+   ],
+   "level": "weak",
+   "representative": [
+    "dust_storm_1936"
+   ],
+   "context": "rests on one famous photograph",
+   "confidence": "low",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "rural poverty",
+   "tags": [
+    "farm",
+    "vernacular house"
+   ],
+   "level": "repeated",
+   "series": [
+    "fsa"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "composition",
+   "value": "deliberate, balanced compositions",
+   "kind": "interpretive",
+   "scope": "series:gees_bend",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "palette",
+   "value": "some early colour work (1943)",
+   "kind": "observable",
+   "scope": "period:1943",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "RA/FSA",
+   "range": [
+    1935,
+    1940
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "Look magazine",
+   "range": [
+    1940,
+    1971
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "He wrote nine books (page); titles not given."
+ ]
+}

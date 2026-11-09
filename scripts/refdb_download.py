@@ -50,6 +50,17 @@ def toned_monochrome(img: Image.Image) -> bool:
     return float(np.std(hue)) < 12.0
 
 
+def renditions(url: str) -> list[str]:
+    """Scaled renditions only. Commons returns the original file ('thumbnail_unscaled') when it is narrower than the
+    requested width; originals are rate-limited hard on upload.wikimedia.org, so ask the thumbnail service for a
+    smaller width instead (a width larger than the original is refused and the next one is tried)."""
+    if "upload.wikimedia.org/wikipedia/commons/" in url and "/thumb/" not in url:
+        base = url.split("?")[0]
+        head, h1, h2, name = base.rsplit("/", 3)
+        return [f"{head}/thumb/{h1}/{h2}/{name}/{w}px-{name}" for w in (960, 500, 330)]
+    return [url]
+
+
 def pick(rows: list, cap: int) -> list:
     return sorted(rows, key=lambda r: hashlib.sha256(r["work_id"].encode()).hexdigest())[:cap]
 
@@ -67,7 +78,7 @@ def main() -> None:
         if not only or r["photographer_id"] in only:
             by_p[r["photographer_id"]].append(r)
     chosen = [r for p, rs in sorted(by_p.items()) for r in pick(rs, a.cap)]
-    items = [{"id": r["work_id"], "urls": [r["image_url"]], "dst": manifest.image_path(r["work_id"])} for r in chosen]
+    items = [{"id": r["work_id"], "urls": renditions(r["image_url"]), "dst": manifest.image_path(r["work_id"])} for r in chosen]
 
     def validate(content: bytes, tmp: Path) -> None:
         img = Image.open(io.BytesIO(content)); img.load()

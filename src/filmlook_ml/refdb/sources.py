@@ -19,7 +19,9 @@ from filmlook_ml.refdb import rights
 from filmlook_ml.refdb.manifest import now
 from filmlook_ml.refdb.roster import Entry
 
-UA = {"User-Agent": "FilmLook-ML-research/0.2 (reference dataset discovery; one request at a time) python-requests",
+# Wikimedia's User-Agent policy asks automated clients for contact information; the public project repository is
+# given (never a personal e-mail address).
+UA = {"User-Agent": "FilmLook-ML-research/0.2 (https://github.com/sholmes-221/filmlook-ml; reference dataset, one request at a time) python-requests",
       "AIC-User-Agent": "filmlook-ml (research; dataset discovery)"}
 COMMONS = "https://commons.wikimedia.org/w/api.php"
 AIC = "https://api.artic.edu/api/v1/artworks/search"

@@ -36,10 +36,14 @@ def main() -> None:
     for i in range(0, len(ids), a.batch):
         imgs = [Image.open(manifest.image_path(w)).convert("RGB") for w in ids[i:i + a.batch]]
         e = t.image_embeddings(imgs)
-        X.append(e); S.append(t.scores(e, t.text)); M += [json.dumps(measure(im)) for im in imgs]
+        X.append(e); S.append(t.logits(e, t.text)); M += [json.dumps(measure(im)) for im in imgs]
         print(f"{i + len(imgs)}/{len(ids)}", flush=True)
+    L = np.concatenate(S).astype(np.float32)
     np.savez_compressed(OUT, work_id=np.array(ids), X=np.concatenate(X).astype(np.float32), tag_names=np.array(t.tags),
-                        tag_scores=np.concatenate(S).astype(np.float32), measured=np.array(M))
+                        tag_logits=L, measured=np.array(M))
+    # Per-tag logit statistics over the reference corpus: the detection baseline (semantic.TAG_STATS).
+    stats = {tag: [float(L[:, j].mean()), float(L[:, j].std())] for j, tag in enumerate(t.tags)}
+    (P.DATA / "refdb" / "siglip_tag_stats.json").write_text(json.dumps(stats, indent=1))
     print("wrote", OUT)
 
 

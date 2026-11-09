@@ -1,0 +1,111 @@
+{
+ "id": "marion_post_wolcott",
+ "website_id": null,
+ "name": {
+  "en": "Marion Post Wolcott",
+  "zh": "玛丽昂·波斯特·沃尔科特",
+  "ja": null
+ },
+ "born": "1910-06-07",
+ "died": "1990-11-24",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "public_domain_subset",
+  "note": "FSA/OWI work is a US federal work (Commons PD-USGov-FSA per file); later magazine work is in copyright."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Marion_Post_Wolcott",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [
+  {
+   "id": "fsa_photographs",
+   "title_en": "Marion Post Wolcott, FSA Photographs",
+   "year": 1983,
+   "publisher": "Friends of Photography, Carmel",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "series": [
+  {
+   "id": "fsa",
+   "title": "Farm Security Administration photographs",
+   "period": [
+    1938,
+    1942
+   ],
+   "subjects": [
+    "poverty",
+    "the Jim Crow South",
+    "rural homes",
+    "leisure"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "juke_1944",
+   "title": "A juke joint located in Belle Glade, Florida",
+   "title_given": false,
+   "year": 1944,
+   "src": [
+    "W"
+   ],
+   "rights": "unverified"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "rural homes and poverty in the South",
+   "tags": [
+    "vernacular house",
+    "farm"
+   ],
+   "level": "repeated",
+   "series": [
+    "fsa"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "atmosphere",
+   "value": "often finds humour in the situations encountered",
+   "kind": "interpretive",
+   "scope": "series:fsa",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "FSA",
+   "range": [
+    1938,
+    1942
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "Colour and composition not described on the page read."
+ ]
+}

@@ -3,9 +3,10 @@
 Three kinds of output are kept apart, because they mean different things:
 
 - ``detected``: objects, scenes and composition tags from the shared vocabulary, scored by SigLIP zero-shot
-  (``google/siglip-base-patch16-224``, Apache-2.0). A score is SigLIP's sigmoid output for "a photo of ...". It is a
-  model estimate, uncalibrated until ``thresholds`` are fitted on labelled data; tags are reported only above their
-  threshold.
+  (``google/siglip-base-patch16-224``, Apache-2.0). SigLIP's sigmoid values are tiny and differ per prompt, so a tag
+  is *detected* when its logit is unusually high for that tag: z = (logit - mean) / sd against the reference corpus
+  (``TAG_STATS``), z >= 1.5, at most six tags. The reported score is z. This is a model estimate, not a verified
+  label; no tag-level accuracy has been measured.
 - ``measured``: tonal attributes computed from pixels (monochrome, contrast, dark or bright tones, saturation). These
   are facts about the file, not interpretations.
 - ``interpretation``: mood words scored the same zero-shot way and always labelled as a subjective reading.
@@ -62,6 +63,10 @@ PROMPT = {
     "posed portrait": "a posed portrait photo of a person looking at the camera",
     "crow": "a photo of a crow or raven",
 }
+
+
+TAG_STATS = P.DATA / "refdb" / "siglip_tag_stats.json"
+Z_MIN, MAX_TAGS = 1.5, 6
 
 
 def vocabulary() -> dict:
@@ -125,15 +130,26 @@ class Tagger:
             v = getattr(v, "pooler_output", v)
             return self.torch.nn.functional.normalize(v.float(), dim=-1).cpu().numpy()
 
-    def scores(self, emb: np.ndarray, text: np.ndarray) -> np.ndarray:
-        scale = float(self.model.logit_scale.exp()); bias = float(self.model.logit_bias)
-        return 1.0 / (1.0 + np.exp(-(emb @ text.T * scale + bias)))
+    def logits(self, emb: np.ndarray, text: np.ndarray) -> np.ndarray:
+        scale = float(self.model.logit_scale.detach().exp()); bias = float(self.model.logit_bias.detach())
+        return emb @ text.T * scale + bias
 
-    def describe(self, img: Image.Image, thresholds: dict[str, float] | None = None) -> dict:
+    def scores(self, emb: np.ndarray, text: np.ndarray) -> np.ndarray:
+        return 1.0 / (1.0 + np.exp(-self.logits(emb, text)))
+
+    def detect(self, logits: np.ndarray, stats: dict | None = None) -> dict[str, float]:
+        """logits: (n_tags,) for one image -> {tag: z} for the tags that stand out."""
+        stats = stats if stats is not None else load_stats()
+        if not stats:
+            return {}
+        mu = np.array([stats[t][0] for t in self.tags]); sd = np.array([stats[t][1] for t in self.tags])
+        z = (logits - mu) / np.maximum(sd, 1e-6)
+        order = [i for i in np.argsort(-z)[:MAX_TAGS] if z[i] >= Z_MIN]
+        return {self.tags[i]: round(float(z[i]), 2) for i in order}
+
+    def describe(self, img: Image.Image, stats: dict | None = None) -> dict:
         emb = self.image_embeddings([img])
-        s = self.scores(emb, self.text)[0]; mood = self.scores(emb, self.mood_text)[0]
-        th = thresholds or {}
-        detected = {t: round(float(v), 4) for t, v in zip(self.tags, s) if v >= th.get(t, 0.10)}
+        detected = self.detect(self.logits(emb, self.text)[0], stats); mood = self.scores(emb, self.mood_text)[0]
         m = measure(img)
         return {
             "detected": dict(sorted(detected.items(), key=lambda kv: -kv[1])),
@@ -141,6 +157,11 @@ class Tagger:
             "interpretation": {"mood": {k: round(float(v), 4) for k, v in zip(MOODS, mood) if v >= 0.05}, "note": "subjective visual reading"},
             "model": MODEL,
         }
+
+
+@lru_cache(maxsize=1)
+def load_stats() -> dict:
+    return json.loads(TAG_STATS.read_text()) if TAG_STATS.exists() else {}
 
 
 @lru_cache(maxsize=1)

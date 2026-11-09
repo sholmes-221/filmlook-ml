@@ -1,0 +1,181 @@
+{
+ "id": "jack_delano",
+ "website_id": null,
+ "name": {
+  "en": "Jack Delano",
+  "zh": "杰克·德拉诺",
+  "ja": null
+ },
+ "born": "1914-08-01",
+ "died": "1997-08-14",
+ "life_src": [
+  "W"
+ ],
+ "image_rights": {
+  "status": "public_domain_subset",
+  "note": "FSA/OWI work is a US federal work (Commons PD-USGov-FSA per file); later magazine work is in copyright."
+ },
+ "sources": {
+  "W": {
+   "url": "https://en.wikipedia.org/wiki/Jack_Delano",
+   "kind": "secondary",
+   "retrieved": "2026-11-09"
+  }
+ },
+ "unreachable_sources": [],
+ "photobooks": [],
+ "series": [
+  {
+   "id": "fsa",
+   "title": "Farm Security Administration / OWI photographs",
+   "period": [
+    1940,
+    1943
+   ],
+   "subjects": [
+    "railroads",
+    "Puerto Rico",
+    "rural and sharecropping scenes",
+    "factory workers"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "railroads",
+   "title": "Chicago railroad yards",
+   "period": [
+    1942,
+    1943
+   ],
+   "subjects": [
+    "roundhouses",
+    "locomotives",
+    "railroad workers"
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "id": "puerto_rico",
+   "title": "Puerto Rico",
+   "period": [
+    1941,
+    1946
+   ],
+   "subjects": [
+    "sugar cane workers"
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "photographs": [
+  {
+   "id": "union_station_1943",
+   "title": "Chicago Union Station",
+   "title_given": false,
+   "year": 1943,
+   "series": "railroads",
+   "why": "described as one of his most famous pictures",
+   "src": [
+    "W"
+   ],
+   "rights": "public_domain"
+  },
+  {
+   "id": "cane_1941",
+   "title": "Sugar cane workers resting at the noon hour, Rio Piedras, Puerto Rico",
+   "title_given": true,
+   "year": 1941,
+   "series": "puerto_rico",
+   "src": [
+    "W"
+   ],
+   "rights": "public_domain"
+  }
+ ],
+ "motifs": [
+  {
+   "element": "railroads, locomotives and rail yards",
+   "tags": [
+    "train",
+    "railway yard",
+    "worker"
+   ],
+   "level": "series_specific",
+   "series": [
+    "railroads"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "element": "farm labour",
+   "tags": [
+    "farm",
+    "farm field",
+    "worker"
+   ],
+   "level": "repeated",
+   "series": [
+    "fsa"
+   ],
+   "confidence": "medium",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "style": [
+  {
+   "dimension": "composition",
+   "value": "unconventional use of scale and proportion",
+   "kind": "interpretive",
+   "scope": "series:fsa",
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "dimension": "subject_background",
+   "value": "cultural and social patterns of regions rather than people or landscape alone",
+   "kind": "interpretive",
+   "scope": "career",
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "periods": [
+  {
+   "label": "FSA/OWI",
+   "range": [
+    1940,
+    1943
+   ],
+   "src": [
+    "W"
+   ]
+  },
+  {
+   "label": "Puerto Rico films and photography",
+   "range": [
+    1946,
+    1997
+   ],
+   "src": [
+    "W"
+   ]
+  }
+ ],
+ "uncertain": [
+  "Bibliography section not read; no book recorded.",
+  "Colour work not described in the verbatim text."
+ ]
+}
