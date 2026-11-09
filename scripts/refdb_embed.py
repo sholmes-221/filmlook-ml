@@ -33,7 +33,10 @@ MODEL = "facebook/dinov2-small"
 def load_model(device: str):
     from transformers import AutoModel
     m = AutoModel.from_pretrained(MODEL).to(device).eval()
-    rev = getattr(m.config, "_commit_hash", None) or "unknown"
+    ref = Path.home() / ".cache" / "huggingface" / "hub" / "models--facebook--dinov2-small" / "refs" / "main"
+    rev = getattr(m.config, "_commit_hash", None) or (ref.read_text().strip() if ref.exists() else None)
+    if not rev:
+        raise SystemExit("cannot determine the model revision; refusing to write unversioned embeddings")
     return m, f"v1-{str(rev)[:12]}-fp32"
 
 
