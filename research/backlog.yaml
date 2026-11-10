@@ -2014,3 +2014,25 @@ experiments:
     claims'
   status: rejected
   result: 'falsified: supported=0.0000 < 1'
+- id: E60_badge_concept_heads
+  hypothesis: linear heads on the production photo-gate embedding (DINOv2-small [CLS, mean patch], each L2-normalised,
+    768) recognise badge scene concepts with test precision >= 0.90 and recall >= 0.3 for a useful subset of the
+    website's _WORDS concepts, at zero extra model memory
+  motivation: replace the vision provider's scene words as the badge trigger with validated local image analysis
+    (owner brief 2026-11-10); a false badge unlock is worse than a miss
+  value: 5
+  gpu_minutes: 30
+  disk_gb: 3
+  datasets:
+  - open_images_v7_concepts
+  metric: per-concept test precision (Wilson 95 % lower bound), recall, FPR on generic photos; thresholds from the
+    author-disjoint validation split for precision >= 0.95
+  confounders:
+  - Open Images image-level labels are not exhaustive (an unlabelled positive counts as a false positive, so test
+    precision is a lower bound)
+  - Flickr-era content and framing differ from FilmAnalysis uploads (film scans, phone photos)
+  - same-photographer leakage (controlled by author-disjoint splits) and near-duplicates (removed across splits)
+  falsified_if: no concept reaches test precision >= 0.90 with recall >= 0.3
+  stop: one selection, one threshold choice on val, test read once; SigLIP-base zero-shot evaluated on the same test
+    split as the comparator
+  status: running
