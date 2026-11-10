@@ -159,10 +159,10 @@ def content_probe(X: np.ndarray, scenes: np.ndarray, presets: np.ndarray, mean, 
 
 
 def run(feature_set: str, model: str, name: str, holdout: str, features: str, manifest: str, out_dir="data/lut/models",
-        rep_dir="reports/lut", seed=0) -> dict:
+        rep_dir="reports/lut", seed=0, label_field: str = "preset") -> dict:
     z, meta = load_data(features, manifest)
     X = select(z, feature_set)
-    preset = np.array([m["preset"] for m in meta])
+    preset = np.array([str(m[label_field]) for m in meta])
     split = np.array([m["split"] for m in meta])
     scene = np.array([m["scene_id"] for m in meta])
     held = [h for h in holdout.split(",") if h] if holdout else []
@@ -177,7 +177,8 @@ def run(feature_set: str, model: str, name: str, holdout: str, features: str, ma
     neg = split == "negatives"
     mean, std = X[tr].mean(0), X[tr].std(0) + 1e-6
     Z = (X - mean) / std
-    d = {"classes": np.array(classes), "mean": mean.astype(np.float32), "std": std.astype(np.float32), "feature_set": feature_set, "model": model}
+    d = {"classes": np.array(classes), "mean": mean.astype(np.float32), "std": std.astype(np.float32), "feature_set": feature_set, "model": model,
+         "label_field": label_field}
     info = {}
     if model == "lr":
         d.update(fit_lr(Z[tr], y[tr], len(classes)))
@@ -197,7 +198,7 @@ def run(feature_set: str, model: str, name: str, holdout: str, features: str, ma
     if model != "knn":
         T = fit_temperature(clf.logits(Z[va]), y[va])
     d["T"] = T
-    res = {"name": name, "feature_set": feature_set, "model": model, "dim": int(X.shape[1]), "classes": classes, "holdout": held,
+    res = {"name": name, "feature_set": feature_set, "model": model, "dim": int(X.shape[1]), "classes": classes, "holdout": held, "label_field": label_field,
            "n_train": int(tr.sum()), "n_val": int(va.sum()), "n_test": int(te.sum()), "n_test_scenes": int(len(np.unique(scene[te]))),
            "n_unknown_preset_test": int(te_unknown_preset.sum()), "n_negatives": int(neg.sum()), "temperature": T, "fit_info": info}
     for sname, mask in (("val", va), ("test", te)):
@@ -251,8 +252,9 @@ def main() -> None:
     ap.add_argument("--features", default="data/lut/synth/features.npz")
     ap.add_argument("--manifest", default="data/lut/synth/manifest.jsonl")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--label-field", default="preset", help="manifest field holding the class label (preset | lut_id | stock)")
     a = ap.parse_args()
-    run(a.feature_set, a.model, a.name, a.holdout, a.features, a.manifest, seed=a.seed)
+    run(a.feature_set, a.model, a.name, a.holdout, a.features, a.manifest, seed=a.seed, label_field=a.label_field)
 
 
 if __name__ == "__main__":

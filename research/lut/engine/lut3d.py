@@ -99,6 +99,28 @@ class LUT3D:
         lines += [" ".join(f"{v:.6f}" for v in row) for row in lat]
         Path(path).write_text("\n".join(lines) + "\n")
 
+    @staticmethod
+    def from_hald(path) -> "LUT3D":
+        """HaldCLUT image (PNG/TIFF, level L -> n = L^2 lattice; red varies fastest, then green, then blue)."""
+        from PIL import Image
+        with Image.open(path) as im:
+            im.load()
+            w, h = im.size
+            if w != h:
+                raise ValueError(f"{path}: HaldCLUT must be square, got {w}x{h}")
+            level = round(w ** (1 / 3))
+            if level ** 3 != w:
+                raise ValueError(f"{path}: width {w} is not a perfect cube")
+            if im.mode in ("I;16", "I;16B", "I;16L", "I"):
+                arr = np.asarray(im, dtype=np.float32)
+                arr = np.repeat(arr[..., None], 3, -1) if arr.ndim == 2 else arr
+                arr = arr / 65535.0
+            else:
+                arr = np.asarray(im.convert("RGB"), dtype=np.float32) / 255.0
+        n = level * level
+        lat = arr.reshape(-1, 3)[:, :3].reshape(n, n, n, 3)        # [b, g, r] because red is fastest
+        return LUT3D(np.transpose(lat, (2, 1, 0, 3)), Path(path).stem, notes="from HaldCLUT")
+
     def resample(self, size: int) -> "LUT3D":
         g = np.linspace(0, 1, size, dtype=np.float32)
         grid = np.stack(np.meshgrid(g, g, g, indexing="ij"), -1)

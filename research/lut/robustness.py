@@ -86,13 +86,14 @@ def main() -> None:
     ap.add_argument("--manifest", default="data/lut/synth/manifest.jsonl")
     ap.add_argument("--n", type=int, default=300)
     ap.add_argument("--out", default="reports/lut/robustness.json")
+    ap.add_argument("--label-field", default="preset")
     a = ap.parse_args()
     clfs = {n: NumpyClassifier.load(f"data/lut/models/{n}.npz") for n in a.models.split(",")}
     need_dino = any("dinov2" in str(c.d["feature_set"]) for c in clfs.values())
     dino = Dino(8) if need_dino else None
     rows = [json.loads(l) for l in open(a.manifest)]
     classes0 = clfs[list(clfs)[0]].classes
-    test = [r for r in rows if r["split"] == "test" and r["preset"] in classes0]
+    test = [r for r in rows if r["split"] == "test" and str(r[a.label_field]) in classes0]
     rng = np.random.default_rng(0)
     test = [test[i] for i in rng.choice(len(test), min(a.n, len(test)), replace=False)]
     imgs = [np.asarray(Image.open(r["path"]).convert("RGB")) for r in test]
@@ -102,7 +103,7 @@ def main() -> None:
         pert = [fn(im) for im in imgs]
         feats = features_for(pert, need_dino, dino)
         for mname, clf in clfs.items():
-            y = np.array([clf.classes.index(r["preset"]) for r in test])
+            y = np.array([clf.classes.index(str(r[a.label_field])) for r in test])
             P = clf.predict_proba(select_from(feats, str(clf.d["feature_set"])))
             m = grouped_bootstrap(P.argmax(1) == y, scenes)
             conf = float(P.max(1).mean())

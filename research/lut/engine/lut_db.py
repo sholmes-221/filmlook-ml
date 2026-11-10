@@ -141,60 +141,48 @@ def reference_scenes(n_ref: int) -> list[dict]:
     return rows[:n_ref]
 
 
-def build(presets_json: str, out_dir: str, cube_dir: str | None = None, n_ref: int = 32, natural_pixels="data/lut/natural_pixels.npy") -> None:
-    from research.lut.explain import describe as explain_preset
-    from research.lut.forward_model import identity_preset, load_presets
+class _LatticePreset:
+    """Preset-like wrapper (``.apply``) around a lattice, for the grid inverse of .cube / HaldCLUT styles."""
+
+    def __init__(self, lut: LUT3D):
+        self.lut = lut
+
+    def apply(self, x):
+        return self.lut.apply(x).astype(np.float64)
+
+
+def build_from_styles(styles: list[dict], luts: list[LUT3D], out_dir: str, n_ref: int = 32, with_inverse: bool = True,
+                      natural_pixels="data/lut/natural_pixels.npy", presets_by_id: dict | None = None, extra_meta: dict | None = None,
+                      lattice_store: int = LATTICE) -> dict:
+    """Generic database builder: `styles` (metadata dicts with id/name/source/approximation/...) and matching `luts`.
+    Writes lut_db.json + lut_db_arrays.npz to out_dir; returns the metadata. Inverse lattices (approach B) are optional;
+    `lattice_store` controls the stored lattice resolution (descriptors always use the 33^3 working lattice)."""
     from research.lut.inverse_analysis import GridInverse
     from research.lut.synthetic import load_base
     t0 = time.time()
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    styles, luts, presets_by_id = [], [], {}
-    for name, p in load_presets(presets_json).items():
-        sid = name.replace("'", "").lower()
-        lut = LUT3D(p.lattice(LATTICE), name, notes="xmp")
-        luts.append(lut)
-        presets_by_id[sid] = p
-        styles.append({"id": sid, "name": name.replace("_", " "), "source": "xmp", "approximation": APPROX_NOTE_XMP, "label_basis": "LUT-derived aesthetic",
-                       "tone_curves": {"main": p.main_curve, "red": p.rgb_curves["Red"], "green": p.rgb_curves["Green"], "blue": p.rgb_curves["Blue"]},
-                       "grain_parameters_not_in_lut": p.grain, "explanation_phrases": explain_preset(p)})
-    if cube_dir and Path(cube_dir).exists():
-        for f in sorted(Path(cube_dir).glob("*.cube")):
-            try:
-                lut = LUT3D.from_cube(f).resample(LATTICE)
-            except ValueError as e:
-                print("skip", f, e)
-                continue
-            luts.append(lut)
-            styles.append({"id": f.stem.lower().replace(" ", "_"), "name": f.stem, "source": "cube", "approximation": APPROX_NOTE_CUBE,
-                           "label_basis": "LUT-derived aesthetic", "tone_curves": None, "grain_parameters_not_in_lut": {}, "explanation_phrases": []})
+    presets_by_id = presets_by_id or {}
     validations = [l.validate() for l in luts]
     keep = [i for i, v in enumerate(validations) if v["ok"]]
     styles = [styles[i] for i in keep]
     luts = [luts[i] for i in keep]
     S = len(styles)
-    print(f"{S} valid styles")
-    # inverse lattices (for plausibility scoring)
-    from research.lut.forward_model import Preset
-    inv_lat = np.zeros((S, LATTICE, LATTICE, LATTICE, 3), np.float32)
-    inv_res = np.zeros((S, LATTICE, LATTICE, LATTICE), np.float32)
+    print(f"{S} valid styles ({len(validations) - S} rejected by validation)")
     cube = _grid(LATTICE).astype(np.float64)
+    inv_lat = np.zeros((S, LATTICE, LATTICE, LATTICE, 3), np.float32) if with_inverse else None
+    inv_res = np.zeros((S, LATTICE, LATTICE, LATTICE), np.float32) if with_inverse else None
     for i, (st, lut) in enumerate(zip(styles, luts)):
-        p = presets_by_id.get(st["id"])
-        if p is None:   # cube: wrap the lattice as a Preset-like object with .apply
-            class _P:
-                def __init__(self, l):
-                    self.l = l
-
-                def apply(self, x):
-                    return self.l.apply(x).astype(np.float64)
-            p = _P(lut)
-        x, resid = GridInverse(p)(cube)
-        inv_lat[i] = x.reshape(LATTICE, LATTICE, LATTICE, 3)
-        inv_res[i] = resid.reshape(LATTICE, LATTICE, LATTICE)
-        st["descriptors"] = style_descriptors(lut, inv_res[i])
-        print(f"  {st['id']}: black lift {st['descriptors']['clipping']['black_lift_8bit']:.1f}, unreachable {st['descriptors']['gamut_compression']['unreachable_cube_fraction_de2']:.3f}")
-    # natural pixel cloud signatures (approach A) and reference bank (approaches C/D/E)
+        resid = None
+        if with_inverse:
+            p = presets_by_id.get(st["id"]) or _LatticePreset(lut)
+            x, r = GridInverse(p)(cube)
+            inv_lat[i] = x.reshape(LATTICE, LATTICE, LATTICE, 3)
+            inv_res[i] = r.reshape(LATTICE, LATTICE, LATTICE)
+            resid = inv_res[i]
+        st["descriptors"] = style_descriptors(lut, resid)
+        if i % 25 == 0 or i == S - 1:
+            print(f"  descriptors {i + 1}/{S} ({time.time() - t0:.0f}s)")
     nat = np.load(natural_pixels)
     cloud = np.stack([describe_pixels(l.apply(nat)) for l in luts] + [describe_pixels(nat)])
     refs = reference_scenes(n_ref)
@@ -206,6 +194,8 @@ def build(presets_json: str, out_dir: str, cube_dir: str | None = None, n_ref: i
         for i, im in enumerate(renders):
             bank[k, i] = describe(im)
             bank_neutral[k, i] = describe(neutralise(im), with_texture=False)
+        if k % 8 == 0:
+            print(f"  reference scene {k + 1}/{len(refs)} ({time.time() - t0:.0f}s)")
     mean = bank.reshape(-1, DIM).mean(0)
     std = bank.reshape(-1, DIM).std(0) + 1e-6
     Z = (bank - mean) / std
@@ -213,20 +203,58 @@ def build(presets_json: str, out_dir: str, cube_dir: str | None = None, n_ref: i
     within = Z.var(0).mean(0) + 1e-6        # within-style variance across scenes
     fisher = between / within
     fisher[np.setdiff1d(np.arange(DIM), MATCH_IDX)] = 0.0
-    np.savez(out / "lut_db_arrays.npz", lattices=np.stack([l.lattice for l in luts]).astype(np.float16), inverse_lattices=inv_lat.astype(np.float16),
-             inverse_residual=inv_res.astype(np.float16), bank=bank, bank_neutral=bank_neutral, cloud_signatures=cloud.astype(np.float32), fisher_weights=fisher.astype(np.float32),
-             bank_mean=mean.astype(np.float32), bank_std=std.astype(np.float32))
-    meta = {"built": time.strftime("%Y-%m-%dT%H:%M:%S"), "lattice_size": LATTICE, "descriptor_dim": DIM, "descriptor_names": NAMES,
-            "match_feature_indices": MATCH_IDX.tolist(), "n_styles": S, "styles": styles, "validation": [validations[i] for i in keep],
-            "rejected": [v for i, v in enumerate(validations) if i not in keep],
+    stored = [l if lattice_store == LATTICE else l.resample(lattice_store) for l in luts]
+    arrays = {"lattices": np.stack([l.lattice for l in stored]).astype(np.float16), "bank": bank, "bank_neutral": bank_neutral,
+              "cloud_signatures": cloud.astype(np.float32), "fisher_weights": fisher.astype(np.float32),
+              "bank_mean": mean.astype(np.float32), "bank_std": std.astype(np.float32)}
+    if with_inverse:
+        arrays["inverse_lattices"] = inv_lat.astype(np.float16)
+        arrays["inverse_residual"] = inv_res.astype(np.float16)
+    np.savez(out / "lut_db_arrays.npz", **arrays)
+    meta = {"built": time.strftime("%Y-%m-%dT%H:%M:%S"), "lattice_size": LATTICE, "stored_lattice_size": lattice_store, "has_inverse": with_inverse,
+            "descriptor_dim": DIM, "descriptor_names": NAMES, "match_feature_indices": MATCH_IDX.tolist(), "n_styles": S, "styles": styles,
+            "validation": [validations[i] for i in keep], "rejected": [v for i, v in enumerate(validations) if i not in keep],
             "reference_scenes": [{"source_id": r["source_id"], "attribution": r["attribution"], "license": r["license"], "dataset": r["dataset_id"]} for r in refs],
             "natural_pixels": {"file": natural_pixels, "n": int(len(nat))},
             "colour_space": "input/output sRGB (IEC 61966-2-1, D65) in [0,1]; CIELAB with D50 white after Bradford adaptation",
-            "storage_precision": "float16 lattices (max abs error 2.4e-4), float32 descriptors",
-            "build_seconds": round(time.time() - t0, 1)}
+            "storage_precision": "float16 lattices (max abs error 2.4e-4), float32 descriptors", "build_seconds": round(time.time() - t0, 1),
+            **(extra_meta or {})}
     (out / "lut_db.json").write_text(json.dumps(meta, indent=1, default=float))
     print(f"wrote {out}/lut_db.json and lut_db_arrays.npz in {time.time() - t0:.0f}s; sizes: json {(out / 'lut_db.json').stat().st_size / 1e6:.2f} MB, "
           f"npz {(out / 'lut_db_arrays.npz').stat().st_size / 1e6:.2f} MB")
+    return meta
+
+
+def preset_styles(presets_json: str):
+    """The owner's 13 XMP presets as (styles, luts, presets_by_id)."""
+    from research.lut.explain import describe as explain_preset
+    from research.lut.forward_model import load_presets
+    styles, luts, presets_by_id = [], [], {}
+    for name, p in load_presets(presets_json).items():
+        sid = name.replace("'", "").lower()
+        luts.append(LUT3D(p.lattice(LATTICE), name, notes="xmp"))
+        presets_by_id[sid] = p
+        styles.append({"id": sid, "name": name.replace("_", " "), "source": "xmp", "license": "owner's private preset (not redistributed)",
+                       "approximation": APPROX_NOTE_XMP, "label_basis": "LUT-derived aesthetic",
+                       "tone_curves": {"main": p.main_curve, "red": p.rgb_curves["Red"], "green": p.rgb_curves["Green"], "blue": p.rgb_curves["Blue"]},
+                       "grain_parameters_not_in_lut": p.grain, "explanation_phrases": explain_preset(p)})
+    return styles, luts, presets_by_id
+
+
+def build(presets_json: str, out_dir: str, cube_dir: str | None = None, n_ref: int = 32, natural_pixels="data/lut/natural_pixels.npy") -> None:
+    """The vendored 13-preset database (plus any .cube files found in cube_dir)."""
+    styles, luts, presets_by_id = preset_styles(presets_json)
+    if cube_dir and Path(cube_dir).exists():
+        for f in sorted(Path(cube_dir).glob("*.cube")):
+            try:
+                lut = LUT3D.from_cube(f).resample(LATTICE)
+            except ValueError as e:
+                print("skip", f, e)
+                continue
+            luts.append(lut)
+            styles.append({"id": f.stem.lower().replace(" ", "_"), "name": f.stem, "source": "cube", "approximation": APPROX_NOTE_CUBE,
+                           "label_basis": "LUT-derived aesthetic", "tone_curves": None, "grain_parameters_not_in_lut": {}, "explanation_phrases": []})
+    build_from_styles(styles, luts, out_dir, n_ref=n_ref, with_inverse=True, natural_pixels=natural_pixels, presets_by_id=presets_by_id)
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -238,8 +266,10 @@ class LutDB:
         self.meta = json.loads((self.dir / "lut_db.json").read_text())
         z = np.load(self.dir / "lut_db_arrays.npz")
         self.lattices = z["lattices"]
-        self.inverse_lattices = z["inverse_lattices"]
-        self.inverse_residual = z["inverse_residual"]
+        self.stored_lattice_size = int(self.lattices.shape[1])
+        self.has_inverse = "inverse_lattices" in z.files
+        self.inverse_lattices = z["inverse_lattices"] if self.has_inverse else None
+        self.inverse_residual = z["inverse_residual"] if self.has_inverse else None
         self.bank = z["bank"]
         self.bank_neutral = z["bank_neutral"]
         self.cloud = z["cloud_signatures"]
@@ -260,6 +290,8 @@ class LutDB:
         return self._luts[i]
 
     def inverse(self, i: int) -> tuple[LUT3D, np.ndarray]:
+        if not self.has_inverse:
+            raise ValueError("this database was built without inverse lattices (approach B unavailable)")
         return LUT3D(self.inverse_lattices[i].astype(np.float32)), self.inverse_residual[i].astype(np.float32)
 
     def style(self, sid: str) -> dict:
