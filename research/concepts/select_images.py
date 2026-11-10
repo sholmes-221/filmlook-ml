@@ -23,6 +23,7 @@ from research.concepts.common import IGNORE, META, DATA, class_maps
 from research.concepts.concept_map import CONCEPTS
 
 POS_CAP, VNEG_CAP, PER_AUTHOR, GENERIC = 650, 300, 4, 8000
+COOC_MIN, COOC_MAX = 10, 0.01
 HEADS = list(CONCEPTS)
 
 
@@ -117,10 +118,31 @@ def build() -> None:
     for c in ["OriginalURL", "OriginalLandingURL", "License", "AuthorProfileURL", "Rotation"]:
         rows[c] = rows.image_id.map(M[c])
     full = rows.oi_split != "train"   # all labels known for validation/test images; train only for the wanted classes
+    # Open Images labels are verified only for candidate classes, so "no label" is unknown, not "absent". An image
+    # chosen as a positive of head A is a negative for head B only if raters verified B on it, unless the source data
+    # show B is rare among A-positives: among A-positives that were verified for B, under COOC_MAX positive (and at
+    # least COOC_MIN such images). Otherwise the image is excluded (-1) from B. Generic random photos stay negatives at
+    # the base rate (a documented limitation: an unlabelled positive there counts as a false positive).
+    verified = {h: P | V for h, (P, V, _) in sets.items()}
+    cooc = {}
+    for a, (Pa, _, _) in sets.items():
+        for b in sets:
+            if a == b:
+                continue
+            ver = Pa & verified[b]
+            cooc[(a, b)] = (len(ver & sets[b][0]) / len(ver) if len(ver) >= COOC_MIN else None, len(ver))
+    pd.Series({f"{a}->{b}": v for (a, b), v in cooc.items()}).to_json(DATA / "cooccurrence.json")
+    ids_arr = rows.image_id.to_numpy()
     for head, (P, V, I) in sets.items():
         y = np.where(rows.image_id.isin(P), 1, np.where(rows.image_id.isin(I), -1, 0))
-        # A train image carries only the wanted classes; if it was chosen for another head, "no positive for this head"
-        # is as reliable as for a validation image only because every head class and its IGNORE classes were kept.
+        unsafe = set()
+        for a, (Pa, _, _) in sets.items():
+            if a != head:
+                rate, _n = cooc[(a, head)]
+                if rate is None or rate >= COOC_MAX:
+                    unsafe |= Pa
+        unknown = np.array([(i in unsafe) and (i not in verified[head]) for i in ids_arr])
+        y = np.where((y == 0) & unknown, -1, y)
         rows[head] = y.astype(np.int8)
     rows.to_parquet(DATA / "selection.parquet")
     print(rows.split.value_counts().to_dict(), len(rows))

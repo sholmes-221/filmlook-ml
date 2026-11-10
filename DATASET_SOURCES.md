@@ -33,6 +33,14 @@ It is metadata, not a judgement of aesthetics, but it is independent of every te
 
 Real-film discovery and acquisition are recorded in `docs/REAL_FILM_DATASETS.md` (registry: `data/manifests/discovery_registry.json`); curated-photography platforms and their terms in `docs/CURATED_PHOTOGRAPHY_SOURCES.md`. New registry entries: `commoncatalog_film` (CC-BY film scans with uploader stock tags, evaluation-only), `artefact_film` (CC BY 4.0, evaluation-only), `aic_photographs` (CC0, curated group). PhotoVogue, DEHAZED and Iconic Artist: metadata only, never crawled (terms prohibit automated access / ML use).
 
+## Badge concepts (2026-11-10, E60)
+
+| Dataset | Source | License (checked per record) | Use | Images | Labels | Access | Attribution |
+|---|---|---|---|---|---|---|---|
+| Open Images V7 concept subset (`open_images_v7_concepts`) | https://storage.googleapis.com/openimages/web/index.html | images **CC BY 2.0** (per-row `License` of the Open Images image list); labels CC BY 4.0 (Google LLC) | training + evaluation of linear concept heads | 45,659 (author-disjoint 60/20/20) | human-verified image-level labels (positive and verified negative) | label/metadata CSVs streamed and filtered; images from the CVDF public S3 copy, else the Flickr 640 px thumbnail URL listed in the metadata; reduced to a 320 px short side, originals not kept | author, profile, source page, licence URL per image in `data/concepts/manifest.jsonl`; training split shipped as `dist/concepts/TRAINING_DATA_ATTRIBUTION.jsonl` |
+
+Details and results: `docs/research/badge-concepts-local.md`.
+
 ## Rejected or not used
 
 | Source | Reason |

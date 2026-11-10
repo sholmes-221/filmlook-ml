@@ -265,3 +265,19 @@ datasets:
     authenticity_class: A
     risks: attribution comes from the source record (Commons community / museum); several scans of one negative (phash dedup); FSA subject matter shared across photographers (intended as a subject-bias control); Library of Congress itself refused scripted access (Cloudflare challenge) so LoC scans arrive only via Commons copies
     verified_on: 2026-11-09
+
+  - id: open_images_v7_concepts
+    name: Open Images V7 - badge-concept subset (human-verified image-level labels)
+    source_url: https://storage.googleapis.com/openimages/web/index.html
+    license: CC-BY-2.0          # images: per-row License field of the Open Images image list (all selected rows are creativecommons.org/licenses/by/2.0); labels and metadata: CC BY 4.0 (Google LLC)
+    commercial_use: true
+    ml_training: true           # CC BY permits any use with attribution; Open Images is published as a training dataset
+    num_images: about 49k selected (train ids missing from the CVDF copy are skipped); see data/concepts/manifest.jsonl
+    labels: [human-verified image-level labels (positive and verified negative), Flickr author, licence URL, source page]
+    download_method: label/metadata CSVs streamed and filtered (research.concepts.oi_meta); images from the CVDF public S3 copy, reduced locally to a 320 px short side; originals discarded (research.concepts.download)
+    attribution: required; author, author profile, source page and licence URL kept per image (data/concepts/manifest.jsonl), shipped as dist/concepts/TRAINING_DATA_ATTRIBUTION.jsonl for the training split
+    redistribution: not done; only linear-head weights and metrics ship
+    training_allowed: true      # owner's brief of 2026-11-10: local badge-concept recogniser from source labels, never from a model's opinion
+    authenticity_class: B
+    risks: uploader-asserted Flickr licences; image-level labels are not exhaustive (unlabelled positives count as false positives in evaluation); Flickr 2005-2016 content differs from today's uploads
+    verified_on: 2026-11-10

@@ -58,7 +58,7 @@ CONCEPTS: dict[str, tuple[str, list[str]]] = {
     "lotus_pond": ("lotus_pond", ["Sacred lotus", "Lotus family", "Lotus (Plant)"]),
     "spider_web": ("spider_web", ["Spider web"]),
     "beetle": ("beetle", ["Beetle", "Ladybug", "Stag beetle", "Rhinoceros beetle", "Ground beetle", "Japanese beetle"]),
-    "reflection": ("reflection", ["Reflection"]),
+    "reflection": ("lesson_reflection", ["Reflection"]),  # lessons.REFLECTION
 }
 
 UNSUPPORTED: dict[str, str] = {
