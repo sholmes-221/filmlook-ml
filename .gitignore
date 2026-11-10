@@ -66,3 +66,6 @@ research/tasks.json.part
 film_physics/third_party/
 film_physics/.venv/
 film_physics/experiments/out/
+
+# LUT library downloads (third-party HaldCLUT/.cube files, CC BY / CC BY-SA / CC0; manifest lives in research/lut_library/)
+/data/lut_library/
