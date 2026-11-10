@@ -2035,4 +2035,6 @@ experiments:
   falsified_if: no concept reaches test precision >= 0.90 with recall >= 0.3
   stop: one selection, one threshold choice on val, test read once; SigLIP-base zero-shot evaluated on the same test
     split as the comparator
-  status: running
+  status: supported
+  result: '22 of 47 heads pass test precision >= 0.90 (Wilson LB >= 0.80) and recall >= 0.30 (21 badge keys); SigLIP-base
+    zero-shot passes 5; pixel rules for night/golden/blue hour/pink pass none. docs/research/badge-concepts-local.md'

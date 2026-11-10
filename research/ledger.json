@@ -1,6 +1,6 @@
 {
- "gpu_seconds": 7334.914188776016,
- "disk_bytes": 563149304,
+ "gpu_seconds": 7634.914188776016,
+ "disk_bytes": 3771309761,
  "runs": [
   {
    "id": "E9_layer_ablation",
@@ -456,6 +456,17 @@
    "disk_bytes": 0,
    "peak_gpu_mb_total": 5743.0,
    "returncode": 0
+  },
+  {
+   "id": "E60_badge_concept_heads",
+   "wall_seconds": 3900,
+   "gpu": true,
+   "gpu_seconds_estimate": 300,
+   "disk_bytes": 3208160457,
+   "peak_gpu_mb_total": 1743.0,
+   "returncode": 0,
+   "note": "2026-11-10 owner brief; DINOv2 embeddings 45,659 images (49 s) + SigLIP val/test embeddings; peak VRAM is this process only",
+   "result": "22 of 47 heads shipped (dist/concepts/concept-heads-20261110-8e3bfd84.json); SigLIP zero-shot 5"
   }
  ],
  "session_started": "2026-11-07T07:03:54Z",
