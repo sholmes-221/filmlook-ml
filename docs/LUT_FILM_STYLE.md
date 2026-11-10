@@ -5,15 +5,15 @@ Summary for the website team. Full record with commands and every number: `resea
 ## Verdict in three lines
 
 - **Which Lightroom preset was applied** (13 presets + "none", synthetic held-out scenes): the best learned model reaches
-  top-1 TBD_SYN_TOP1 / top-3 TBD_SYN_TOP3 against chance 0.09; the deterministic engine reaches TBD_ENG_SYN_TOP1 / TBD_ENG_SYN_TOP3. Usable as a
+  top-1 0.47 [0.43, 0.52] / top-3 0.73 against chance 0.09; the deterministic engine reaches 0.25 [0.21, 0.29] / 0.51. Usable as a
   *ranked similarity*, not as an identification.
 - **Which real film stock exposed a real scan** (353 uploader-labelled scans, 125 uploaders, 9 stocks mapped to presets):
-  every method, learned or deterministic, is **below the majority-class baseline** (best line-level top-1 TBD_REAL_BEST vs
+  every method, learned or deterministic, is **below the majority-class baseline** (best line-level top-1 0.10 vs
   majority 0.48). The presets do not identify film stocks; neither does anything trained on them. Say "LUT-derived
   aesthetic", never "shot on X".
 - **Film-likeness (scan vs digital, 0-100)**: deterministic logistic estimate on measured statistics, held-out-uploader
-  AUROC TBD_FL_AUROC (colour-only TBD_FL_AUROC_COL), ECE TBD_FL_ECE. Baselines: monochrome flag TBD_FL_MONO, fine noise TBD_FL_NOISE.
-  Verdict: TBD_FL_VERDICT.
+  AUROC 0.825 [0.79, 0.86] (colour-only 0.825 [0.79, 0.86]_COL), ECE 0.035. Baselines: monochrome flag 0.58, fine noise 0.68.
+  Verdict: usable as a *measured estimate* with its evidence list and bands (JPEG q50 lowers AUROC to 0.72; fine noise is the main cue, so noisy digital photos score film-like).
 
 ## What the presets contain
 
@@ -66,7 +66,7 @@ in `lut_db.json`); only their descriptors are stored.
 
 Matching approaches evaluated (`research/lut/engine_eval.py`): A descriptor-vs-pixel-cloud, B inverse-LUT plausibility,
 C nearest reference render, CW Fisher-weighted C, D Fisher-weighted nearest centroid, E scene-conditioned delta
-matching. Chosen: **TBD_ENG_METHOD** (synthetic top-1 TBD_ENG_SYN_TOP1). Latency / memory, one CPU thread: TBD_BENCH.
+matching. Chosen: **D (Fisher-weighted nearest centroid over 32 reference scenes)** (synthetic top-1 0.25 [0.21, 0.29]). Latency / memory, one CPU thread: engine `analyze()` 80 ms, `film_likeness()` 258 ms, 92 MB RSS after analyze / 237 MB peak during film-likeness (fresh process, numpy+scipy+cv2 baseline 46 MB), 7.5 MB database, 7 ms load; colour MLP 84 ms / 123 MB; DINOv2 variant 190 ms / 306 MB (`reports/lut/bench*.json`).
 
 Catalog mapping (`catalog_map.json`): 10 of 13 styles map exactly to a catalog direction (Portra 400 → `portra_like`,
 Portra 160 → `kodak_portra_160_like`, Ektar → `ektar_like`, Gold → `gold_like`, ColorPlus → `kodak_colorplus_200_like`,
@@ -76,11 +76,28 @@ UltraMax → `kodak_ultramax_400_like`, Fujifilm 200 → `fuji_c200_like`, Cines
 
 ## Does it beat the current baseline?
 
-TBD_BASELINE_COMPARISON
+| task | current baseline | this work | verdict |
+|---|---|---|---|
+| film family / stock on real scans | statistics 0.68 acc on 90 scans *with a B&W class* (film_physics, 2026-11-09); stock-line p@5 at chance (claim 20) | 353 colour scans, 125 uploaders: every preset-based method 0.05-0.10 line top-1 vs majority 0.48; family 0.17-0.34 vs majority 0.54; supervised-on-real LR also below majority | **no improvement; stock claims stay unsupported** |
+| which preset / look was applied (synthetic) | none existed | colour MLP 0.47 / 0.73 top-1 / top-3; engine 0.25 / 0.51 (chance 0.07 / 0.21) | new capability, synthetic only, modest |
+| film-likeness | monochrome 0.62, fine noise 0.61, student head 0.78 (ECE 0.20) | **0.825 [0.79, 0.86]**, ECE 0.035, 502 held-out uploaders | **beats the baselines; calibrated** |
+| unknown-style rejection | - | max-softmax AUROC 0.46 (presets) / 0.34 (edits); engine distance 0.70 vs edits | weak; show `uncertain`, never hide the `none` candidate |
+| robustness | - | WB / JPEG / mild edits cost 2-5 points; -1 EV halves accuracy | state in the UI that exposure edits after the look break the match |
 
 ## Integration recommendation
 
-TBD_RECOMMENDATION
+1. Vendor `research/lut/engine/` + `research/lut/db/` (7.5 MB) into the website; dependencies numpy, scipy, opencv-python-headless,
+   Pillow (optional, for EXIF orientation). Call `FilmStyleEngine().analyze(bytes)` and `.film_likeness(bytes)`; cache both
+   results per upload hash (the database itself is precomputed, nothing is recomputed per upload).
+2. Present the top-3 as **"closest LUT-derived aesthetic" with similarity 0-100 (relative)**, the catalog direction from
+   `catalog_map.json` (show the `exact: false` note for Candido / Film One Hundred / Lomography 400), the zh/en description and
+   the `key_features`; when `uncertain` is true, say "no clear match". Never write "shot on <stock>".
+3. Present `film_likeness.estimate` as a *measured estimate* with its band and the six evidence statistics; label it
+   "weak evidence" when `confidence` is `low` (monochrome or within +-15 of 50).
+4. If a stronger synthetic ranking is wanted later: `data/lut/models/colour_mlp_all.npz` + `research.lut.train.NumpyClassifier`
+   + `research.lut.features.colour_features` (numpy/PIL, 84 ms, 123 MB) doubles the synthetic top-1 (0.47) with the same
+   blindness on real film and over-confident scores (ECE 0.12); it is not required for the honest product statement.
+5. Do not ship the DINOv2 variant (no gain, 88 MB, 190 ms). Do not re-add Gemini for these two features.
 
 ## Known limitations
 

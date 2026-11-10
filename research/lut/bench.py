@@ -103,7 +103,7 @@ def main() -> None:
         res["peak_rss_mb"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
         res["rss_mb_before_engine"] = rss_before
         res["top3"] = [(s["id"], s["similarity"]) for s in r["styles"]]
-        res["film_likeness"] = {"estimate": fl.get("estimate"), "band": fl.get("band")}
+        res["film_likeness_result"] = {"estimate": fl.get("estimate"), "band": fl.get("band")}
         out["engine"] = res
         print(f"engine ({eng.method}) analyze {res['analyze']['median_ms']:.1f} ms (p90 {res['analyze']['p90_ms']:.1f}) | film_likeness {res['film_likeness']['median_ms']:.1f} ms | "
               f"load {t_load:.0f} ms | db {res['db_mb']:.1f} MB | peak RSS {res['peak_rss_mb']:.0f} MB (before engine {rss_before:.0f})")

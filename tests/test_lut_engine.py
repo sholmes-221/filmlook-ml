@@ -82,6 +82,17 @@ def test_render_moves_photo_towards_its_style(engine):
     assert closer >= 9
 
 
+def test_film_likeness_contract(engine):
+    res = engine.film_likeness(photo(seed=7))
+    assert res["band"] in ("digital-like", "ambiguous", "film-like") and res["confidence"] in ("low", "medium", "high")
+    assert 0 <= res["estimate"] <= 100 and len(res["evidence"]) == 6
+    assert all(e[2] in ("towards film", "towards digital") for e in res["evidence"])
+    assert abs(sum(res["contributions"].values()) + res["logit"] - res["logit"] - sum(res["contributions"].values())) < 1e-6
+    # noisier image -> higher estimate (fine noise is the strongest positive weight)
+    noisy = np.clip(photo(seed=7).astype(float) + np.random.default_rng(1).normal(0, 12, photo().shape), 0, 255).astype(np.uint8)
+    assert engine.film_likeness(noisy)["estimate"] > res["estimate"]
+
+
 def test_similarity_scale():
     s = similarity_0_100(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
     assert s[0] == 100.0 and abs(s[2] - 50.0) < 1e-6 and s[-1] < s[-2]
