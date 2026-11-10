@@ -312,3 +312,162 @@ research/lut/film_likeness_train.py python -m research.lut.film_likeness_train b
 tests/test_lut_*.py                 pytest -q tests/test_lut*.py
 reports/lut/*.json|.log             all numbers quoted above (git-ignored)
 ```
+
+---
+
+# Part 2 — the discovered LUT library (phases 4-8 of the "Autonomous Film LUT Discovery" brief, 2026-11-10 evening)
+
+Input: `research/lut_library/manifest.json` (341 records, 337 files: RawTherapee HaldCLUT collection CC BY-SA 4.0,
+GlassMeter film looks CC BY 4.0 (30 .cube), filmlab Vision3 CC BY-SA (8), sguyader FilmSim CC0 (4 HaldCLUT TIFF + 4
+.pp3)) and `research/lut_library/source_photos.json` (tier 1 = 669 untouched digital originals). New code:
+`research/lut/library_db.py` (ingestion, two databases, comparison/clustering), `research/lut/synthetic_library.py`,
+`research/lut/real_eval_library.py`, `LUT3D.from_hald`, generic `build_from_styles`, `tests/test_lut_library.py`.
+Budget this part: 3.7 GPU-seconds (ledger total 31.8 s), +1.0 GB disk (`data/lut/synthetic_library`, 5,535 JPEGs) and
+41 MB of committed databases; disk stays at 93 %.
+
+## 11. Ingestion and coverage (`python -m research.lut.library_db build --which library|free`)
+
+Ingested into `research/lut/db_library/`: **293 LUTs, 74 stocks** (259 RawTherapee CC BY-SA, 30 GlassMeter CC BY, 4
+sguyader CC0; 227 colour film looks, 66 B&W). Skipped with the reason recorded in `lut_db.json → ingestion.skipped`: 33
+creative looks, the identity LUT, the negative inversion, 4 `.pp3` profiles (not LUTs), 1 record whose library
+validation was not ok, and the **8 filmlab Vision3 LUTs** (input = DaVinci Intermediate / DaVinci Wide Gamut with a
+density-wire print stage; no verified DI/DWG → sRGB transform is implemented, so applying them to sRGB would be wrong).
+HaldCLUTs (level 12, 144³) and .cube (33³ / 65³) are resampled to the 33³ working lattice (identity HaldCLUT reads back
+with RMS 0.0016, confirming the red-fastest ordering); all 293 pass `LUT3D.validate`. `db_library` stores 17³ lattices
+(no inverse lattices) = 4.0 MB json + 24.3 MB npz; **`research/lut/db_free/`** = the owner's 13 presets + the 34 CC BY /
+CC0 LUTs (47 styles, full 33³ lattices, no inverse, 0.65 MB + 12.7 MB) with the attribution texts listed in its json.
+
+Colour film looks per stock (LUT count): fuji_fp100c 20, kodak_portra_400 17, polaroid_px_680 16, polaroid_px_70 16,
+polaroid_690 15, kodak_portra_160 13, polaroid_px_100uv 12, polaroid_669 10, polaroid_time_zero_expired 10,
+polaroid_665 9, fuji_superia_100 6, kodak_portra_800 6, fuji_pro400h 5, fuji_superia_1600 5, fuji_superia_400 5,
+fuji_superia_800 5, kodak_elite_chrome 5, fuji_pro160c 4, fuji_pro800z 4, kodak_ektachrome_100 4, fuji_provia_100 3,
+fuji_astia_100 2, fuji_provia_400 2, fuji_superia_200 2, fuji_velvia_100 2, fuji_velvia_50 2, kodak_ektar_100 2,
+kodak_kodachrome_64 2, and one each for agfa_ctprecisa_100, agfa_optima_100, agfa_vista_200, cinestill_400d,
+cinestill_50d, cinestill_800t, fuji_industrial_100, fuji_sensia_100, kodak_colorplus_200, kodak_gold_200,
+kodak_kodachrome_25/200, kodak_ultramax_400, lomography_redscale_100, lomography_xpro_slide_200, polaroid_664/667/672/
+polachrome, and the 4 Fujifilm camera simulations (acros, classic chrome, provia, velvia). Coverage is lopsided: half
+of the colour LUTs are Polaroid / Fuji instant looks and Portra push/pull variants; the consumer negatives that dominate
+the real scans (Gold, UltraMax, ColorPlus, Ektar, Superia 200/400, C200) have 1-5 LUTs each, and Fuji C200 / Natura /
+ProImage / Reala have none.
+
+**Licence decision point.** 259 of the 293 ingested LUTs (and 304 of 337 files) are CC BY-SA 4.0. Descriptors,
+reference renders and any model trained on renders are *derived* from them; whether that makes a database or a trained
+model an "adaptation" that must itself be released CC BY-SA 4.0 is unresolved (recorded in
+`db_library/lut_db.json → licence_decision_point`). Nothing from `db_library` or from the library-trained models may
+ship in the proprietary website until the owner decides. `db_free` (owner's presets + GlassMeter CC BY 4.0 + sguyader
+CC0) carries only attribution duties and is the shippable variant.
+
+## 12. Do LUTs that claim the same stock agree? (`python -m research.lut.library_db compare`, reports/lut/library_clusters.json)
+
+Mean ΔE76 between lattices on 4,000 natural pixels, 227 colour LUTs + the 13 presets. Pairwise mean ΔE 18.0 overall
+(Polaroid / expired looks are far from everything); **within-stock mean ΔE 10.1 against 2.8-11 ΔE to the nearest *other*
+stock**; a LUT's nearest neighbour claims the same stock only 49 % of the time, and that rate is carried by the
+distinctive Polaroid families (0.85-1.00); for the negatives it is Portra 400 0.65, Portra 160 0.54, Superia 400 0.80,
+Superia 100 0.67, Pro 400H 0.40, Pro 160C 0.25, Ektar 100 / Provia / Velvia / Kodachrome 0.00. Agglomerative average
+linkage on the ΔE matrix: best silhouette 0.44 at **4 clusters = one cluster of 214 LUTs plus three small Polaroid /
+expired outlier groups**; no stock-level structure emerges. One exact duplicate (Portra 160 NC 3 = Portra 400 NC 3,
+ΔE 0.00). The owner's presets versus library LUTs of the same stock: Portra 160 preset → nearest same-stock LUT ΔE 3.2
+(rank 1 of 227), Portra 400 → 7.0 (rank 5), Ektar → 6.6 (rank 54), UltraMax → 8.6 (rank 84), ColorPlus → 9.3 (rank 84),
+Gold → 11.7 (rank 105), Cinestill 50D → 11.7 (rank 121). Reading: **different authors' LUTs for the same stock disagree
+with each other more than with other stocks' LUTs**, and the owner's presets disagree with the library for everything
+except Portra. "Stock" is not a consistent colour target in this material.
+
+| stock (≥3 colour LUTs) | n | within ΔE | nearest other stock ΔE | NN same-stock | owner preset ΔE / rank |
+|---|---|---|---|---|---|
+| fuji_fp100c | 20 | 11.5 | 7.1 | 0.85 | |
+| kodak_portra_400 | 17 | 4.9 | 3.0 | 0.65 | 7.0 / 5 |
+| polaroid_px_680 / px_70 / 690 | 16 / 16 / 15 | 15.4 / 18.2 / 12.2 | 10.1 / 11.0 / 7.0 | 0.94 / 0.94 / 0.93 | |
+| kodak_portra_160 | 13 | 5.2 | 2.8 | 0.54 | 3.2 / 1 |
+| polaroid_px_100uv / 669 / time_zero / 665 | 12 / 10 / 10 / 9 | 8.9 / 13.8 / 22.6 / 4.9 | 7.1 / 11.5 / 18.9 / 4.7 | 1.00 / 1.00 / 1.00 / 0.89 | |
+| fuji_superia_100 / 400 / 800 / 1600 | 6 / 5 / 5 / 5 | 6.9 / 4.8 / 8.0 / 7.6 | 3.6 / 3.7 / 3.8 / 4.1 | 0.67 / 0.80 / 0.40 / 0.40 | |
+| kodak_portra_800 | 6 | 6.4 | 4.1 | 0.83 | |
+| fuji_pro400h | 5 | 6.1 | 3.1 | 0.40 | |
+| kodak_elite_chrome | 5 | 9.0 | 5.6 | 0.60 | |
+| fuji_pro160c / pro800z | 4 / 4 | 4.4 / 4.9 | 2.9 / 3.7 | 0.25 / 0.50 | |
+| kodak_ektachrome_100 | 4 | 8.2 | 3.5 | 0.00 | |
+| fuji_provia_100 | 3 | 8.2 | 2.2 | 0.00 | |
+| kodak_ektar_100 | 2 | 11.6 | 3.2 | 0.00 | 6.6 / 54 |
+
+## 13. Library synthetic set (`python -m research.lut.synthetic_library --luts-per-image 8`)
+
+615 tier-1 photos (669 minus monochrome), long side ≤ 1024, every colour film-look LUT (227 over 51 stocks), 8 LUTs
+per photo stratified by stock (least-used stock first; 96-97 renders per stock) + the untouched render → **5,535 JPEGs,
+1.02 GB**, manifest with lut id, library id, claimed stock, film type, variant tokens, push/pull, LUT licence, photo
+licence, category, nuisance, split. Splits: Flickr uploaders by `group_id` hash (same rule as Part 1); the pd12m
+institutional groups (iNaturalist, museums) are platforms, not photographers, so they are split by scene-id hash
+(recorded per row in `split_rule`) → train 3,204 renders / 356 scenes, val 1,161 / 129, test 1,170 / 130; test
+categories nature 41, architecture 18, landscape 15, people 15, portrait 11, night 9, high-contrast 8, street 4.
+
+## 14. Classifiers on the library set (`python -m research.lut.train --label-field stock|lut_id --holdout ""`)
+
+| model | classes | test top-1 [CI, scene bootstrap] | top-3 | ECE | NN same scene / same class |
+|---|---|---|---|---|---|
+| stats24 LR | 52 stocks | 0.204 [0.184, 0.226] | 0.333 | 0.047 | 0.70 / 0.10 |
+| cr80 LR | 52 | 0.246 [0.222, 0.271] | 0.417 | 0.065 | 0.69 / 0.11 |
+| colour LR | 52 | 0.224 [0.196, 0.252] | 0.388 | 0.100 | 0.64 / 0.12 |
+| colour kNN | 52 | 0.142 | 0.245 | 0.206 | |
+| **colour MLP (stock level, seeds 0 / 1)** | 52 | **0.253 [0.226, 0.280] / 0.258 [0.231, 0.283]** | 0.422 / 0.426 | 0.050 / 0.043 | 0.64 / 0.12 |
+| colour MLP (LUT level) | 228 LUTs | 0.210 [0.184, 0.237] | 0.361 | 0.062 | 0.64 / 0.08 |
+| colour LR (LUT level) | 228 | 0.184 | 0.342 | 0.107 | |
+| chance | | 0.019 / 0.004 | | | |
+
+Per stock (MLP, test): the instant looks are recognised (PX 100UV 0.92, Time-Zero expired 0.83, 665 0.74, 669 0.73),
+the negatives are not (Portra 160 0.00, Ektar 0.00, Provia / Velvia / Kodachrome 0.00; none 0.45). Grouping LUT
+variants into stocks helps a little (0.25 vs 0.21 at a quarter of the classes) because the within-stock disagreement of
+§12 is now label noise.
+
+Robustness (`python -m research.lut.robustness --models lib_stock_colour_mlp --label-field stock --n 300`):
+
+| perturbation (after the LUT) | stock-level colour MLP top-1 [CI] (300 test renders, 52 classes) |
+|---|---|
+| clean | 0.260 [0.213, 0.310] |
+| white balance warm / cool (R x1.08 B x0.92 / reverse) | 0.220 / 0.213 |
+| exposure -1 EV / +1 EV | 0.187 [0.144, 0.233] / 0.217 |
+| JPEG q50 / q80 | 0.257 / 0.263 |
+| contrast +10 % | 0.267 |
+| saturation -15 % / +15 % | 0.257 / 0.267 |
+| 60 % centre crop | 0.257 |
+
+JPEG, mild edits and crops are harmless; white balance costs 4-5 points and -1 EV 7 points (mean confidence 0.18-0.23
+throughout: the softmax does not react).
+
+## 15. Real-film evaluation with the library models (`python -m research.lut.real_eval_library`)
+
+The library covers more real lines than the 13 presets did: portra, ektar, gold, ultramax, colorplus, **superia,
+pro400h, vista, cinestill800t**, cinestill50d (10 lines; Fuji C200, Natura, ProImage, Reala, Pro 160, Konica,
+Lomography, Vision3 and reversal scans stay unknown).
+
+540 scans (168 uploaders) carry one of the 10 lines (portra 191, superia 162, ektar 64, gold 28, ultramax 26, vista 25,
+cinestill 800T 17, pro400h 16, colorplus 10, cinestill 50D 1); 269 name the exact stock; 606 scans are unknown-stock.
+Uploader bootstrap, 95 % CI:
+
+| model (trained on the library synthetic set) | line top-1 [CI] | chance / **majority** | line top-3 | family top-1 [CI] (maj 0.383) | exact stock top-1 (n=269, maj 0.268) | none-rate | unknown reject AUROC |
+|---|---|---|---|---|---|---|---|
+| stock-level colour MLP (seed 0 / 1) | 0.276 [0.218, 0.337] / 0.259 [0.209, 0.315] | 0.100 / **0.354** | 0.617 / 0.659 | 0.315 [0.261, 0.374] / 0.322 | 0.045 / 0.052 | 0.36 / 0.37 | 0.467 / 0.463 |
+| stock-level colour LR | 0.259 [0.202, 0.320] | | 0.678 | 0.322 [0.274, 0.372] | 0.059 | 0.33 | 0.454 |
+| stock-level cr80 LR | 0.287 [0.227, 0.347] | | 0.670 | 0.343 [0.286, 0.404] | 0.041 | 0.49 | 0.440 |
+| stock-level stats24 LR | 0.306 [0.245, 0.371] | | 0.693 | 0.348 [0.281, 0.416] | 0.033 | 0.78 | 0.461 |
+| comparator: LR trained on the real scans, leave-one-uploader-out: stats24 / colour312 / DINOv2 | 0.191 [0.148, 0.239] / 0.267 [0.221, 0.321] / 0.367 [0.312, 0.425] | majority 0.354 | | 0.296 / 0.339 / 0.396 (maj 0.383) | | | |
+
+Confusion (stock-level MLP, by line): 126 of 191 Portra and 108 of 162 Superia scans are called Superia; Ektar is
+called Superia 41 / 64 times, Gold 17 / 28; the diagonal holds 35 Portra, 108 Superia, 2 UltraMax, 1 Ektar, 1 Gold, 0
+Cinestill, 0 Pro 400H, 1 Vista. The prediction histogram over 540 scans is none 193, Superia-family 139, Vista 58,
+Pro 400H 31, Portra-family 63, Cinestill 24, Ektar 9, Gold 8, ColorPlus 10, UltraMax 5: the model mostly says "none"
+or one of the many-variant Superia LUTs. Family level (soft / cool / warm / vivid / cine): 0.315-0.348 vs majority
+0.383. Rejection of unknown stocks by max-softmax: 0.44-0.47 (below chance). The one method whose CI reaches the
+majority rate is the DINOv2 regression trained *on the real scans themselves* (0.367 [0.312, 0.425] vs 0.354) -- a
+content embedding fitted to 168 photographers' scans, not a transfer from LUTs, and not above the baseline either.
+
+## 16. Conclusion of Part 2
+
+**The conclusion stands.** With 227 colour LUTs over 51 stocks instead of 13 presets, scene- and source-disjoint
+synthetic splits, and stock-level grouping of LUT variants, every library-trained model is below the majority baseline
+on 540 real scans at every level (line 0.26-0.31 vs 0.354; family 0.32-0.35 vs 0.383; exact stock 0.03-0.06 vs 0.27),
+no CI lower bound clears the majority rate, and unknown stocks are not rejected. No artefact can be offered as a film-
+stock identifier. Two structural reasons were measured: (1) LUT authors disagree about what a stock looks like (within-
+stock ΔE 10 vs 3-11 ΔE to the nearest other stock; one big cluster at the best silhouette), so "stock" is not a
+consistent colour target even before real scanning and lab variation; (2) the library's weight is on instant films and
+Portra push/pull variants, while the real scans are consumer negatives with 1-5 LUTs each. What the library does add:
+a larger, licence-tagged style catalogue (`db_library`, CC BY-SA caveat; `db_free`, shippable with attribution) for
+*ranked LUT-derived similarity*, where the stock-level synthetic top-1 is 0.25 (chance 0.02) and top-3 0.42. Costs of
+Part 2: 3.7 GPU-seconds, 1.0 GB renders + 41 MB databases, 1,705 s of CPU for the library database build.

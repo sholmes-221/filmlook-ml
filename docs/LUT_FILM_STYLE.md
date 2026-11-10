@@ -108,3 +108,32 @@ UltraMax → `kodak_ultramax_400_like`, Fujifilm 200 → `fuji_c200_like`, Cines
 - Texture (grain, halation, sharpness) is measured for the film-likeness estimate and for information only; no colour
   LUT describes it.
 - Labels of the real scans are uploader claims (class B) except ARTeFACT (class A).
+
+
+## Addendum (2026-11-10, evening): the discovered LUT library
+
+The library agent's 337 validated LUT files were ingested (`research/lut/library_db.py`): **293 film-look LUTs over 74
+stocks** (227 colour; RawTherapee HaldCLUTs CC BY-SA 4.0 259, GlassMeter .cube CC BY 4.0 30, sguyader HaldCLUT TIFF CC0 4;
+skipped: 33 creative looks, identity, negative inversion, 4 .pp3 profiles, 1 failed validation, 8 Vision3 LUTs whose
+DaVinci Intermediate input cannot be converted correctly here). Two new databases, built with the same descriptor set as
+the vendored one (which is unchanged):
+
+| database | content | size | licence status |
+|---|---|---|---|
+| `research/lut/db_library/` | 293 library LUTs (17³ lattices, no inverse) | 4.0 + 24.3 MB | **owner decision needed**: 259 LUTs are CC BY-SA 4.0; whether descriptors / models derived from them are adaptations that must be CC BY-SA is unresolved — do not ship until decided |
+| `research/lut/db_free/` | owner's 13 presets + 30 GlassMeter (CC BY 4.0) + 4 sguyader (CC0) = 47 styles, 33³ lattices | 0.65 + 12.7 MB | shippable with the attribution texts in its json |
+
+Findings (details and tables: `research/lut/REPORT.md` Part 2):
+
+- **LUTs that claim the same stock disagree with each other** (within-stock mean ΔE 10.1 vs 2.8-11 to the nearest other
+  stock; nearest-neighbour same-stock rate 0.49, carried by Polaroid looks; clustering finds one cluster of 214 LUTs plus
+  three Polaroid/expired outlier groups). The owner's presets match the library only for Portra (160: ΔE 3.2, rank 1;
+  400: rank 5); Ektar / Gold / UltraMax / ColorPlus / Cinestill 50D presets rank 54-121.
+- Library synthetic set: 5,535 renders of 615 tier-1 licensed photos (8 stock-stratified LUTs + untouched each, ≤1024 px,
+  1.0 GB), source-disjoint splits 356 / 129 / 130 scenes. Stock-level colour MLP (52 classes): top-1 0.25 [0.23, 0.28],
+  top-3 0.42 (chance 0.02); LUT-level (228 classes) 0.21. Instant looks are recognisable, colour negatives are not.
+- **Real film (540 scans, 168 uploaders, 10 lines): every library-trained model stays below the majority baseline**
+  (line top-1 0.26-0.31 vs majority 0.354, chance 0.10; family 0.32-0.35 vs 0.383; exact stock 0.03-0.06 vs 0.27; unknown-
+  stock rejection AUROC 0.44-0.47). The conclusion of the main report stands: no film-stock identification; styles are
+  LUT-derived aesthetics only. If the owner clears the CC BY-SA question, `db_library` can serve as a larger similarity
+  catalogue through the same engine API (`FilmStyleEngine(db_dir="research/lut/db_library")`, method D).
