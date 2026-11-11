@@ -295,7 +295,9 @@ def require_paid(a) -> None:
 
 
 def key_source() -> str:
-    """'env' | '.env' | 'missing'. Where the key would come from; the key itself is never returned, logged or stored."""
+    """'env' | '.env' | 'missing'. Where the key comes from; the key itself is never returned, logged or stored.
+    A key placed in a Claude Code settings.local.json "env" block reaches this process as 'env' once the Claude Code
+    session that runs it has been restarted."""
     if os.environ.get("ANTHROPIC_API_KEY", "").strip() or os.environ.get("ANTHROPIC_AUTH_TOKEN", "").strip():
         return "env"
     from filmlook_ml.labeling.teachers import api_key_status
