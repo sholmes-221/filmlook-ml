@@ -118,12 +118,12 @@ def _synth_test() -> dict[str, dict[str, str]]:
     return out
 
 
-def lutdesc_items(n_scenes: int = 24, seed: int = 0) -> list[dict]:
+def lutdesc_items(n_scenes: int = 24, seed: int = 0, source: str = "catalog", tag: str = "lutdesc") -> list[dict]:
     """Forced choice: untouched render A and preset render B of one scene, four of the website's look descriptions
     (the applied preset's and three others), which one describes the change? Ground truth is the preset applied."""
     import random
     from research.claude_annotations import lut_tasks as L
-    desc = L.descriptions()
+    desc = L.descriptions(source)
     scenes = _synth_test(); items = []
     for scene in sorted(scenes, key=lambda x: hashlib.sha256(f"{seed}:{x}".encode()).hexdigest())[:n_scenes]:
         for preset in sorted(desc):
@@ -132,7 +132,7 @@ def lutdesc_items(n_scenes: int = 24, seed: int = 0) -> list[dict]:
             rng = random.Random(f"{seed}:{scene}:{preset}")
             options = [preset] + rng.sample([q for q in sorted(desc) if q != preset and desc[q] != desc[preset]], 3)
             rng.shuffle(options)
-            items.append({"item_id": f"lutdesc:{scene}:{preset}", "group": preset, "paths": [scenes[scene]["none"], scenes[scene][preset]],
+            items.append({"item_id": f"{tag}:{scene}:{preset}", "group": preset, "paths": [scenes[scene]["none"], scenes[scene][preset]],
                           "user": L.user_text([desc[o] for o in options]), "meta": {"options": options, "answer": str(options.index(preset) + 1)}})
     return items
 
@@ -143,9 +143,10 @@ def lutscene_items() -> list[dict]:
     return [{"item_id": f"lutscene:{scene}", "group": "scene", "path": by["none"]} for scene, by in sorted(_synth_test().items()) if "none" in by]
 
 
-def _lut_task() -> dict:
+def _lut_task(source: str = "catalog", seed: int = 0, tag: str = "lutdesc") -> dict:
     from research.claude_annotations import lut_tasks as L
-    return {"items": lutdesc_items, "system": L.SYSTEM_PROMPT, "user": "", "schema": L.json_schema, "validate": L.validate, "prompt_version": L.VERSION}
+    return {"items": lambda: lutdesc_items(seed=seed, source=source, tag=tag), "system": L.SYSTEM_PROMPT, "user": "", "schema": L.json_schema, "validate": L.validate,
+            "prompt_version": L.VERSION + ("" if source == "catalog" else f"+{source}")}
 
 
 def filmset_items() -> list[dict]:
@@ -167,7 +168,8 @@ TASKS = {"bank": {"items": bank_items, "system": S.SYSTEM_PROMPT, "user": S.USER
                       "prompt_version": S.VERSION},
          "filmset": {"items": filmset_items, "system": S.SYSTEM_PROMPT, "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate,
                      "prompt_version": S.VERSION},
-         "lutdesc": _lut_task()}
+         "lutdesc": _lut_task(),
+         "lutdesc2": _lut_task(source="rewrite", seed=1, tag="lutdesc2")}  # rewritten descriptions, different scenes
 
 
 def store_path(task: str, model: str) -> Path:
@@ -260,7 +262,7 @@ def estimate(task: str, items: list[dict], c: dict, client=None) -> dict:
             "output_tokens_assumed": c["est_output_tokens"], "usd_per_request": round(per, 6), "usd": round(per * len(items), 4), "method": how}
 
 
-BUCKET_OF_TASK = {"bank": "photographer", "filmset": "film", "lutdesc": "film", "lutscene": "film", "lutsynth": "film"}
+BUCKET_OF_TASK = {"bank": "photographer", "filmset": "film", "lutdesc": "film", "lutdesc2": "film", "lutscene": "film", "lutsynth": "film"}
 
 
 def bucket_of(task: str, tier: str) -> str:

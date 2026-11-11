@@ -19,9 +19,18 @@ CATALOG = Path.home() / "misc" / "film-evaluation" / "filmlook" / "data" / "film
 KEY = lambda preset: preset.lower().replace("'", "").replace(" ", "_")  # noqa: E731
 
 
-def descriptions() -> dict[str, str]:
+REWRITE = Path(__file__).resolve().parent / "look_descriptions_rewrite.json"
+
+
+def descriptions(source: str = "catalog") -> dict[str, str]:
+    """Preset name -> English description. `catalog`: the website's templated text; `rewrite`: the contrastive text
+    written from the same numbers (rewrite_descriptions.py)."""
     styles = json.loads(CATALOG.read_text())["styles"]
-    by_key = {k.replace("'", ""): v["description"]["en"] for k, v in styles.items()}
+    if source == "rewrite":
+        rw = json.loads(REWRITE.read_text())["descriptions"]
+        by_key = {k.replace("'", ""): rw[k]["en"] for k in styles}
+    else:
+        by_key = {k.replace("'", ""): v["description"]["en"] for k, v in styles.items()}
     import collections
     presets = collections.OrderedDict()
     for line in (Path(__file__).resolve().parents[2] / "data" / "lut" / "synth" / "manifest.jsonl").read_text().splitlines():

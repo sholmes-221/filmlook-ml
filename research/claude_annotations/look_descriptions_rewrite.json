@@ -1,0 +1,58 @@
+{
+ "model": "claude-sonnet-5-5",
+ "source": "catalog_map.json numbers",
+ "descriptions": {
+  "candido_800t": {
+   "en": "A clear yellow warmth sits in the midtones, with a faint green tint in the shadows and a gentle warm red in the highlights. It looks fairly muted and slightly flat, with lifted blacks.",
+   "zh": "中间调有明显的偏黄暖色，暗部带一点淡淡的绿，高光则偏暖红。整体偏柔和，对比略平，黑位有些抬起。"
+  },
+  "cinestill_50d": {
+   "en": "Almost neutral, with only a faint yellow-green lean in the midtones and a faint warm touch in the shadows. Highlights stay clean. It looks muted and soft, with slightly lifted blacks.",
+   "zh": "整体接近中性，中间调只有一点淡淡的黄绿，暗部略微偏暖，高光很干净。色彩偏柔和，对比较平，黑位略抬起。"
+  },
+  "film_one_hundred_100": {
+   "en": "A faint warm, slightly red-orange cast in the midtones that fades to almost nothing in the highlights. Colour is muted and contrast is soft, with mildly lifted blacks.",
+   "zh": "中间调有淡淡的暖橙偏红，到高光几乎消失。色彩偏柔和，对比较软，黑位轻微抬起。"
+  },
+  "fujifilm_200": {
+   "en": "A strong yellow warmth in the midtones, stronger still in the shadows than most, while the highlights stay nearly clean. Fairly muted and flat, with noticeably lifted blacks.",
+   "zh": "中间调有强烈的黄色暖调，暗部的黄也比多数风格明显，高光则较干净。色彩偏柔和，对比偏平，黑位明显抬起。"
+  },
+  "kodak_color_plus_200": {
+   "en": "A clear, even yellow warmth in the midtones with a faint warm tone in the highlights and neutral shadows. Colour is moderately rich, contrast is a little punchy, and the blacks are quite faded.",
+   "zh": "中间调有明显而均匀的黄色暖调，高光略带暖意，暗部保持中性。色彩较为饱满，对比稍强，黑位明显发灰。"
+  },
+  "kodak_ektar_100": {
+   "en": "A faint warm yellow in the midtones and highlights with nearly neutral shadows. Contrast is punchy and the blacks are deep and unlifted, though colour stays moderately muted.",
+   "zh": "中间调和高光有淡淡的暖黄，暗部几乎中性。对比很强，黑位深沉没有抬起，色彩饱和度中等偏柔。"
+  },
+  "kodak_gold_200": {
+   "en": "Midtones and highlights are close to neutral, but the shadows carry a strong yellow cast that is the standout here. Colour is fairly rich and contrast is soft.",
+   "zh": "中间调和高光接近中性，但暗部有强烈的黄色偏色，这是最突出的特点。色彩较为饱满，对比偏软。"
+  },
+  "kodak_portra_160": {
+   "en": "Very gentle: a faint warm touch in the midtones and shadows and clean highlights. Colour is soft and muted, contrast is flat, and the blacks are lightly lifted.",
+   "zh": "非常柔和：中间调和暗部有一点淡淡的暖意，高光干净。色彩偏柔，对比偏平，黑位轻微抬起。"
+  },
+  "kodak_portra_400": {
+   "en": "A clear warm yellow-orange glow in the midtones and shadows that eases off in the highlights. Colour is fairly muted, contrast is neutral, and the blacks are slightly lifted.",
+   "zh": "中间调和暗部有明显的暖黄橙色，到高光逐渐减弱。色彩偏柔，对比中等，黑位略微抬起。"
+  },
+  "kodak_ultramax_400": {
+   "en": "Midtones are nearly neutral and the shadows lean faintly cool blue, while the highlights pick up a clear warm tint. It is the most saturated and punchiest of the set, with slightly lifted blacks.",
+   "zh": "中间调接近中性，暗部略偏冷蓝，高光则带有明显的暖色。这是十三种里最鲜艳、对比最强的一个，黑位略抬起。"
+  },
+  "lomochrome_92_400": {
+   "en": "No colour cast at all in any tonal range, so it looks neutral. It is the most muted of all, with punchy contrast and heavily faded blacks.",
+   "zh": "各个影调都没有偏色，看起来很中性。它是所有风格里最素的，对比较强，黑位明显发灰。"
+  },
+  "lomography_color_400": {
+   "en": "A strong warm red-yellow cast in the midtones, with a fainter warm tint in the shadows and highlights. Colour is rich and contrast is soft, with mildly lifted blacks.",
+   "zh": "中间调有强烈的暖红黄偏色，暗部和高光的暖意较淡。色彩较饱满，对比偏软，黑位轻微抬起。"
+  },
+  "phoenix_200": {
+   "en": "A very strong yellow cast with a slight green lean in the midtones and highlights, and a clear yellow in the shadows. It is muted yet punchy in contrast, with the most faded, lifted blacks of all.",
+   "zh": "中间调和高光有非常强的黄色偏色并略带绿，暗部也有明显的黄。色彩偏素但对比很强，黑位抬得最高、最灰。"
+  }
+ }
+}
