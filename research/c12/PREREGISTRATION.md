@@ -52,3 +52,7 @@ Date: 2026-11-12. Data: `research/c12/build.py` (features through the website's 
    non-abstained photos.
 6. Model file < 10 MB; CPU latency < 50 ms per image single-threaded (features already computed).
 Decision: ship only if 1-6 all pass. Otherwise nothing changes in production.
+
+## Outcome (added after the test run; nothing above changed)
+See `REPORT.md`: gate items 2 (unknown AUROC 0.727), 4 (JPEG q50, crop 60 %, +1 EV) and 6-size (10.39 MB) fail.
+Not shipped.
