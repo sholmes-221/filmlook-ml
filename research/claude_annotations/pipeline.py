@@ -168,6 +168,9 @@ TASKS = {"bank": {"items": bank_items, "system": S.SYSTEM_PROMPT, "user": S.USER
                       "prompt_version": S.VERSION},
          "filmset": {"items": filmset_items, "system": S.SYSTEM_PROMPT, "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate,
                      "prompt_version": S.VERSION},
+         # C09 pilot: the same works, prompt and model a second time, to measure how often Haiku agrees with itself.
+         "bankretest": {"items": lambda: [dict(it, item_id=f"retest:{it['item_id']}") for it in bank_items()], "system": S.SYSTEM_PROMPT,
+                        "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate, "prompt_version": S.VERSION},
          "lutdesc": _lut_task(),
          "lutdesc2": _lut_task(source="rewrite", seed=1, tag="lutdesc2")}  # rewritten descriptions, different scenes
 
@@ -262,7 +265,7 @@ def estimate(task: str, items: list[dict], c: dict, client=None) -> dict:
             "output_tokens_assumed": c["est_output_tokens"], "usd_per_request": round(per, 6), "usd": round(per * len(items), 4), "method": how}
 
 
-BUCKET_OF_TASK = {"bank": "photographer", "filmset": "film", "lutdesc": "film", "lutdesc2": "film", "lutscene": "film", "lutsynth": "film"}
+BUCKET_OF_TASK = {"bank": "photographer", "bankretest": "quality", "filmset": "film", "lutdesc": "film", "lutdesc2": "film", "lutscene": "film", "lutsynth": "film"}
 
 
 def bucket_of(task: str, tier: str) -> str:

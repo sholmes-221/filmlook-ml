@@ -105,3 +105,30 @@ mood, and Spearman 0.64 on the narrative axes. The palette and tone information 
 descriptors already carry, though, and the predicted vector adds nothing reliable to the top-1 match. Recommendation: do
 not integrate. `dist/c09/style_head.npz` (B, seed-0 bank split, float16, 1.47 MB, with input mean and std, target bank
 mean, feature names and softmax groups) is kept as a research artefact only.
+
+## Pilot: annotation reliability (2026-11-11, `research/c09/reliability.py`, `reports/c09/reliability.json`)
+
+Haiku re-annotated 382 bank works (stratified, 27 photographers + 1 small; same prompt `style-annotation-v2`, model and
+settings; batch, **$0.0749**, 382/382 valid; task `bankretest`, bucket `quality`). Earlier Sonnet annotations give a
+second-model comparison on 188 works (that sample over-represents works Haiku marked low-confidence).
+
+| Agreement (kappa; lists: mean per-option kappa; 0-4 axes: quadratic) | Haiku vs Haiku | Haiku vs Sonnet |
+|---|---|---|
+| range over the 33 style fields | 0.63 – 0.95 (median 0.87) | 0.20 – 0.83 |
+| high in both | documentary_character 0.92/0.82, stillness 0.93/0.83, intimacy 0.93/0.81, abstraction 0.81/0.81, depth 0.85/0.79, moment 0.92/0.77, dominant_colours 0.90/0.76 | |
+| repeatable but model-specific | | film_like_impression 0.72/0.20, tonal_range 0.74/0.32, shadows 0.87/0.33, light_quality 0.77/0.36, sharpness 0.76/0.37, framing 0.92/0.38, focus 0.87/0.38, saturation 0.93/0.40 |
+
+Matching (oracle annotations, same protocol as above, pooled over two seeds, paired against the shipped hybrid):
+
+| Field set | rule | top-1 full | top-1 cross-subject |
+|---|---|---|---|
+| all fields | — | +0.013 [-0.006, +0.034] | +0.008 [-0.011, +0.027] |
+| Haiku-self kappa >= 0.6 (pre-registered; also >= 0.4) | keeps every field | identical | identical |
+| Haiku-Sonnet kappa >= 0.6 (12 fields, **exploratory**, chosen after reading the table) | | +0.001 [-0.016, +0.018] | -0.005 [-0.021, +0.013] |
+
+**Conclusion.** Annotation noise is not the bottleneck: Haiku repeats itself closely, and keeping only the fields both
+models agree on lowers the gain (-0.012 vs all fields). The annotation is consistent but model-specific, and even as an
+oracle it adds at most +0.013 top-1 (interval includes 0) to the shipped hybrid; locally predicted, nothing. A schema v3
+would re-word fields v2 already covers (colour/tone, light, composition, texture, separate subject, motifs, mood). Under
+the brief's rule (more spending only with evidence of meaningful improvement) **C09 stops here: $0.075 of the $30 cap
+spent; no deployment.**
