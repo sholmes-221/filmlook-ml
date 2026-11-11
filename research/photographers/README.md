@@ -22,3 +22,4 @@ python -m research.photographers.evaluate --seed 1 --out reports/photographers/b
 Results and their limits: film-evaluation `docs/PHOTOGRAPHER_RETRIEVAL_BENCHMARK.md`.
 Claude annotations as an extra feature space: `research/claude_annotations/` (film-evaluation
 `docs/CLAUDE_API_RESEARCH.md`).
+- `encoder_hybrid.py`, `encoder_cost.py`: C19, a stronger image encoder in the hybrid (`encoder_hybrid.md`).
