@@ -10,6 +10,10 @@ Contents of dist/refmatch/<version>/:
                     (bank = bank split only, so they are conservative for the full index), the benchmark headline, and
                     the reading of 500 modern CC-BY digital photographs against the same bank.
   manifest.json     encoder file hash, preprocessing string, counts, sha256 of every file.
+  siglip.f16.npy    (when data/embeddings/photographers/siglip_base_onnx_int8.npz exists) N x 768 float16: the optional
+                    style encoder (SigLIP-B/16 int8 ONNX, C19), L2-normalised; calibration.json -> fusion_siglip holds
+                    its z-scored fusion (weights chosen on validation, as for `fusion`), manifest.json -> style_encoder
+                    the model files' sha256 and the preprocessing. `fusion` and every other file are unchanged by it.
 
 The index holds every eligible work of photographers with at least --min-works works (bank, val and test splits:
 the benchmark is finished before this runs). Only public-domain / CC0 works can be in it.
@@ -31,12 +35,16 @@ sys.path.insert(0, str(ROOT / "src"))
 from filmlook_ml.refdb import manifest  # noqa: E402
 from research.photographers import evaluate as E  # noqa: E402
 
+STYLE = {"name": "google/siglip-base-patch16-224 image tower, int8 dynamic (MatMul, per-channel), ONNX with external weights",
+         "licence": "Apache-2.0", "files": ("siglip_base_int8_ext.onnx", "siglip_base_int8_ext.weights"),
+         "preprocessing": "RGB, resize to 224 x 224 bicubic (no crop), (x / 255 - 0.5) / 0.5; output L2-normalised pooled embedding (768)"}
 PREPROCESSING = "dinov2_pixels: short side 256 bicubic, centre crop 224, ImageNet normalisation; ONNX fp32 [CLS, mean patch]"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(); ap.add_argument("--seed", type=int, default=0); ap.add_argument("--min-works", type=int, default=40)
     ap.add_argument("--out", default="dist/refmatch")
+    ap.add_argument("--version", default="", help="reuse this version name (only when the base files are byte-identical to it)")
     a = ap.parse_args()
     rows = E.load_rows(); ids = [r["work_id"] for r in rows]
     X = E.load_vectors("prod", ids)
@@ -99,13 +107,40 @@ def main() -> None:
                       "rule": "photographers are admitted by the embedding score (thresholds above); those admitted are ordered by the fused score"}
             extra = {"axes17.f16.npy": spaces["axes17"], "film205.f16.npy": spaces["film205"]}
     cal["fusion"] = fusion
+    # Optional style encoder (C19): its own fusion, the shipped one stays as it is. Weights on validation, test read once.
+    sig = E.load_vectors("siglip_base_onnx_int8", ids)
+    if fusion is not None and sig is not None:
+        Gv, Gt = sig[v] @ sig[b].T, sig[t] @ sig[b].T
+        ms = max([1, 2, 3, 5, 8, 12], key=lambda q: E.class_metrics(E.topm_scores(Gv, y[b], len(classes), q), y[v], len(classes))["top1"])
+        scores["siglip"] = (E.topm_scores(Gv, y[b], len(classes), ms), E.topm_scores(Gt, y[b], len(classes), ms), int(ms))
+        Z = {k: (zs(scores[k][0], scores[k][0]), zs(scores[k][1], scores[k][0])) for k in scores}
+        sgrid, best_s = [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0], None
+        for ws in sgrid:
+            for w1 in grid:
+                for w2 in grid:
+                    acc = float(((Z["prod"][0] + w1 * Z["film205"][0] + w2 * Z["axes17"][0] + ws * Z["siglip"][0]).argmax(1) == y[v]).mean())
+                    if best_s is None or acc > best_s[0] + 1e-9:
+                        best_s = (acc, w1, w2, ws)
+        fused_s = Z["prod"][1] + best_s[1] * Z["film205"][1] + best_s[2] * Z["axes17"][1] + best_s[3] * Z["siglip"][1]
+        cal["fusion_siglip"] = {
+            "weights": {"prod": 1.0, "film205": best_s[1], "axes17": best_s[2], "siglip": best_s[3]},
+            "scale": {k: {"mean": float(scores[k][0].mean()), "std": float(scores[k][0].std()), "m": scores[k][2]} for k in scores},
+            "weight_grid": {"siglip": sgrid, "film205": grid, "axes17": grid},
+            "benchmark": {"top1": round(float((fused_s.argmax(1) == y[t]).mean()), 4),
+                          "top3": round(float(np.mean([y[t][i] in np.argsort(-fused_s[i])[:3] for i in range(int(t.sum()))])), 4),
+                          "top1_without_style": fusion["benchmark"]["top1"], "val_top1": round(best_s[0], 4)},
+            "rule": "as fusion, with the style encoder's top-m score added; used only when the website's style encoder is on"}
+        extra["siglip.f16.npy"] = sig
     with manifest.connect() as c:
         meta = {r["work_id"]: dict(r) for r in c.execute(
             "SELECT work_id, photographer_id, title, year, source_url, license, license_evidence_url, credit, rights_class, rights_status FROM works")}
     sel = [i for i in range(len(rows)) if keep[i]]
     assert all(meta[ids[i]]["rights_status"] == "eligible" and meta[ids[i]]["rights_class"] in ("public_domain", "cc0") for i in sel)
-    version = time.strftime("refmatch-%Y%m%d-") + hashlib.sha256("".join(ids[i] for i in sel).encode()).hexdigest()[:8]
-    out = ROOT / a.out / version; out.mkdir(parents=True, exist_ok=True)
+    version = a.version or time.strftime("refmatch-%Y%m%d-") + hashlib.sha256("".join(ids[i] for i in sel).encode()).hexdigest()[:8]
+    target = ROOT / a.out / version
+    reuse = bool(a.version) and (target / "manifest.json").exists()
+    out = target.with_name(version + ".new") if reuse else target  # a reused name is replaced only after the check below
+    out.mkdir(parents=True, exist_ok=True)
     np.save(out / "vectors.f16.npy", X[sel].astype(np.float16))
     for name, Z in extra.items():
         np.save(out / name, Z[sel].astype(np.float16))
@@ -116,10 +151,25 @@ def main() -> None:
     (out / "calibration.json").write_text(json.dumps(cal, indent=1))
     enc = ROOT / "checkpoints" / "refdb" / "dinov2_small_cls_patch.onnx"
     files = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.iterdir()) if p.name != "manifest.json"}
+    if reuse:  # a reused version name must keep every base file byte-identical
+        before = json.loads((target / "manifest.json").read_text())["files"]
+        changed = [n for n, h in before.items() if n != "calibration.json" and files.get(n) != h]
+        old_cal = {k: v for k, v in json.loads((target / "calibration.json").read_text()).items() if k != "fusion_siglip"}
+        if changed or json.dumps({k: v for k, v in cal.items() if k != "fusion_siglip"}) != json.dumps(old_cal):
+            raise SystemExit(f"--version {version}: base files differ ({changed or 'calibration'}); kept {target}, new files in {out}")
+    style = None
+    if "siglip.f16.npy" in files:
+        enc_dir = ROOT / "checkpoints" / "c19"
+        style = {**STYLE, "files": {n: hashlib.sha256((enc_dir / n).read_bytes()).hexdigest() for n in STYLE["files"]}, "dim": int(sig.shape[1]),
+                 "vectors": "siglip.f16.npy", "parity": "vectors computed with the int8 ONNX graph (same weights as the shipped file) and this preprocessing"}
     (out / "manifest.json").write_text(json.dumps({
         "version": version, "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "encoder": "facebook/dinov2-small (ONNX fp32)",
         "encoder_sha256": hashlib.sha256(enc.read_bytes()).hexdigest(), "preprocessing": PREPROCESSING, "dim": 768, "metric": "cosine (dot product of L2-normalised vectors)",
-        "works": len(sel), "photographers": dict(Counter(pid[sel].tolist())), "rights": dict(Counter(meta[ids[i]]["rights_class"] for i in sel)), "files": files}, indent=1))
+        "works": len(sel), "photographers": dict(Counter(pid[sel].tolist())), "rights": dict(Counter(meta[ids[i]]["rights_class"] for i in sel)), "files": files,
+        **({"style_encoder": style} if style else {})}, indent=1))
+    if reuse:
+        import shutil
+        shutil.rmtree(target); out.rename(target); out = target
     print(version, len(sel), "works", len(set(pid[sel].tolist())), "photographers"); print(json.dumps(cal, indent=1))
 
 

@@ -9,6 +9,9 @@ ANALYSIS_BACKEND=filmlook_ml, photo gate on, reference matching on, local vision
   prepare_image -> photo gate judge -> local vision signals -> DnaService.analyze (measured matching + reference
   retrieval through photo_gate.embedding) -> LocalFilmLookAnalyzer.analyze (measurements, simulations, local_report with
   the film head on photo_gate.embedding_layers).
+With --style-flag (a website checkout that has the switch, e.g. --web ~/misc/fe-siglip) the website's own
+FILMLOOK_STYLE_ENCODER=siglip path is used instead (Settings(style_encoder="siglip")): its StyleEncoder, the index's
+siglip vectors and the style fusion run inside DnaService.analyze, exactly as in production.
 With --siglip the SigLIP-B/16 int8 session (external, memory-mapped weights; lean options; 1 thread) is created
 before the analyses and the prepared JPEG is embedded with it, as an integration would.
 Reported: ru_maxrss (peak RSS of the process, MiB), RSS after imports, RSS at the end.
@@ -50,8 +53,12 @@ def siglip_pixels(img):
 
 def main() -> None:
     ap = argparse.ArgumentParser(); ap.add_argument("--siglip", action="store_true"); ap.add_argument("--out", default=None)
+    ap.add_argument("--web", default=str(WEB), help="website checkout to import (read-only)")
+    ap.add_argument("--photo-gate-dir", default=str(WEB / "models" / "photo_gate"), help="where the DINOv2 ONNX is (git-ignored)")
+    ap.add_argument("--style-flag", action="store_true", help="FILMLOOK_STYLE_ENCODER=siglip through the website's own code")
     a = ap.parse_args()
-    sys.path.insert(0, str(WEB))
+    web = Path(a.web).expanduser()
+    sys.path.insert(0, str(web))
     t0 = time.perf_counter()
     from filmlook import local_film, local_vision
     from filmlook import photo_gate as pg
@@ -64,10 +71,11 @@ def main() -> None:
 
     import onnxruntime as ort
     from PIL import Image
-    out = {"siglip": a.siglip, "rss_after_imports_mib": round(mib_rss(), 1), "peak_after_imports_mib": round(peak(), 1)}
+    out = {"siglip": a.siglip, "style_flag": a.style_flag, "web": str(web), "rss_after_imports_mib": round(mib_rss(), 1), "peak_after_imports_mib": round(peak(), 1)}
     tmp = Path(tempfile.mkdtemp(prefix="c19mem-"))
+    extra = {"style_encoder": "siglip", "style_encoder_dir": web / "models" / "style_encoder"} if a.style_flag else {}
     settings = Settings(mode="local", analysis_backend="filmlook_ml", photo_gate="on", reference_match=True, local_vision=True,
-                        results_dir=tmp, require_login=False)
+                        results_dir=tmp, require_login=False, photo_gate_dir=Path(a.photo_gate_dir), **extra)
     local_film.set_embedding_provider(lambda jpeg: (lambda gate: gate.embedding_layers(jpeg) if gate is not None else None)(pg.gate_for(settings.photo_gate_dir)))
     sig = None
     if a.siglip:
@@ -87,6 +95,8 @@ def main() -> None:
     film = LocalFilmLookAnalyzer().analyze(image, "en")
     out.update({"gate": verdict.outcome, "local_vision_signals": len(signals), "dna_status": dna.status,
                 "dna_reference": (dna.result.reference or {}).get("status") if dna.result else None,
+                "dna_reference_style": (dna.result.reference or {}).get("style") if dna.result else None,
+                "dna_reference_ranking": (dna.result.reference or {}).get("ranking") if dna.result else None,
                 "film_score": film.analysis.film_look_score, "film_matches": len(film.analysis.simulation_matches or []),
                 "peak_rss_mib": round(peak(), 1), "rss_end_mib": round(mib_rss(), 1), "seconds": round(time.perf_counter() - t0, 2),
                 "ort": ort.__version__, "omp_threads": os.getenv("OMP_NUM_THREADS")})
