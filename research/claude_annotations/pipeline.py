@@ -148,10 +148,25 @@ def _lut_task() -> dict:
     return {"items": lutdesc_items, "system": L.SYSTEM_PROMPT, "user": "", "schema": L.json_schema, "validate": L.validate, "prompt_version": L.VERSION}
 
 
+def filmset_items() -> list[dict]:
+    """The film-versus-digital set of research/lut/film_likeness_train.py: CC-BY / CC0 photographs whose capture medium is
+    recorded independently (scanner or camera EXIF, owner records). The label is never sent and never comes from the model."""
+    seen, items = set(), []
+    for r in read_jsonl(ROOT / "data" / "lut" / "film_likeness" / "manifest.jsonl"):
+        key = Path(r["path"]).name
+        if key in seen or not Path(r["path"]).exists():
+            continue
+        seen.add(key)
+        items.append({"item_id": f"filmset:{r['dataset']}:{key}", "group": f"{r['split']}:{'film' if r['label'] else 'digital'}", "path": r["path"]})
+    return items
+
+
 TASKS = {"bank": {"items": bank_items, "system": S.SYSTEM_PROMPT, "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate,
                   "prompt_version": S.VERSION},
          "lutscene": {"items": lutscene_items, "system": S.SYSTEM_PROMPT, "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate,
                       "prompt_version": S.VERSION},
+         "filmset": {"items": filmset_items, "system": S.SYSTEM_PROMPT, "user": S.USER_TEXT, "schema": S.json_schema, "validate": S.validate,
+                     "prompt_version": S.VERSION},
          "lutdesc": _lut_task()}
 
 
@@ -243,11 +258,35 @@ def estimate(task: str, items: list[dict], c: dict, client=None) -> dict:
             "output_tokens_assumed": c["est_output_tokens"], "usd_per_request": round(per, 6), "usd": round(per * len(items), 4), "method": how}
 
 
-def guard(extra: float, c: dict) -> None:
+BUCKET_OF_TASK = {"bank": "photographer", "filmset": "film", "lutdesc": "film", "lutscene": "film", "lutsynth": "film"}
+
+
+def bucket_of(task: str, tier: str) -> str:
+    """Which allocation a request is charged to: the task's own for bulk annotation, `quality` for second-model
+    checks, `advanced` for the strong model."""
+    return {"check": "quality", "strong": "advanced"}.get(tier, BUCKET_OF_TASK.get(task, "advanced"))
+
+
+def bucket_spent(bucket: str) -> float:
+    done = sum(r["cost_usd"] for r in read_jsonl(LEDGER) if r.get("bucket") == bucket)
+    open_ = sum(b["estimate_usd"] for b in read_jsonl(BATCHES) if not b.get("collected") and b.get("bucket") == bucket)
+    return round(done + open_, 6)
+
+
+def guard(extra: float, c: dict, bucket: str | None = None) -> None:
+    """Refuse a submission that would pass the active cap, its bucket's allocation, or the credit's expiry date."""
+    import datetime
+    expires = datetime.date.fromisoformat(str(c["budget"].get("expires", "2999-12-31")))
+    if datetime.datetime.now(datetime.timezone.utc).date() >= expires - datetime.timedelta(days=1):
+        raise SystemExit(f"DEADLINE STOP: the credit expires on {expires}; nothing new is submitted from the day before")
     limit, name = cap(c)
     total = spent() + reserved() + extra
     if total > limit:
         raise SystemExit(f"BUDGET STOP: spent {spent():.4f} + reserved {reserved():.4f} + this run {extra:.4f} = {total:.4f} USD exceeds the {name} cap {limit:.2f}")
+    if bucket and bucket in c["budget"].get("buckets", {}):
+        used = bucket_spent(bucket)
+        if used + extra > float(c["budget"]["buckets"][bucket]):
+            raise SystemExit(f"BUDGET STOP: bucket {bucket} holds {used:.4f} + this run {extra:.4f} USD, over its allocation {c['budget']['buckets'][bucket]:.2f}")
 
 
 def require_paid(a) -> None:
@@ -255,11 +294,24 @@ def require_paid(a) -> None:
         raise SystemExit("dry run: add --no-dry-run --confirm-paid to make paid API calls")
 
 
+def key_source() -> str:
+    """'env' | '.env' | 'missing'. Where the key would come from; the key itself is never returned, logged or stored."""
+    if os.environ.get("ANTHROPIC_API_KEY", "").strip() or os.environ.get("ANTHROPIC_AUTH_TOKEN", "").strip():
+        return "env"
+    from filmlook_ml.labeling.teachers import api_key_status
+    return api_key_status(ROOT)
+
+
 def client_or_none():
+    """An SDK client when a key is reachable: the environment first, then the repository's git-ignored .env."""
     import anthropic
-    if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")):
-        return None
-    return anthropic.Anthropic()
+    source = key_source()
+    if source == "env":
+        return anthropic.Anthropic()
+    if source == ".env":
+        from filmlook_ml.labeling.teachers import _key_from_dotenv
+        return anthropic.Anthropic(api_key=_key_from_dotenv(ROOT))
+    return None
 
 
 def record(task: str, model: str, item_id: str, message, sent_sha: str, batch_id: str | None) -> dict:
@@ -291,10 +343,11 @@ def cmd_status(a) -> None:
             by[r["model"]][k] += r.get(k, 0)
         by[r["model"]]["cost_usd"] += r["cost_usd"]
     out = {"spent_usd": spent(), "reserved_usd": reserved(), "active_cap": {"name": name, "usd": limit}, "total_cap_usd": c["budget"]["total_usd"],
+           "expires": str(c["budget"].get("expires")), "buckets": {k: {"allocated": v, "used": bucket_spent(k)} for k, v in c["budget"].get("buckets", {}).items()},
            "by_model": {m: dict(v) for m, v in by.items()},
            "annotations": {f"{t}/{m}": len(annotated(t, m)) for t in TASKS for m in c["models"].values()},
            "open_batches": [{k: b[k] for k in ("batch_id", "task", "model", "n", "estimate_usd", "submitted")} for b in read_jsonl(BATCHES) if not b.get("collected")],
-           "key_in_environment": bool(os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN"))}
+           "key_source": key_source()}
     print(json.dumps(out, indent=1))
 
 
@@ -310,30 +363,30 @@ def cmd_plan(a) -> None:
 def cmd_smoke(a) -> None:
     require_paid(a); c = cfg(); client = client_or_none()
     if client is None:
-        raise SystemExit("no ANTHROPIC_API_KEY in the environment")
+        raise SystemExit("no ANTHROPIC_API_KEY in the environment or in the repository's .env")
     items = pick(a.task, "pilot", a.tier, 1)[:1]
     if not items:
         raise SystemExit("nothing to annotate")
-    guard(0.05, c)
+    guard(0.05, c, bucket_of(a.task, a.tier))
     p, sha = build(a.task, items[0], c)
     msg = client.messages.create(**p)
     row = record(a.task, items[0]["model"], items[0]["item_id"], msg, sha, None)
     cost = price(row["usage"], items[0]["model"], batch=False, c=c)
-    append_jsonl(LEDGER, {"ts": now(), "task": a.task, "model": items[0]["model"], "mode": "sync", "requests": 1, **row["usage"], "cost_usd": round(cost, 6)})
+    append_jsonl(LEDGER, {"ts": now(), "task": a.task, "bucket": bucket_of(a.task, a.tier), "model": items[0]["model"], "mode": "sync", "requests": 1, **row["usage"], "cost_usd": round(cost, 6)})
     print(json.dumps({"valid": row["valid"], "problems": row["problems"], "usage": row["usage"], "cost_usd": cost, "annotation": row["annotation"]}, indent=1))
 
 
 def cmd_submit(a) -> None:
     require_paid(a); c = cfg(); client = client_or_none()
     if client is None:
-        raise SystemExit("no ANTHROPIC_API_KEY in the environment")
+        raise SystemExit("no ANTHROPIC_API_KEY in the environment or in the repository's .env")
     from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
     from anthropic.types.messages.batch_create_params import Request
     items = pick(a.task, a.phase, a.tier, a.n)
     if not items:
         raise SystemExit("nothing to annotate: every selected item already has a valid annotation or is in an open batch")
     est = estimate(a.task, items, c, client)
-    guard(est["usd"], c)
+    guard(est["usd"], c, bucket_of(a.task, a.tier))
     for start in range(0, len(items), a.chunk):  # chunks keep each upload well under the 256 MB batch limit
         part = items[start:start + a.chunk]
         requests, ids, shas = [], {}, {}
@@ -343,7 +396,7 @@ def cmd_submit(a) -> None:
             ids[cid], shas[cid] = it["item_id"], sha
             requests.append(Request(custom_id=cid, params=MessageCreateParamsNonStreaming(**prm)))
         batch = client.messages.batches.create(requests=requests)
-        append_jsonl(BATCHES, {"batch_id": batch.id, "task": a.task, "phase": a.phase, "tier": a.tier, "model": part[0]["model"], "n": len(part),
+        append_jsonl(BATCHES, {"batch_id": batch.id, "task": a.task, "phase": a.phase, "tier": a.tier, "bucket": bucket_of(a.task, a.tier), "model": part[0]["model"], "n": len(part),
                                "estimate_usd": round(est["usd_per_request"] * len(part), 4), "submitted": now(), "items": ids, "shas": shas})
         print("submitted", batch.id, len(part), "requests, estimate", round(est["usd_per_request"] * len(part), 4), "USD", flush=True)
 
@@ -351,7 +404,7 @@ def cmd_submit(a) -> None:
 def cmd_collect(a) -> None:
     c = cfg(); client = client_or_none()
     if client is None:
-        raise SystemExit("no ANTHROPIC_API_KEY in the environment")
+        raise SystemExit("no ANTHROPIC_API_KEY in the environment or in the repository's .env")
     while True:
         rows = read_jsonl(BATCHES); waiting = 0
         for b in rows:
@@ -370,7 +423,7 @@ def cmd_collect(a) -> None:
                 row = record(b["task"], b["model"], b["items"][res.custom_id], res.result.message, b["shas"][res.custom_id], b["batch_id"])
                 totals.update(row["usage"]); outcome["valid" if row["valid"] else "invalid"] += 1
             cost = price(totals, b["model"], batch=True, c=c)
-            append_jsonl(LEDGER, {"ts": now(), "task": b["task"], "phase": b["phase"], "tier": b["tier"], "model": b["model"], "mode": "batch",
+            append_jsonl(LEDGER, {"ts": now(), "task": b["task"], "phase": b["phase"], "tier": b["tier"], "bucket": b.get("bucket"), "model": b["model"], "mode": "batch",
                                   "batch_id": b["batch_id"], "requests": b["n"], **dict(totals), "cost_usd": round(cost, 6), "outcome": dict(outcome),
                                   "estimate_usd": b["estimate_usd"]})
             b["collected"], b["outcome"], b["cost_usd"] = now(), dict(outcome), round(cost, 6)

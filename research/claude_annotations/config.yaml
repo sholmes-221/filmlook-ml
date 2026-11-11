@@ -1,12 +1,19 @@
 # Claude API research budget and models (owner brief of 2026-11-11: "Use Claude API Credits to Accelerate ML Research").
 # Offline research only: annotation, validation, evaluation. Nothing here is called from the website.
 budget:
-  total_usd: 100.0          # hard cap for the whole research line ($120 credit, $20 kept in reserve)
-  pilot_usd: 5.0            # hard cap until the pilot is recorded as reviewed (pilot_reviewed: true below)
-  pilot_reviewed: false     # set to true only after reports/claude/pilot_review.json exists (pipeline does it)
+  # Owner briefs of 2026-11-11: $120 of promotional credit, expiring 2026-12-06. No auto-reload, no charge beyond the credit.
+  total_usd: 115.0          # hard cap for the whole campaign: the credit minus the $5 contingency, which no code may spend
+  pilot_usd: 5.0            # hard cap until `review-pilot` has passed (reports/claude/pilot_review.json)
+  expires: "2026-12-06"     # no submission is accepted on or after this date; nothing new is submitted on the last day before it
+  buckets:                  # flexible allocations; a submission is refused when its bucket would be exceeded
+    film: 45.0              # film-look dataset annotation and analysis (filmset, lutsynth, lutdesc, lutscene)
+    photographer: 35.0      # photographer-style dataset annotation (bank)
+    quality: 20.0           # second-model checks, difficult examples, agreement samples (any task, tier check)
+    advanced: 15.0          # stronger-model review and exploratory experiments
 models:
   cheap: claude-haiku-5-5         # bulk annotation
   check: claude-sonnet-5-5        # difficult images and a validation sample
+  strong: claude-opus-5-5         # selective review of cases where the two cheaper models disagree
 prices_per_mtok:                  # list prices checked 2026-11-11 against the skill's cached table (2026-11-03)
   claude-haiku-5-5: {input: 0.10, output: 0.50}
   claude-sonnet-5-5: {input: 2.00, output: 10.00}

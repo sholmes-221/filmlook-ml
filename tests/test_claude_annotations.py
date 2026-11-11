@@ -51,7 +51,8 @@ def test_cost_is_priced_from_usage_with_cache_and_batch_multipliers():
     full = p["input"] * (1 + m["cache_write_5m"] + m["cache_read"]) + p["output"]
     assert P.price(usage, "claude-haiku-5-5", batch=False, c=c) == pytest.approx(full)
     assert P.price(usage, "claude-haiku-5-5", batch=True, c=c) == pytest.approx(full * m["batch"])
-    assert c["budget"]["total_usd"] <= 100 and c["budget"]["pilot_usd"] <= 5  # the owner's caps
+    assert c["budget"]["total_usd"] <= 115 and c["budget"]["pilot_usd"] <= 5  # the owner's caps: $120 credit, $5 contingency never spent
+    assert sum(c["budget"]["buckets"].values()) <= c["budget"]["total_usd"] and str(c["budget"]["expires"]) == "2026-12-06"
 
 
 def test_the_pilot_cap_applies_until_the_pilot_review_exists_and_the_total_cap_after(sandbox):
@@ -66,7 +67,19 @@ def test_the_pilot_cap_applies_until_the_pilot_review_exists_and_the_total_cap_a
     assert P.cap(c) == (c["budget"]["total_usd"], "total")
     P.guard(50, c)
     with pytest.raises(SystemExit, match="BUDGET STOP"):
-        P.guard(96, c)
+        P.guard(111, c)
+    # allocations: a bulk photographer run is charged to its own bucket and stops there, whatever the total still allows
+    assert P.bucket_of("bank", "cheap") == "photographer" and P.bucket_of("bank", "check") == "quality" and P.bucket_of("filmset", "cheap") == "film"
+    P.append_jsonl(P.LEDGER, {"cost_usd": 34.0, "model": "claude-haiku-5-5", "requests": 1, "bucket": "photographer"})
+    P.guard(0.5, c, "photographer")
+    with pytest.raises(SystemExit, match="bucket photographer"):
+        P.guard(1.5, c, "photographer")
+
+
+def test_nothing_is_submitted_from_the_day_before_the_credit_expires(sandbox, monkeypatch):
+    c = P.cfg(); c["budget"]["expires"] = "2020-01-01"
+    with pytest.raises(SystemExit, match="DEADLINE STOP"):
+        P.guard(0.01, c)
 
 
 def test_nothing_is_sent_without_both_paid_flags(sandbox):

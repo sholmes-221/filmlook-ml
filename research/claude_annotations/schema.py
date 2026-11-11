@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import numpy as np
 
-VERSION = "style-annotation-v1"
+VERSION = "style-annotation-v2"  # v2 (before any paid run): palette, tone, film-rendering and style-trait fields added
 
 SUBJECT = ["person_single", "people_group", "crowd", "street_scene", "architecture_exterior", "interior", "landscape", "rural_scene",
            "industrial", "still_life", "object_detail", "sign_or_text", "vehicle", "animal", "plant_nature", "water_or_sky",
@@ -30,6 +30,13 @@ SINGLE = {
     "focus": ["sharp_overall", "selective_focus", "soft_overall", "motion_blur"],
     "texture": ["fine", "moderate_grain", "coarse_grain", "print_surface_artifacts"],
     "moment": ["posed_still", "candid_moment", "decisive_action", "empty_stillness", "constructed_arrangement"],
+    "palette": ["monochrome_neutral", "monochrome_toned", "analogous", "complementary", "varied", "earth_tones", "pastel", "neon_or_artificial"],
+    "colour_temperature": ["cool", "neutral", "warm", "mixed", "not_applicable"],
+    "saturation": ["none", "low", "medium", "high"],
+    "shadows": ["crushed", "deep", "open", "lifted_matte"],
+    "highlights": ["clipped", "bright", "soft_rolloff", "muted"],
+    "tonal_range": ["narrow", "medium", "wide"],
+    "sharpness": ["soft", "medium", "crisp"],
     "physical_condition": ["clean", "minor_wear", "heavy_damage_or_visible_border"],
     "confidence": ["low", "medium", "high"],
 }
@@ -38,9 +45,22 @@ MULTI = {
     "composition": ["centered_subject", "off_center_subject", "symmetrical", "strong_diagonals", "frontal_flat", "layered_depth",
                     "frame_within_frame", "negative_space", "dense_all_over", "leading_lines", "horizon_dominant", "repeated_forms", "tight_crop"],
     "mood": ["formal", "austere", "tender", "melancholic", "tense", "playful", "monumental", "intimate", "detached", "lyrical", "gritty", "serene"],
+    "dominant_colours": ["black", "white", "grey", "brown", "beige_cream", "red", "orange", "yellow", "green", "teal_cyan", "blue", "purple", "pink"],
+    # How the image is rendered, as seen. These are observations about the picture, never a claim about the medium.
+    "film_rendering": ["visible_grain", "halation_or_glow", "faded_blacks", "colour_cast_in_shadows", "colour_cast_in_highlights", "soft_highlight_rolloff",
+                       "muted_palette", "saturated_palette", "cross_processed_look", "light_leak_or_flare", "vignetting", "soft_focus_rendering",
+                       "clean_digital_rendering", "oversharpened_or_hdr", "dust_or_scratches"],
+    # Ways of working that a viewer could point to in the picture. No names: a trait describes the image, not an author.
+    "style_traits": ["geometric_order", "layered_street_complexity", "quiet_everyday_detail", "high_contrast_grit", "lyrical_light", "deadpan_frontal",
+                     "social_documentary", "formal_portraiture", "pictorial_softness", "topographic_distance", "snapshot_spontaneity", "colour_as_subject",
+                     "shadow_play", "reflections_and_glass", "humanist_moment", "minimal_isolation", "typological_record", "staged_tableau"],
+    "motifs": ["window", "doorway", "sign_or_lettering", "shadow_figure", "reflection", "child", "worker", "machinery", "storefront", "road", "field",
+               "tree", "water", "animal", "vehicle", "direct_gaze", "hands", "crowd", "architectural_detail", "table_or_interior_objects", "fence",
+               "bridge", "staircase", "sky_and_clouds", "mountain", "flowers", "umbrella", "bicycle", "boat", "laundry_or_fabric"],
 }
 # The eight narrative axes of the website's Photographer DNA (seed_data/axes.json), which pixels cannot measure.
-ORDINAL = ["human_presence", "documentary_character", "abstraction", "humour", "melancholy", "intimacy", "urban_setting", "stillness"]
+ORDINAL = ["human_presence", "documentary_character", "abstraction", "humour", "melancholy", "intimacy", "urban_setting", "stillness",
+           "film_like_impression"]  # the last one: how much the rendering looks like a scan of film ("0" clearly digital, "4" clearly film)
 LEVELS = ["0", "1", "2", "3", "4"]
 # Fields that describe the scan or print rather than the photograph; kept, but excluded from the style vector.
 ARTEFACT_FIELDS = ("physical_condition", "confidence")
@@ -96,7 +116,8 @@ For each photograph, return one JSON object in the required schema ({VERSION}). 
 2. Choose exactly one value for each single-choice field. Use "unclear" or the closest value when unsure, and set
    "confidence" to "low" when several fields were hard to decide.
 3. List fields: "subjects_secondary" at most 3 values (do not repeat the primary subject), "composition" at most 4,
-   "mood" at most 3. An empty list is allowed.
+   "mood" at most 3, "dominant_colours" at most 3 (largest areas first), "film_rendering" every item that is
+   clearly visible, "style_traits" at most 3, "motifs" at most 5. An empty list is allowed.
 4. The eight narrative fields are levels "0" (absent) to "4" (dominant):
    human_presence: how much people and their traces carry the picture.
    documentary_character: observed record of the world ("4") versus staged or constructed image ("0").
@@ -109,7 +130,13 @@ For each photograph, return one JSON object in the required schema ({VERSION}). 
 5. "tonal_treatment" describes the image as presented: a sepia or albumen print is "warm_toned_bw".
 6. "physical_condition" describes the scan or print (scratches, stains, a visible film border or mount), not the
    photograph's style. It is recorded so that archive artefacts can be separated from style.
-7. "widely_reproduced" is true only if this exact picture looks like a very frequently reproduced photograph.
+7. "film_rendering" and "film_like_impression" describe how the picture looks, not how it was made: say what is
+   visible (grain, glow around highlights, faded blacks, a colour cast, clean digital rendering) and give your
+   impression on the "0" to "4" scale. Do not name a film stock, a camera or a preset.
+   "style_traits" are ways of working visible in this picture; they are descriptions, never an author's name.
+   "palette", "colour_temperature" and "saturation" describe the colours as presented; for a neutral black-and-white
+   image use "monochrome_neutral", "not_applicable" and "none".
+7b. "widely_reproduced" is true only if this exact picture looks like a very frequently reproduced photograph.
 8. "framing" is the distance to the main subject; "vantage" the camera position; "depth" the spatial structure;
    "moment" the kind of instant (a posed sitting, a candid moment, an action at its peak, an empty quiet scene, an
    arrangement made for the camera).
