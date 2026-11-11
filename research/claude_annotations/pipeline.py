@@ -439,7 +439,8 @@ def cmd_collect(a) -> None:
 def cmd_review_pilot(a) -> None:
     """Pilot gate: cost per image as measured, validity, and field distributions. Writing the report lifts the pilot cap."""
     c = cfg(); cheap = c["models"]["cheap"]
-    rows = read_jsonl(store_path(a.task, cheap)); led = [r for r in read_jsonl(LEDGER) if r["model"] == cheap]
+    tasks = [t for t in ("bank", "filmset") if store_path(t, cheap).exists()] or [a.task]  # the pilot covers both annotation sets
+    rows = [r for t in tasks for r in read_jsonl(store_path(t, cheap))]; led = [r for r in read_jsonl(LEDGER) if r["model"] == cheap]
     if len(rows) < 50:
         raise SystemExit(f"only {len(rows)} annotations: the pilot has not run")
     valid = [r for r in rows if r["valid"]]
@@ -449,7 +450,8 @@ def cmd_review_pilot(a) -> None:
               "cost_usd": round(cost, 4), "usd_per_image": round(cost / max(1, n_req), 6),
               "tokens": {k: sum(r.get(k, 0) for r in led) for k in ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens", "output_tokens")},
               "widely_reproduced_share": sum(r["annotation"]["widely_reproduced"] for r in valid) / max(1, len(valid)), "distributions": dist}
-    total_items = len(TASKS[a.task]["items"]())
+    total_items = sum(len(TASKS[t]["items"]()) for t in tasks)
+    report["tasks"] = tasks
     report["projected_full_run_usd"] = round(report["usd_per_image"] * total_items, 2)
     ok = report["valid"] / max(1, len(rows)) >= 0.95 and report["projected_full_run_usd"] < c["budget"]["total_usd"] * 0.5
     report["gate"] = {"valid_share_min": 0.95, "projected_cost_max_usd": c["budget"]["total_usd"] * 0.5, "passed": bool(ok)}
