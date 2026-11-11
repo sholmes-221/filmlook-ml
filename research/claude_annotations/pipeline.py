@@ -182,7 +182,9 @@ def annotated(task: str, model: str) -> dict[str, dict]:
 def pick(task: str, phase: str, tier: str, n: int | None, seed: int = 0) -> list[dict]:
     c = cfg(); items = TASKS[task]["items"]()
     cheap, check = c["models"]["cheap"], c["models"]["check"]
-    if tier == "check":
+    if tier == "check_all":  # the check model on every item of the task (used for filmset after Sonnet measured 0.966 vs Haiku 0.878)
+        chosen, model = list(items), check
+    elif tier == "check":
         # Sonnet sees: every item Haiku could not annotate validly or marked low confidence, plus a fixed random
         # sample (for agreement). It never sees an item it already annotated.
         done = annotated(task, cheap)
@@ -264,7 +266,7 @@ BUCKET_OF_TASK = {"bank": "photographer", "filmset": "film", "lutdesc": "film", 
 def bucket_of(task: str, tier: str) -> str:
     """Which allocation a request is charged to: the task's own for bulk annotation, `quality` for second-model
     checks, `advanced` for the strong model."""
-    return {"check": "quality", "strong": "advanced"}.get(tier, BUCKET_OF_TASK.get(task, "advanced"))
+    return {"check": "quality", "strong": "advanced"}.get(tier, BUCKET_OF_TASK.get(task, "advanced"))  # check_all is charged to the task's own bucket
 
 
 def bucket_spent(bucket: str) -> float:
@@ -469,7 +471,7 @@ def main() -> None:
     for name in ("status", "plan", "smoke", "submit", "collect", "review-pilot"):
         p = sub.add_parser(name)
         p.add_argument("--task", default="bank", choices=sorted(TASKS)); p.add_argument("--phase", default="pilot", choices=("pilot", "full"))
-        p.add_argument("--tier", default="cheap", choices=("cheap", "check")); p.add_argument("--n", type=int, default=None)
+        p.add_argument("--tier", default="cheap", choices=("cheap", "check", "check_all")); p.add_argument("--n", type=int, default=None)
         p.add_argument("--chunk", type=int, default=1000); p.add_argument("--wait", action="store_true")
         p.add_argument("--no-dry-run", action="store_true"); p.add_argument("--confirm-paid", action="store_true")
     a = ap.parse_args()
