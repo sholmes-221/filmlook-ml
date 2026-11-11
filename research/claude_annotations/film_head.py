@@ -64,13 +64,14 @@ def main() -> None:
     ap = argparse.ArgumentParser(); ap.add_argument("--epochs", type=int, default=60); ap.add_argument("--seeds", type=int, default=3); ap.add_argument("--hidden", type=int, default=128)
     ap.add_argument("--no-aux", action="store_true", help="ablation: the same head and data without the annotation targets (medium only)")
     ap.add_argument("--tag", default="")
-    a = ap.parse_args(); cheap = P.cfg()["models"]["cheap"]
+    ap.add_argument("--targets", default="cheap", choices=("cheap", "check"), help="whose annotations are the auxiliary targets")
+    a = ap.parse_args(); cheap = P.cfg()["models"][a.targets]
     rs = film_rows(); F = np.nan_to_num(np.load(FILM_SET / "features.npy").astype(np.float32)); X = np.load(FILM_EMB)["X"].astype(np.float32)
     ann = P.annotated("filmset", cheap); ids = [f"filmset:{r['dataset']}:{Path(r['path']).name}" for r in rs]
     A = np.stack([S.vectorise(ann[i]["annotation"]) for i in ids])[:, AUX]
     y = np.array([r["label"] for r in rs], np.float32); g = np.array([r["uploader"] for r in rs]); tr = np.array([r["split"] == "train" for r in rs])
     # bank rows: auxiliary targets only (medium unknown). Their 36 statistics must be computed with the same function.
-    bank = P.annotated("bank", cheap); bank_ids = sorted(bank)
+    bank = P.annotated("bank", P.cfg()["models"]["cheap"]); bank_ids = sorted(bank)
     bE = np.load(ROOT / "data/embeddings/photographers/prod.npz"); pos = {w: i for i, w in enumerate(bE["work_ids"].tolist())}
     bank_feats = ROOT / "data/embeddings/photographers/film36.npz"
     if not bank_feats.exists():

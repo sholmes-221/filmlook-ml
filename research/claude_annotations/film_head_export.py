@@ -77,12 +77,17 @@ def numpy_forward(art, f36, emb):
 
 
 def main() -> None:
-    cheap = P.cfg()["models"]["cheap"]; rs = film_rows()
+    import argparse
+    ap = argparse.ArgumentParser(); ap.add_argument("--targets", default="cheap", choices=("cheap", "check")); ap.add_argument("--tag", default="")
+    args = ap.parse_args()
+    cheap = P.cfg()["models"][args.targets]; rs = film_rows()
     F = np.nan_to_num(np.load(FILM_SET / "features.npy").astype(np.float32)); X = np.load(FILM_EMB)["X"].astype(np.float32)
-    ann = P.annotated("filmset", cheap); ids = [f"filmset:{r['dataset']}:{Path(r['path']).name}" for r in rs]
+    ann = P.annotated("filmset", cheap)
+    bank_model = P.cfg()["models"]["cheap"]  # the bank has only Haiku annotations
+    ids = [f"filmset:{r['dataset']}:{Path(r['path']).name}" for r in rs]
     A = np.stack([S.vectorise(ann[i]["annotation"]) for i in ids])[:, AUX].astype(np.float32)
     y = np.array([r["label"] for r in rs], np.float32); g = np.array([r["uploader"] for r in rs]); tr = np.array([r["split"] == "train" for r in rs])
-    bank = P.annotated("bank", cheap); bank_ids = sorted(bank)
+    bank = P.annotated("bank", bank_model); bank_ids = sorted(bank)
     bE = np.load(ROOT / "data/embeddings/photographers/prod.npz"); pos = {w: i for i, w in enumerate(bE["work_ids"].tolist())}
     bf = np.load(ROOT / "data/embeddings/photographers/film36.npz"); bpos = {w: i for i, w in enumerate(bf["work_ids"].tolist())}
     FB = np.nan_to_num(bf["F"][[bpos[w] for w in bank_ids]]); XB = bE["X"][[pos[w] for w in bank_ids]].astype(np.float32)
@@ -139,8 +144,10 @@ def main() -> None:
     diff = max(abs(numpy_forward(art_np, F[i], X[i]) - float(logits(models, Z[i:i + 1])[0])) for i in te[:50])
     report["numpy_parity_max_abs_diff"] = round(float(diff), 6)
     t = time.perf_counter(); [numpy_forward(art_np, F[i], X[i]) for i in te[:50]]; report["numpy_forward_ms"] = round((time.perf_counter() - t) / 50 * 1000, 2)
-    DIST.mkdir(parents=True, exist_ok=True); (DIST / "film_head_v1.json").write_text(json.dumps(art))
-    OUT.write_text(json.dumps(report, indent=1)); print(json.dumps(report, indent=1))
+    report["targets"] = args.targets; art["training"]["auxiliary_targets"] = f"{cheap} style-annotation-v2 rendering fields (filmset) + claude-haiku-5-5 (bank); not labels of the medium"
+    if args.tag: art["version"] = art["version"].replace("-v1", f"-{args.tag}")
+    DIST.mkdir(parents=True, exist_ok=True); (DIST / f"film_head_{args.tag or 'v1'}.json").write_text(json.dumps(art))
+    out = OUT.with_name(OUT.stem + (("_" + args.tag) if args.tag else "") + ".json"); out.write_text(json.dumps(report, indent=1)); print(json.dumps(report, indent=1))
 
 
 if __name__ == "__main__":
