@@ -19,10 +19,9 @@ from filmlook_ml.refdb import rights
 from filmlook_ml.refdb.manifest import now
 from filmlook_ml.refdb.roster import Entry
 
-# Wikimedia's User-Agent policy asks automated clients for contact information; the public project repository is
-# given (never a personal e-mail address).
-UA = {"User-Agent": "FilmLook-ML-research/0.2 (https://github.com/sholmes-221/filmlook-ml; reference dataset, one request at a time) python-requests",
-      "AIC-User-Agent": "filmlook-ml (research; dataset discovery)"}
+# A descriptive, generic client name: no personal or project-identifying details are sent to outside services.
+UA = {"User-Agent": "photo-reference-research/0.3 (public-domain reference dataset; metadata and scaled renditions; one request at a time) python-requests",
+      "AIC-User-Agent": "photo-reference-research (dataset discovery)"}
 COMMONS = "https://commons.wikimedia.org/w/api.php"
 AIC = "https://api.artic.edu/api/v1/artworks/search"
 

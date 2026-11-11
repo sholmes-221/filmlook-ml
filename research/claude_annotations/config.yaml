@@ -1,0 +1,24 @@
+# Claude API research budget and models (owner brief of 2026-11-11: "Use Claude API Credits to Accelerate ML Research").
+# Offline research only: annotation, validation, evaluation. Nothing here is called from the website.
+budget:
+  total_usd: 100.0          # hard cap for the whole research line ($120 credit, $20 kept in reserve)
+  pilot_usd: 5.0            # hard cap until the pilot is recorded as reviewed (pilot_reviewed: true below)
+  pilot_reviewed: false     # set to true only after reports/claude/pilot_review.json exists (pipeline does it)
+models:
+  cheap: claude-haiku-5-5         # bulk annotation
+  check: claude-sonnet-5-5        # difficult images and a validation sample
+prices_per_mtok:                  # list prices checked 2026-11-11 against the skill's cached table (2026-11-03)
+  claude-haiku-5-5: {input: 0.10, output: 0.50}
+  claude-sonnet-5-5: {input: 2.00, output: 10.00}
+  claude-opus-5-5: {input: 4.00, output: 20.00}
+multipliers: {batch: 0.5, cache_write_5m: 1.25, cache_read: 0.1}
+image: {long_edge: 768, jpeg_quality: 85}
+effort: low
+max_tokens: 3000
+est_output_tokens: 700            # planning estimate only; the ledger records what the API reports
+authorization:
+  basis: >-
+    Owner brief 2026-11-11 (structured style annotations of legally usable datasets, evaluation, model improvement);
+    configs/labeling.yaml training_authorization.status user_confirmed (2026-11-07, no written reference on file).
+  images: public domain or CC0 per file (refdb manifest rights_status = eligible); synthetic LUT renders of CC-BY scenes
+  never_sent: user uploads, photographs by in-copyright photographers, file names, titles, photographer names
