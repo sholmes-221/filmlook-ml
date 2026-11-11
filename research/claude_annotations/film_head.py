@@ -65,6 +65,7 @@ def main() -> None:
     ap.add_argument("--no-aux", action="store_true", help="ablation: the same head and data without the annotation targets (medium only)")
     ap.add_argument("--tag", default="")
     ap.add_argument("--targets", default="cheap", choices=("cheap", "check"), help="whose annotations are the auxiliary targets")
+    ap.add_argument("--crop", action="store_true", help="add the native-resolution crop embedding (crop_embed.py) as a third input")
     a = ap.parse_args(); cheap = P.cfg()["models"][a.targets]
     rs = film_rows(); F = np.nan_to_num(np.load(FILM_SET / "features.npy").astype(np.float32)); X = np.load(FILM_EMB)["X"].astype(np.float32)
     ann = P.annotated("filmset", cheap); ids = [f"filmset:{r['dataset']}:{Path(r['path']).name}" for r in rs]
@@ -87,6 +88,10 @@ def main() -> None:
     FB = np.nan_to_num(bf["F"][[bpos[w] for w in bank_ids]]); XB = bE["X"][[pos[w] for w in bank_ids]].astype(np.float32)
     AB = np.stack([S.vectorise(bank[w]["annotation"]) for w in bank_ids])[:, AUX]
     mu, sd = F[tr].mean(0), F[tr].std(0) + 1e-6
+    if a.crop:
+        C = np.load(ROOT / "data/embeddings/photographers/filmset_crop_prod.npz"); assert C["paths"].tolist() == [r["path"] for r in rs]
+        CB = np.load(ROOT / "data/embeddings/photographers/bank_crop_prod.npz"); cpos = {w: i for i, w in enumerate(CB["work_ids"].tolist())}
+        X = np.hstack([X, C["X"].astype(np.float32)]); XB = np.hstack([XB, CB["X"][[cpos[w] for w in bank_ids]].astype(np.float32)])
     Z = np.hstack([(F - mu) / sd, X]).astype(np.float32); ZB = np.hstack([(FB - mu) / sd, XB]).astype(np.float32)
     base = LogisticRegression(C=0.3, class_weight="balanced", max_iter=5000).fit((F[tr] - mu) / sd, y[tr]).decision_function((F[~tr] - mu) / sd)
     dev = "cuda" if torch.cuda.is_available() else "cpu"
@@ -119,7 +124,7 @@ def main() -> None:
     # also the two combined by logistic regression on the training rows' out-of-sample behaviour is not available; report a simple average of ranks
     from scipy.stats import rankdata
     comb = rankdata(base) + rankdata(s); report["measured36+film_head_rank_average"] = auroc_ci(y[~tr], comb, g[~tr], base)
-    report["aux_targets"] = not a.no_aux
+    report["aux_targets"] = not a.no_aux; report["crop_input"] = a.crop
     out = OUT.with_name(OUT.stem + (a.tag or ("_noaux" if a.no_aux else "")) + ".json")
     out.write_text(json.dumps(report, indent=1)); print(json.dumps(report, indent=1))
 
