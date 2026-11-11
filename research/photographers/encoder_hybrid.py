@@ -48,25 +48,28 @@ def prepare(seed: int, encoders: list[str]) -> dict:
     return dict(y=y, s=s, b=b, v=v, t=t, groups=groups, n_class=len(classes), sims=sims)
 
 
-def variants(encoders: list[str]) -> dict:
+def variants(encoders: list[str], w_grid=W_GRID, only: list[str] | None = None) -> dict:
     """name -> (parts, list of weight vectors, index of the tuned weight vector closest to the shipped choice)."""
     out = {"retuned_ref": (["prod", "axes17", "film205"], [(1.0, m, m) for m in M_GRID], 1)}
     for e in encoders:
         out[f"swap_{e}"] = ([e, "axes17", "film205"], [(1.0, m, m) for m in M_GRID], 1)
-        out[f"add_{e}"] = (["prod", e, "axes17", "film205"], [(1.0, w, 0.5, 0.5) for w in W_GRID], 0)
-    return out
+        out[f"add_{e}"] = (["prod", e, "axes17", "film205"], [(1.0, w, 0.5, 0.5) for w in w_grid], 0)
+    return {k: v for k, v in out.items() if only is None or k in only}
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--encoders", nargs="+", default=["clip_b32", "siglip_base", "dinov2_base"])
     ap.add_argument("--out", default="reports/photographers/encoder_hybrid.json")
+    ap.add_argument("--seeds", nargs="+", type=int, default=[0, 1])
+    ap.add_argument("--w-grid", nargs="+", type=float, default=list(W_GRID))
+    ap.add_argument("--variants", nargs="+", default=None, help="keep only these variant names")
     a = ap.parse_args()
-    V = variants(a.encoders)
+    V = variants(a.encoders, tuple(a.w_grid), a.variants); seeds = tuple(a.seeds)
     rep: dict = {"encoders": a.encoders, "reference": {"parts": ["prod", "axes17", "film205"], "weights": REF_W},
-                 "grids": {"m": M_GRID, "w": W_GRID}, "per_seed": {}}
+                 "grids": {"m": M_GRID, "w": tuple(a.w_grid)}, "seeds": seeds, "per_seed": {}}
     per_query: dict = {}
-    for seed in (0, 1):
+    for seed in seeds:
         D = prepare(seed, a.encoders); y, s, b, v, t, nc, S = D["y"], D["s"], D["b"], D["v"], D["t"], D["n_class"], D["sims"]
         R = {"n": {"bank": len(b), "val": len(v), "test": len(t), "classes": nc}, "val": {}, "test": {}}
         ref_val = run_match([S[p] for p in ("prod", "axes17", "film205")], REF_W, y, s, v, b, nc, True)["top1"].mean()
@@ -92,18 +95,18 @@ def main() -> None:
                                           "diff_vs_ref": {k: {"diff": round(float((r[k] - ref[k]).mean()), 4), "ci95": paired_ci(r[k] - ref[k], D["groups"][t])} for k in METRICS}}
         rep["per_seed"][str(seed)] = R; per_query[seed] = pq
     # primary candidate (pre-registered): highest mean VAL cross top-1 over seeds, control excluded
-    val_mean = {n: float(np.mean([rep["per_seed"][str(sd)]["val"][n]["cross_top1"] for sd in (0, 1)])) for n in V}
+    val_mean = {n: float(np.mean([rep["per_seed"][str(sd)]["val"][n]["cross_top1"] for sd in seeds])) for n in V}
     rep["val_mean_cross_top1"] = val_mean
     rep["primary_candidate"] = max((n for n in V if n != "retuned_ref"), key=lambda n: val_mean[n])
     pooled: dict = {}
     for proto in ("full", "cross"):
-        g = np.concatenate([np.array(per_query[sd]["groups"]) for sd in (0, 1)])
-        pooled[proto] = {"reference": {k: round(float(np.concatenate([per_query[sd][f"{proto}:reference"][k] for sd in (0, 1)]).mean()), 4) for k in METRICS}}
+        g = np.concatenate([np.array(per_query[sd]["groups"]) for sd in seeds])
+        pooled[proto] = {"reference": {k: round(float(np.concatenate([per_query[sd][f"{proto}:reference"][k] for sd in seeds]).mean()), 4) for k in METRICS}}
         for name in V:
             row = {}
             for k in METRICS:
-                x = np.concatenate([per_query[sd][f"{proto}:{name}"][k] for sd in (0, 1)])
-                d = x - np.concatenate([per_query[sd][f"{proto}:reference"][k] for sd in (0, 1)])
+                x = np.concatenate([per_query[sd][f"{proto}:{name}"][k] for sd in seeds])
+                d = x - np.concatenate([per_query[sd][f"{proto}:reference"][k] for sd in seeds])
                 row[k] = round(float(x.mean()), 4)
                 row[f"d_{k}"] = {"diff": round(float(d.mean()), 4), "ci95": paired_ci(d, g)}
             pooled[proto][name] = row
